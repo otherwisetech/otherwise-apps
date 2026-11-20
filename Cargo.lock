@@ -4648,7 +4648,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "gpui",
@@ -4663,7 +4663,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "flate2",
  "otherwise-apps-i18n",
@@ -4679,7 +4679,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "parking"

@@ -267,6 +267,7 @@ fn digest_mismatch_is_refused() {
 }
 
 #[test]
+#[cfg(not(windows))]
 fn linux_install_writes_menu_entry() {
     let env = Env::new();
     let e = rama();
