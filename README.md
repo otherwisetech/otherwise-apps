@@ -85,7 +85,8 @@ since they have no Info.plist to read the version from. **Uninstall** moves the 
 entry) to the Trash after confirmation and tells you where its data still is.
 
 Network use: the catalog, GitHub's public release API (anonymous, 60 requests per hour) and the
-release files themselves. No telemetry.
+release files themselves, plus this repository's star count (`api.github.com/repos/otherwisetech/otherwise-apps`,
+once a day, shown next to *Star on GitHub*; off when automatic checks are off). No telemetry.
 
 ## Install
 

@@ -7,6 +7,7 @@ mod dialogs;
 mod jobs;
 mod notify;
 mod settings;
+mod star;
 mod theme;
 mod ui;
 mod util;
