@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedAt": "2026-11-20T00:00:00Z",
+  "generatedAt": "2026-11-20T16:44:31.683Z",
   "apps": [
     {
       "id": "genealogy",
@@ -51,6 +51,7 @@
         "tag": "v0.3.0",
         "publishedAt": "2026-11-19T23:26:06Z",
         "url": "https://github.com/otherwisetech/genealogy-rs/releases/tag/v0.3.0",
+        "notes": "## What's Changed\n* Open .ged files from Finder / Open With (file association) by @jcguarinpenaranda in https://github.com/otherwisetech/genealogy-rs/pull/5\n* Release v0.3.0 by @jcguarinpenaranda in https://github.com/otherwisetech/genealogy-rs/pull/6\n\n\n**Full Changelog**: https://github.com/otherwisetech/genealogy-rs/compare/v0.2.0...v0.3.0",
         "assets": [
           {
             "name": "genealogy-rs-linux-x86_64.tar.gz",
@@ -122,6 +123,7 @@
         "tag": "v0.3.0",
         "publishedAt": "2026-11-19T23:35:17Z",
         "url": "https://github.com/otherwisetech/diskmap-rs/releases/tag/v0.3.0",
+        "notes": "## What's Changed\n* Analyze a folder from Finder's right-click menu by @jcguarinpenaranda in https://github.com/otherwisetech/diskmap-rs/pull/8\n* Release v0.3.0 by @jcguarinpenaranda in https://github.com/otherwisetech/diskmap-rs/pull/9\n\n\n**Full Changelog**: https://github.com/otherwisetech/diskmap-rs/compare/v0.2.0...v0.3.0",
         "assets": [
           {
             "name": "diskmap-linux-x86_64.tar.gz",
@@ -193,6 +195,7 @@
         "tag": "v0.1.0",
         "publishedAt": "2026-11-19T22:37:42Z",
         "url": "https://github.com/otherwisetech/rama-rs/releases/tag/v0.1.0",
+        "notes": "**Full Changelog**: https://github.com/otherwisetech/rama-rs/commits/v0.1.0",
         "assets": [
           {
             "name": "rama-linux-x86_64.tar.gz",
@@ -264,6 +267,7 @@
         "tag": "v0.1.0",
         "publishedAt": "2026-11-19T23:30:30Z",
         "url": "https://github.com/otherwisetech/mosaico-rs/releases/tag/v0.1.0",
+        "notes": "**Full Changelog**: https://github.com/otherwisetech/mosaico-rs/commits/v0.1.0",
         "assets": [
           {
             "name": "mosaico-linux-x86_64.tar.gz",
