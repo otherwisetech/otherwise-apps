@@ -210,6 +210,7 @@ impl Launcher {
         this.set_catalog(manifest);
         this.refresh(true, cx);
         this.schedule_checks(cx);
+        crate::star::refresh(this.settings.check_hours() != 0, cx);
         this
     }
 
@@ -682,6 +683,7 @@ impl Launcher {
 
     pub fn set_check_hours(&mut self, h: u64, cx: &mut Context<Self>) {
         self.settings = Settings::update(|s| s.check_hours = Some(h.to_string()));
+        crate::star::refresh(h != 0, cx);
         cx.notify();
     }
 
@@ -908,6 +910,7 @@ impl Launcher {
                     })
                     .child(div().truncate().child(left)),
             )
+            .child(crate::star::footer_link(t, cx))
             .child(
                 div()
                     .id("footer-about")

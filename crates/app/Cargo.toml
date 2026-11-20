@@ -15,6 +15,9 @@ path = "src/main.rs"
 i18n.workspace = true
 otherwise-core.workspace = true
 anyhow.workspace = true
+# GitHub star count (one GET a day)
+ureq = { version = "3", default-features = false, features = ["rustls"] }
+serde_json.workspace = true
 gpui.workspace = true
 gpui_platform.workspace = true
 gpui-component.workspace = true

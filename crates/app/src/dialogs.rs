@@ -163,7 +163,15 @@ impl Launcher {
             .child(div().w_full().h(px(1.)).my(px(4.)).bg(t.border))
             .child(div().flex().flex_col().items_center().gap(px(2.)).child(div().text_size(px(13.)).child(i18n::t!("app.about.by", company = crate::COMPANY))).child(div().text_size(px(12.)).text_color(t.ink_muted).child(i18n::t!("app.about.place"))))
             .child(ui::filled_button(t, "about-site", t.accent).mt(px(4.)).child(i18n::t!("app.about.visit")).on_click(|_, _, cx| cx.open_url(crate::COMPANY_URL)))
-            .child(div().id("about-source").text_size(px(12.)).text_color(accent).cursor_pointer().hover(|s| s.underline()).child(i18n::t!("app.about.source")).on_click(|_, _, cx| cx.open_url(crate::REPO_URL)))
+            .child(
+                div()
+                    .flex()
+                    .items_center()
+                    .gap(px(14.))
+                    .child(div().id("about-source").text_size(px(12.)).text_color(accent).cursor_pointer().hover(|s| s.underline()).child(i18n::t!("app.about.source")).on_click(|_, _, cx| cx.open_url(crate::REPO_URL)))
+                    .child(crate::star::about_button(t, cx)),
+            )
+            .child(crate::star::about_ask(t))
             .child(div().text_size(px(11.)).text_color(t.ink_muted).child(i18n::t!("app.about.license")))
     }
 }

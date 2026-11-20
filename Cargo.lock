@@ -4658,6 +4658,8 @@ dependencies = [
  "objc",
  "otherwise-apps-core",
  "otherwise-apps-i18n",
+ "serde_json",
+ "ureq",
  "winresource",
 ]
 
