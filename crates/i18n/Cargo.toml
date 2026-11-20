@@ -1,0 +1,11 @@
+[package]
+name = "otherwise-apps-i18n"
+description = "Tiny embedded translation catalog for Otherwise Apps"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "i18n"

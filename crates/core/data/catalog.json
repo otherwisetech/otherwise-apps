@@ -1,0 +1,337 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-11-20T00:00:00Z",
+  "apps": [
+    {
+      "id": "genealogy",
+      "name": "genealogy-rs",
+      "repo": "otherwisetech/genealogy-rs",
+      "tagline": {
+        "en": "Your family tree, fast and private.",
+        "es": "Tu árbol genealógico, rápido y privado.",
+        "fr": "Votre arbre généalogique, rapide et privé.",
+        "pt": "Sua árvore genealógica, rápida e privada."
+      },
+      "description": {
+        "en": "genealogy-rs is a fast desktop app to explore and edit GEDCOM family trees. Open the .ged export from your genealogy site or program and walk through the generations on a pan-and-zoom canvas, a fan chart or a map, then edit people and save without losing anything the file already had.",
+        "es": "genealogy-rs es una app de escritorio rápida para explorar y editar árboles genealógicos GEDCOM. Abre el .ged que exportaste de tu sitio o programa de genealogía y recorre las generaciones en un lienzo con zoom, un abanico o un mapa; luego edita personas y guarda sin perder nada de lo que el archivo ya tenía.",
+        "fr": "genealogy-rs est une app de bureau rapide pour explorer et modifier des arbres généalogiques GEDCOM. Ouvrez le .ged exporté depuis votre site ou logiciel de généalogie et parcourez les générations sur un canevas zoomable, un éventail ou une carte, puis modifiez les personnes et enregistrez sans rien perdre de ce que le fichier contenait.",
+        "pt": "genealogy-rs é um app de desktop rápido para explorar e editar árvores genealógicas GEDCOM. Abra o .ged exportado do seu site ou programa de genealogia e percorra as gerações numa tela com zoom, num leque ou num mapa; depois edite pessoas e salve sem perder nada do que o arquivo já tinha."
+      },
+      "icon": "https://otherwisetech.com/apps/genealogy-rs.png",
+      "homepage": "https://otherwisetech.com/apps/genealogy-rs",
+      "bundleId": "io.github.otherwisetech.genealogy-rs",
+      "installName": "genealogy-rs",
+      "platforms": {
+        "macos": [
+          {
+            "pattern": "genealogy-rs-macos-universal.zip",
+            "arch": "universal"
+          }
+        ],
+        "windows": [
+          {
+            "pattern": "genealogy-rs-windows-x86_64.zip",
+            "arch": "x86_64"
+          }
+        ],
+        "linux": [
+          {
+            "pattern": "genealogy-rs-linux-x86_64.tar.gz",
+            "arch": "x86_64"
+          }
+        ]
+      },
+      "minimumOs": {
+        "macos": "11.0",
+        "windows": "10"
+      },
+      "license": "MIT OR Apache-2.0",
+      "release": {
+        "tag": "v0.3.0",
+        "publishedAt": "2026-11-19T23:26:06Z",
+        "url": "https://github.com/otherwisetech/genealogy-rs/releases/tag/v0.3.0",
+        "assets": [
+          {
+            "name": "genealogy-rs-linux-x86_64.tar.gz",
+            "size": 19719258,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.3.0/genealogy-rs-linux-x86_64.tar.gz",
+            "digest": "sha256:9b52c0f3b45a42b4693bec0a7935f1e75d2f0676472553db16a72313258e8681"
+          },
+          {
+            "name": "genealogy-rs-macos-universal.zip",
+            "size": 21760547,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.3.0/genealogy-rs-macos-universal.zip",
+            "digest": "sha256:775f57ec3b986936b85459be722d8cfbd0501b7f40d5c5220a2387ac8c4c1bbe"
+          },
+          {
+            "name": "genealogy-rs-windows-x86_64.zip",
+            "size": 11329154,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.3.0/genealogy-rs-windows-x86_64.zip",
+            "digest": "sha256:3cb1b63b0e8d11b50d807d91526a73c5a36406fe7bee5891ebf903b431e187c1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "diskmap",
+      "name": "diskmap",
+      "repo": "otherwisetech/diskmap-rs",
+      "tagline": {
+        "en": "See what fills your disk.",
+        "es": "Mira qué está llenando tu disco.",
+        "fr": "Voyez ce qui remplit votre disque.",
+        "pt": "Veja o que está enchendo o seu disco."
+      },
+      "description": {
+        "en": "diskmap scans a folder in parallel and draws it as a nested treemap: every rectangle is as big as the space it takes on disk, coloured by kind — video, images, archives, code and more. Walk into folders, find the biggest files, reveal them in the file manager or move them to the Trash.",
+        "es": "diskmap escanea una carpeta en paralelo y la dibuja como un mapa de rectángulos anidados: cada uno es tan grande como lo que ocupa en disco, con colores por tipo — video, imágenes, comprimidos, código y más. Entra en las carpetas, encuentra los archivos más grandes, muéstralos en el explorador de archivos o mándalos a la papelera.",
+        "fr": "diskmap analyse un dossier en parallèle et le dessine sous forme de rectangles imbriqués : chacun est aussi grand que la place qu'il occupe sur le disque, coloré selon son type — vidéo, images, archives, code et plus. Entrez dans les dossiers, trouvez les plus gros fichiers, affichez-les dans le gestionnaire de fichiers ou mettez-les à la corbeille.",
+        "pt": "diskmap examina uma pasta em paralelo e a desenha como um mapa de retângulos aninhados: cada um é tão grande quanto o espaço que ocupa no disco, com cores por tipo — vídeo, imagens, arquivos compactados, código e mais. Entre nas pastas, encontre os maiores arquivos, mostre-os no gerenciador de arquivos ou mande-os para a lixeira."
+      },
+      "icon": "https://otherwisetech.com/apps/diskmap.png",
+      "homepage": "https://otherwisetech.com/apps/diskmap",
+      "bundleId": "io.github.otherwisetech.diskmap",
+      "installName": "diskmap",
+      "platforms": {
+        "macos": [
+          {
+            "pattern": "diskmap-macos-universal.zip",
+            "arch": "universal"
+          }
+        ],
+        "windows": [
+          {
+            "pattern": "diskmap-windows-x86_64.zip",
+            "arch": "x86_64"
+          }
+        ],
+        "linux": [
+          {
+            "pattern": "diskmap-linux-x86_64.tar.gz",
+            "arch": "x86_64"
+          }
+        ]
+      },
+      "minimumOs": {
+        "macos": "11.0",
+        "windows": "10"
+      },
+      "license": "MIT OR Apache-2.0",
+      "release": {
+        "tag": "v0.3.0",
+        "publishedAt": "2026-11-19T23:35:17Z",
+        "url": "https://github.com/otherwisetech/diskmap-rs/releases/tag/v0.3.0",
+        "assets": [
+          {
+            "name": "diskmap-linux-x86_64.tar.gz",
+            "size": 17541300,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.3.0/diskmap-linux-x86_64.tar.gz",
+            "digest": "sha256:1eba19d0c7cc6b38cbb639eb5933e5d4474e5e8f908c8b526487994fbce24765"
+          },
+          {
+            "name": "diskmap-macos-universal.zip",
+            "size": 16835301,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.3.0/diskmap-macos-universal.zip",
+            "digest": "sha256:a2aa3f507ea294ee1787aa3c8803716ce8c45555b109aae0f844e4477c16b7d5"
+          },
+          {
+            "name": "diskmap-windows-x86_64.zip",
+            "size": 9242227,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.3.0/diskmap-windows-x86_64.zip",
+            "digest": "sha256:7e2d35a584f924b25ff56c65581e3e50058fa208cf3bab07ab3b1bd5dd37aa5b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rama",
+      "name": "rama",
+      "repo": "otherwisetech/rama-rs",
+      "tagline": {
+        "en": "Your git history, as a graph you can read.",
+        "es": "Tu historia de git, en un grafo que se entiende.",
+        "fr": "Votre historique git, dans un graphe lisible.",
+        "pt": "Seu histórico do git, num grafo que dá para ler."
+      },
+      "description": {
+        "en": "rama shows every branch and merge of a git repository as a coloured commit graph, with the full history at a glance and each commit's changes down to the line. It reads the repository with gitoxide, so it does not even need git installed. Rama is Spanish for branch.",
+        "es": "rama muestra cada rama y cada merge de un repositorio git en un grafo de commits a color, con toda la historia a la vista y los cambios de cada commit línea por línea. Lee el repositorio con gitoxide, así que ni siquiera necesita git instalado.",
+        "fr": "rama affiche chaque branche et chaque fusion d'un dépôt git dans un graphe de commits en couleurs, avec tout l'historique d'un coup d'œil et les changements de chaque commit à la ligne près. Il lit le dépôt avec gitoxide, sans même avoir besoin de git. Rama veut dire branche en espagnol.",
+        "pt": "rama mostra cada branch e cada merge de um repositório git num grafo de commits colorido, com todo o histórico à vista e as mudanças de cada commit linha por linha. Lê o repositório com gitoxide, então nem precisa do git instalado. Rama quer dizer galho em espanhol."
+      },
+      "icon": "https://otherwisetech.com/apps/rama.png",
+      "homepage": "https://otherwisetech.com/apps/rama",
+      "bundleId": "io.github.otherwisetech.rama",
+      "installName": "rama",
+      "platforms": {
+        "macos": [
+          {
+            "pattern": "rama-macos-universal.zip",
+            "arch": "universal"
+          }
+        ],
+        "windows": [
+          {
+            "pattern": "rama-windows-x86_64.zip",
+            "arch": "x86_64"
+          }
+        ],
+        "linux": [
+          {
+            "pattern": "rama-linux-x86_64.tar.gz",
+            "arch": "x86_64"
+          }
+        ]
+      },
+      "minimumOs": {
+        "macos": "11.0",
+        "windows": "10"
+      },
+      "license": "MIT OR Apache-2.0",
+      "release": {
+        "tag": "v0.1.0",
+        "publishedAt": "2026-11-19T22:37:42Z",
+        "url": "https://github.com/otherwisetech/rama-rs/releases/tag/v0.1.0",
+        "assets": [
+          {
+            "name": "rama-linux-x86_64.tar.gz",
+            "size": 18639430,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.1.0/rama-linux-x86_64.tar.gz",
+            "digest": "sha256:3b0e750923554a303c376a3b56df3439aafc0badfb9ee90c9479da60b863d8b4"
+          },
+          {
+            "name": "rama-macos-universal.zip",
+            "size": 19608733,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.1.0/rama-macos-universal.zip",
+            "digest": "sha256:418be4e0d2235b39154e62e3308a72e8801e8c7c6ab8e22d548ffe9410b1d2d3"
+          },
+          {
+            "name": "rama-windows-x86_64.zip",
+            "size": 10283899,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.1.0/rama-windows-x86_64.zip",
+            "digest": "sha256:38182ebd9f9e8319b8dceeb0292fee0984ebcd71a79013e95e750c89491a4938"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mosaico",
+      "name": "mosaico",
+      "repo": "otherwisetech/mosaico-rs",
+      "tagline": {
+        "en": "Your photos, in order by date.",
+        "es": "Tus fotos, ordenadas por fecha.",
+        "fr": "Vos photos, rangées par date.",
+        "pt": "Suas fotos, em ordem por data."
+      },
+      "description": {
+        "en": "Point mosaico at the folders where your pictures live — Pictures, a camera's SD card, an external disk — and it finds every photo and video, works out when each one was taken and shows them on a timeline. Only after you have seen and confirmed the plan does it copy them into tidy year and month folders.",
+        "es": "Apunta mosaico a las carpetas donde viven tus fotos — Imágenes, la tarjeta SD de la cámara, un disco externo — y encuentra cada foto y video, averigua cuándo se tomó cada uno y los muestra en una línea de tiempo. Solo cuando has visto y confirmado el plan los copia en carpetas ordenadas por año y mes.",
+        "fr": "Indiquez à mosaico les dossiers où se trouvent vos photos — Images, la carte SD de l'appareil, un disque externe — et il trouve chaque photo et vidéo, détermine quand chacune a été prise et les affiche sur une frise chronologique. Ce n'est qu'après que vous avez vu et validé le plan qu'il les copie dans des dossiers rangés par année et par mois.",
+        "pt": "Aponte o mosaico para as pastas onde ficam suas fotos — Imagens, o cartão SD da câmera, um disco externo — e ele encontra cada foto e vídeo, descobre quando cada um foi feito e os mostra numa linha do tempo. Só depois que você viu e confirmou o plano ele os copia para pastas organizadas por ano e mês."
+      },
+      "icon": "https://otherwisetech.com/apps/mosaico.png",
+      "homepage": "https://otherwisetech.com/apps/mosaico",
+      "bundleId": "io.github.otherwisetech.mosaico",
+      "installName": "mosaico",
+      "platforms": {
+        "macos": [
+          {
+            "pattern": "mosaico-macos-universal.zip",
+            "arch": "universal"
+          }
+        ],
+        "windows": [
+          {
+            "pattern": "mosaico-windows-x86_64.zip",
+            "arch": "x86_64"
+          }
+        ],
+        "linux": [
+          {
+            "pattern": "mosaico-linux-x86_64.tar.gz",
+            "arch": "x86_64"
+          }
+        ]
+      },
+      "minimumOs": {
+        "macos": "11.0",
+        "windows": "10"
+      },
+      "license": "MIT OR Apache-2.0",
+      "release": {
+        "tag": "v0.1.0",
+        "publishedAt": "2026-11-19T23:30:30Z",
+        "url": "https://github.com/otherwisetech/mosaico-rs/releases/tag/v0.1.0",
+        "assets": [
+          {
+            "name": "mosaico-linux-x86_64.tar.gz",
+            "size": 18007423,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.1.0/mosaico-linux-x86_64.tar.gz",
+            "digest": "sha256:1fb1ba06da7cce6bb70040482bd2273e45381e9d29521492532d181b963b0c2a"
+          },
+          {
+            "name": "mosaico-macos-universal.zip",
+            "size": 18126539,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.1.0/mosaico-macos-universal.zip",
+            "digest": "sha256:d4f02309b291343045c166b53ed0591d9dd481d86ac854e5a47e8f4af8aee055"
+          },
+          {
+            "name": "mosaico-windows-x86_64.zip",
+            "size": 9884100,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.1.0/mosaico-windows-x86_64.zip",
+            "digest": "sha256:ace4bd188f22e085bdf7658b0ac2e4203321bee45d19bd33867a620ffcb522e1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "otherwise-apps",
+      "name": "Otherwise Apps",
+      "repo": "otherwisetech/otherwise-apps",
+      "tagline": {
+        "en": "All our apps, installed and kept up to date in one place.",
+        "es": "Todas nuestras apps, instaladas y al día en un solo lugar.",
+        "fr": "Toutes nos apps, installées et à jour au même endroit.",
+        "pt": "Todos os nossos apps, instalados e atualizados num só lugar."
+      },
+      "description": {
+        "en": "Otherwise Apps lists Otherwise Technologies' open-source apps, installs the right build for your computer and keeps them up to date. Every download is checked against the SHA-256 that GitHub publishes before it is installed, and your apps' settings and data are never touched.",
+        "es": "Otherwise Apps lista las apps de código abierto de Otherwise Technologies, instala la versión correcta para tu computador y las mantiene al día. Cada descarga se comprueba con el SHA-256 que publica GitHub antes de instalarse, y nunca toca la configuración ni los datos de tus apps.",
+        "fr": "Otherwise Apps liste les apps open source d'Otherwise Technologies, installe la bonne version pour votre ordinateur et les garde à jour. Chaque téléchargement est vérifié avec le SHA-256 publié par GitHub avant d'être installé, et les réglages et données de vos apps ne sont jamais touchés.",
+        "pt": "Otherwise Apps lista os apps de código aberto da Otherwise Technologies, instala o certo para o seu computador e os mantém atualizados. Cada download é conferido com o SHA-256 que o GitHub publica antes de ser instalado, e as configurações e os dados dos seus apps nunca são tocados."
+      },
+      "icon": "https://otherwisetech.com/apps/otherwise-apps.png",
+      "homepage": "https://otherwisetech.com/apps/otherwise-apps",
+      "bundleId": "io.github.otherwisetech.otherwise-apps",
+      "installName": "otherwise-apps",
+      "appName": "Otherwise Apps",
+      "platforms": {
+        "macos": [
+          {
+            "pattern": "otherwise-apps-macos-universal.zip",
+            "arch": "universal"
+          }
+        ],
+        "windows": [
+          {
+            "pattern": "otherwise-apps-windows-x86_64.zip",
+            "arch": "x86_64"
+          }
+        ],
+        "linux": [
+          {
+            "pattern": "otherwise-apps-linux-x86_64.tar.gz",
+            "arch": "x86_64"
+          }
+        ]
+      },
+      "minimumOs": {
+        "macos": "11.0",
+        "windows": "10"
+      },
+      "license": "MIT OR Apache-2.0"
+    }
+  ]
+}

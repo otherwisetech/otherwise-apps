@@ -1,0 +1,146 @@
+// No console window behind the app on Windows release builds.
+#![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]
+
+mod app;
+mod cards;
+mod dialogs;
+mod jobs;
+mod notify;
+mod settings;
+mod theme;
+mod ui;
+mod util;
+
+use gpui::*;
+use gpui_component::Root;
+use gpui_component_assets::Assets;
+use std::borrow::Cow;
+
+actions!(otherwise_apps, [Quit, OpenWebsite]);
+
+pub(crate) const APP_NAME: &str = "Otherwise Apps"; // i18n-ok: product name
+pub(crate) const COMPANY: &str = "Otherwise Technologies LLC"; // i18n-ok: company name
+pub(crate) const COMPANY_URL: &str = "https://otherwisetech.com";
+pub(crate) const REPO_URL: &str = "https://github.com/otherwisetech/otherwise-apps";
+pub(crate) const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// The native menu bar holds plain strings, so it is rebuilt on every language switch.
+pub(crate) fn set_app_menus(cx: &mut App) {
+    let items = vec![
+        MenuItem::action(i18n::t!("app.about.menu", app = APP_NAME), app::ShowAbout),
+        MenuItem::action(i18n::t!("app.menu.check"), app::Refresh),
+        MenuItem::action(i18n::t!("app.menu.settings"), app::ShowSettings),
+        MenuItem::separator(),
+        MenuItem::action(i18n::t!("app.credit.menu", company = COMPANY), OpenWebsite),
+        MenuItem::separator(),
+        MenuItem::action(i18n::t!("app.menu.quit"), Quit),
+    ];
+    cx.set_menus(vec![Menu { name: APP_NAME.into(), items, disabled: false }]);
+}
+
+pub(crate) const LOGO_SVG: &str = "icons/otherwise-apps-logo.svg";
+pub(crate) static ICON_PNG: &[u8] = include_bytes!("../assets/logo/otherwise-apps-icon-512.png");
+
+/// gpui-component's icon set plus our own `icons/*.svg`.
+struct AppAssets;
+
+impl AssetSource for AppAssets {
+    fn load(&self, path: &str) -> Result<Option<Cow<'static, [u8]>>> {
+        let ours: Option<&'static [u8]> = match path {
+            LOGO_SVG => Some(include_bytes!("../assets/icons/otherwise-apps-logo.svg")),
+            ui::GRID => Some(include_bytes!("../assets/icons/layout-grid.svg")),
+            ui::LIST => Some(include_bytes!("../assets/icons/list.svg")),
+            ui::DOWNLOAD => Some(include_bytes!("../assets/icons/download.svg")),
+            ui::REFRESH => Some(include_bytes!("../assets/icons/refresh.svg")),
+            ui::UPDATE => Some(include_bytes!("../assets/icons/arrow-up-circle.svg")),
+            ui::TRASH => Some(include_bytes!("../assets/icons/trash.svg")),
+            ui::SORT => Some(include_bytes!("../assets/icons/arrow-up-down.svg")),
+            _ => None,
+        };
+        match ours {
+            Some(b) => Ok(Some(Cow::Borrowed(b))),
+            None => Assets.load(path),
+        }
+    }
+
+    fn list(&self, path: &str) -> Result<Vec<SharedString>> {
+        Assets.list(path)
+    }
+}
+
+/// Sets the Dock icon at runtime: covers `cargo run` (no bundle) and stale Dock icon caches.
+#[cfg(target_os = "macos")]
+#[allow(unexpected_cfgs)] // objc 0.2 macros check a `cargo-clippy` feature
+fn set_dock_icon() {
+    use objc::runtime::Object;
+    use objc::{class, msg_send, sel, sel_impl};
+    static PNG: &[u8] = include_bytes!("../assets/logo/otherwise-apps-icon-1024.png");
+    // SAFETY: plain AppKit calls on the main thread with a valid byte buffer that NSData copies.
+    unsafe {
+        let data: *mut Object = msg_send![class!(NSData), dataWithBytes: PNG.as_ptr() length: PNG.len()];
+        let image: *mut Object = msg_send![class!(NSImage), alloc];
+        let image: *mut Object = msg_send![image, initWithData: data];
+        if image.is_null() {
+            return;
+        }
+        let app: *mut Object = msg_send![class!(NSApplication), sharedApplication];
+        let _: () = msg_send![app, setApplicationIconImage: image];
+        let _: () = msg_send![image, release];
+    }
+}
+
+const FONTS: [&[u8]; 3] = [
+    include_bytes!("../assets/fonts/Inter-Regular.ttf"),
+    include_bytes!("../assets/fonts/Inter-Medium.ttf"),
+    include_bytes!("../assets/fonts/Inter-SemiBold.ttf"),
+];
+
+fn main() {
+    let settings = settings::Settings::load();
+    i18n::set_locale(settings::initial_language(&settings));
+    if matches!(std::env::args().nth(1).as_deref(), Some("-h" | "--help")) {
+        println!("{}", i18n::t!("app.cli.usage"));
+        return;
+    }
+    // a Windows self-update leaves the previous exe renamed next to us
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(dir) = exe.parent()
+    {
+        otherwise_core::install::cleanup_overlay(dir, "otherwise-apps");
+    }
+    gpui_platform::application().with_assets(AppAssets).run(move |cx| {
+        if let Err(e) = cx.text_system().add_fonts(FONTS.iter().map(|f| Cow::Borrowed(*f)).collect()) {
+            eprintln!("fonts: {e}"); // i18n-ok: developer diagnostic
+        }
+        #[cfg(target_os = "macos")]
+        set_dock_icon();
+        gpui_component::init(cx);
+        theme::apply(settings.theme.as_deref(), None, cx);
+        app::bind_keys(cx);
+        cx.bind_keys([KeyBinding::new("secondary-q", Quit, None)]);
+        cx.on_action(|_: &Quit, cx| cx.quit());
+        cx.on_action(|_: &OpenWebsite, cx| cx.open_url(COMPANY_URL));
+        gpui_component::set_locale(i18n::locale());
+        set_app_menus(cx);
+        cx.on_window_closed(|cx, _| {
+            if cx.windows().is_empty() {
+                cx.quit();
+            }
+        })
+        .detach();
+        let window_options = WindowOptions {
+            window_bounds: Some(WindowBounds::centered(size(px(1180.), px(800.)), cx)),
+            titlebar: Some(TitlebarOptions { title: Some(APP_NAME.into()), ..Default::default() }),
+            window_min_size: Some(size(px(560.), px(420.))),
+            ..Default::default()
+        };
+        cx.spawn(async move |cx| {
+            cx.open_window(window_options, |window, cx| {
+                let view = cx.new(|cx| app::Launcher::new(window, cx));
+                cx.new(|cx| Root::new(view, window, cx))
+            })
+            .expect("open window");
+        })
+        .detach();
+    });
+}

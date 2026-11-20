@@ -1,0 +1,11 @@
+# Rasterises the app icon SVGs (script/build-icons.sh). Not part of the app's workspace.
+[package]
+name = "otherwise-apps-icon"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+resvg = "0.45"
