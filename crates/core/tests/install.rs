@@ -359,3 +359,16 @@ fn macos_detect_ignores_foreign_bundles() {
     fs::write(user.join("Info.plist"), plist("io.github.otherwisetech.rama", "0.1.0")).unwrap();
     assert_eq!(detect::detect(&e, &l).unwrap().path, l.mac_dirs[1].join("rama.app"));
 }
+
+#[test]
+fn detection_is_otherwise_links() {
+    let e = rama();
+    let s = detect::spec(&e);
+    assert_eq!((s.id.as_str(), s.binary.as_str(), s.app_name.as_str()), ("rama", "rama", e.app_name()));
+    assert!(s.has(otherwise_link::apps::Capability::DeepLinks), "capabilities come from otherwise-link's table");
+    let env = Env::new();
+    let l = env.mac();
+    let loc = detect::locations(&l);
+    assert_eq!(loc.mac_dirs, l.mac_dirs);
+    assert!(loc.path.is_empty(), "the launcher only manages its own install folders");
+}

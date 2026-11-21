@@ -3,10 +3,11 @@
 use crate::catalog::AppEntry;
 use crate::layout::Layout;
 use crate::platform::Os;
+use otherwise_link::apps::{AppSpec, Locations, Os as LinkOs};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
-pub const MARKER: &str = ".otherwise-install.json";
+pub const MARKER: &str = otherwise_link::apps::MARKER;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Installed {
@@ -37,61 +38,46 @@ pub fn write_marker(dir: &Path, m: &Marker) -> std::io::Result<()> {
     std::fs::write(dir.join(MARKER), serde_json::to_string_pretty(m).unwrap_or_default())
 }
 
-/// The `<string>` value of `key` in an XML property list's top-level dict.
-pub fn plist_string(xml: &str, key: &str) -> Option<String> {
-    let needle = format!("<key>{key}</key>");
-    let rest = &xml[xml.find(&needle)? + needle.len()..];
-    let rest = rest.trim_start();
-    let body = rest.strip_prefix("<string>")?;
-    let end = body.find("</string>")?;
-    Some(unescape(body[..end].trim()))
-}
+pub use otherwise_link::apps::{plist_string, read_info_plist};
 
-fn unescape(s: &str) -> String {
-    s.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"").replace("&apos;", "'").replace("&amp;", "&")
-}
-
-/// Reads `Contents/Info.plist` as XML; binary plists are converted with `plutil` first.
-pub fn read_info_plist(app: &Path) -> Option<String> {
-    let path = app.join("Contents").join("Info.plist");
-    let bytes = std::fs::read(&path).ok()?;
-    if bytes.starts_with(b"bplist") {
-        if !cfg!(target_os = "macos") {
-            return None;
-        }
-        let out = std::process::Command::new("plutil").args(["-convert", "xml1", "-o", "-"]).arg(&path).output().ok()?;
-        return out.status.success().then(|| String::from_utf8_lossy(&out.stdout).into_owned());
+/// The catalog entry as otherwise-link's app description (its detection is shared with every
+/// app that looks for its siblings).
+pub fn spec(e: &AppEntry) -> AppSpec {
+    let known = otherwise_link::apps::known(&e.id).map(|k| k.spec());
+    AppSpec {
+        id: e.id.clone(),
+        name: e.name.clone(),
+        bundle_id: e.bundle_id.clone(),
+        app_name: e.app_name().to_string(),
+        install_name: e.install_name.clone(),
+        binary: e.install_name.clone(),
+        cli: known.as_ref().map(|k| k.cli.clone()).unwrap_or_default(),
+        mcp_args: known.as_ref().map(|k| k.mcp_args.clone()).unwrap_or_default(),
+        mcp_write_arg: known.as_ref().and_then(|k| k.mcp_write_arg.clone()),
+        open_source: true,
+        capabilities: known.map(|k| k.capabilities).unwrap_or_default(),
     }
-    String::from_utf8(bytes).ok()
+}
+
+/// Where `layout` looks, as otherwise-link [`Locations`] (no PATH: the launcher manages installs).
+pub fn locations(layout: &Layout) -> Locations {
+    let os = match layout.os {
+        Os::Macos => LinkOs::Macos,
+        Os::Windows => LinkOs::Windows,
+        Os::Linux => LinkOs::Linux,
+    };
+    Locations { os, mac_dirs: layout.mac_dirs.clone(), roots: vec![layout.root.clone()], path: vec![] }
 }
 
 /// The first install of `e` found in `layout`'s locations.
 pub fn detect(e: &AppEntry, layout: &Layout) -> Option<Installed> {
-    for path in layout.candidates(e) {
-        match layout.os {
-            Os::Macos => {
-                if !path.join("Contents").is_dir() {
-                    continue;
-                }
-                let plist = read_info_plist(&path);
-                let bundle_id = plist.as_deref().and_then(|p| plist_string(p, "CFBundleIdentifier"));
-                // a different app that happens to share the name is not ours to manage
-                if bundle_id.as_deref().is_some_and(|b| b != e.bundle_id) {
-                    continue;
-                }
-                let version = plist.as_deref().and_then(|p| plist_string(p, "CFBundleShortVersionString"));
-                return Some(Installed { path, version, bundle_id });
-            }
-            Os::Windows | Os::Linux => {
-                if !layout.executable(e, &path).is_file() {
-                    continue;
-                }
-                let version = read_marker(&path).filter(|m| m.id == e.id).map(|m| crate::version::display(&m.version));
-                return Some(Installed { path, version, bundle_id: None });
-            }
-        }
-    }
-    None
+    let found = otherwise_link::apps::detect_install(&spec(e), &locations(layout))?;
+    let path = found.path?;
+    let version = match layout.os {
+        Os::Macos => found.version,
+        Os::Windows | Os::Linux => read_marker(&path).filter(|m| m.id == e.id).map(|m| crate::version::display(&m.version)),
+    };
+    Some(Installed { path, version, bundle_id: found.bundle_id })
 }
 
 #[cfg(test)]

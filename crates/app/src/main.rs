@@ -4,6 +4,7 @@
 mod app;
 mod cards;
 mod dialogs;
+mod hub;
 mod jobs;
 mod notify;
 mod settings;
@@ -15,7 +16,9 @@ mod util;
 use gpui::*;
 use gpui_component::Root;
 use gpui_component_assets::Assets;
+use otherwise_link::Link;
 use std::borrow::Cow;
+use std::sync::Mutex;
 
 actions!(otherwise_apps, [Quit, OpenWebsite]);
 
@@ -96,7 +99,44 @@ const FONTS: [&[u8]; 3] = [
     include_bytes!("../assets/fonts/Inter-SemiBold.ttf"),
 ];
 
+/// `otherwise://` links waiting for the window (macOS delivers them before it exists, and
+/// outside any `App` context).
+static INBOUND: Mutex<Vec<Link>> = Mutex::new(Vec::new());
+
+fn push_inbound(links: impl IntoIterator<Item = Link>) {
+    INBOUND.lock().unwrap_or_else(|e| e.into_inner()).extend(links);
+}
+
+pub(crate) fn take_inbound() -> Vec<Link> {
+    std::mem::take(&mut *INBOUND.lock().unwrap_or_else(|e| e.into_inner()))
+}
+
+/// Windows and Linux learn about `otherwise://` at run time (macOS from Info.plist).
+fn register_scheme() {
+    let Ok(exe) = std::env::current_exe() else { return };
+    std::thread::spawn(move || {
+        if cfg!(windows) {
+            let _ = otherwise_link::register::register_windows(otherwise_link::link::SCHEME, &exe, APP_NAME);
+        } else if cfg!(target_os = "linux") {
+            let file = "io.github.otherwisetech.otherwise-apps.desktop"; // i18n-ok: file name
+            let entry = otherwise_link::paths::home().join(".local/share/applications").join(file);
+            if entry.is_file() {
+                let _ = otherwise_link::register::register_linux(file, &[otherwise_link::link::SCHEME]);
+            }
+        }
+    });
+}
+
 fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    // the MCP hub: stdin / stdout only, no window
+    if args.first().map(String::as_str) == Some("mcp") {
+        if let Err(e) = otherwise_mcp_hub::run_stdio() {
+            eprintln!("otherwise-hub: {e}"); // i18n-ok: developer diagnostic
+            std::process::exit(1);
+        }
+        return;
+    }
     let settings = settings::Settings::load();
     i18n::set_locale(settings::initial_language(&settings));
     if matches!(std::env::args().nth(1).as_deref(), Some("-h" | "--help")) {
@@ -109,7 +149,11 @@ fn main() {
     {
         otherwise_core::install::cleanup_overlay(dir, "otherwise-apps");
     }
-    gpui_platform::application().with_assets(AppAssets).run(move |cx| {
+    push_inbound(Link::from_args(&args));
+    register_scheme();
+    let application = gpui_platform::application().with_assets(AppAssets);
+    application.on_open_urls(|urls| push_inbound(urls.iter().filter_map(|u| Link::parse(u).ok())));
+    application.run(move |cx| {
         if let Err(e) = cx.text_system().add_fonts(FONTS.iter().map(|f| Cow::Borrowed(*f)).collect()) {
             eprintln!("fonts: {e}"); // i18n-ok: developer diagnostic
         }
