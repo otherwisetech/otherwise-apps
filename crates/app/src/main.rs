@@ -2,6 +2,7 @@
 #![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]
 
 mod app;
+mod assistant;
 mod cards;
 mod data_root;
 mod dialogs;
@@ -21,11 +22,13 @@ use otherwise_link::Link;
 use std::borrow::Cow;
 use std::sync::Mutex;
 
-actions!(otherwise_apps, [Quit, OpenWebsite]);
+actions!(otherwise_apps, [Quit, OpenWebsite, OpenVcity]);
 
 pub(crate) const APP_NAME: &str = "Otherwise Apps"; // i18n-ok: product name
 pub(crate) const COMPANY: &str = "Otherwise Technologies LLC"; // i18n-ok: company name
 pub(crate) const COMPANY_URL: &str = "https://otherwisetech.com";
+/// The invitation to Vcity (About, Help menu, the Apps page).
+pub(crate) const VCITY_URL: &str = "https://vcity.io/?utm_source=otherwise-apps&utm_medium=app&utm_campaign=otherwise-apps";
 pub(crate) const REPO_URL: &str = "https://github.com/otherwisetech/otherwise-apps";
 pub(crate) const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -40,7 +43,8 @@ pub(crate) fn set_app_menus(cx: &mut App) {
         MenuItem::separator(),
         MenuItem::action(i18n::t!("app.menu.quit"), Quit),
     ];
-    cx.set_menus(vec![Menu { name: APP_NAME.into(), items, disabled: false }]);
+    let help = vec![MenuItem::action(i18n::t!("app.vcity.menu"), OpenVcity)];
+    cx.set_menus(vec![Menu { name: APP_NAME.into(), items, disabled: false }, Menu { name: i18n::t!("app.menu.help").into(), items: help, disabled: false }]);
 }
 
 pub(crate) const LOGO_SVG: &str = "icons/otherwise-apps-logo.svg";
@@ -166,6 +170,7 @@ fn main() {
         cx.bind_keys([KeyBinding::new("secondary-q", Quit, None)]);
         cx.on_action(|_: &Quit, cx| cx.quit());
         cx.on_action(|_: &OpenWebsite, cx| cx.open_url(COMPANY_URL));
+        cx.on_action(|_: &OpenVcity, cx| cx.open_url(VCITY_URL));
         gpui_component::set_locale(i18n::locale());
         set_app_menus(cx);
         cx.on_window_closed(|cx, _| {

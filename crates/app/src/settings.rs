@@ -22,6 +22,8 @@ pub struct Settings {
     pub last_check: Option<String>,
     /// `id@tag` pairs already announced in a notification, so each update is announced once.
     pub notified: Vec<String>,
+    /// The Assistant's agent command line (`claude`, `codex`, `opencode`); the first found when unset.
+    pub assistant_agent: Option<String>,
 }
 
 pub const DEFAULT_HOURS: u64 = 6;
@@ -78,6 +80,7 @@ impl Settings {
             notify: st("notify"),
             last_check: st("last_check"),
             notified: list("notified"),
+            assistant_agent: st("assistant_agent"),
         }
     }
 
@@ -91,6 +94,7 @@ impl Settings {
             ("sort", &self.sort),
             ("notify", &self.notify),
             ("last_check", &self.last_check),
+            ("assistant_agent", &self.assistant_agent),
         ];
         let lists = [("notified", &self.notified)];
         let mut fields: Vec<String> = strings.iter().filter_map(|(k, v)| v.as_ref().map(|v| format!("  \"{k}\": {}", quote(v)))).collect();
@@ -260,6 +264,7 @@ mod tests {
             notify: Some("off".into()),
             last_check: Some("1795000000".into()),
             notified: vec!["rama@v0.2.0".into(), "diskmap@v0.4.0".into()],
+            assistant_agent: Some("codex".into()),
         };
         assert_eq!(Settings::parse(&s.to_json()), s);
         assert_eq!(s.check_hours(), 12);

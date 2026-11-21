@@ -1,0 +1,10 @@
+{"type":"system","subtype":"init","session_id":"s1","tools":["mcp__otherwise__vigia_due","mcp__otherwise__today"],"mcp_servers":[{"name":"otherwise","status":"connected"}]}
+{"type":"stream_event","event":{"type":"message_start","message":{"id":"msg_1","role":"assistant","content":[]}}}
+{"type":"stream_event","event":{"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"Reviso Vigía…"}}}
+{"type":"assistant","message":{"id":"msg_1","role":"assistant","content":[{"type":"text","text":"Reviso Vigía…"},{"type":"tool_use","id":"toolu_01","name":"mcp__otherwise__vigia_due","input":{"days":30}},{"type":"tool_use","id":"toolu_02","name":"mcp__otherwise__today","input":{}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01","content":[{"type":"text","text":"[{\"title\":\"IVA bimestral\",\"due\":\"2026-11-28\"}]"}],"is_error":false},{"type":"tool_result","tool_use_id":"toolu_02","content":"boom","is_error":true}]}}
+{"type":"stream_event","event":{"type":"message_start","message":{"id":"msg_2","role":"assistant","content":[]}}}
+{"type":"stream_event","event":{"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"Este mes vence "}}}
+{"type":"stream_event","event":{"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"el IVA bimestral (28 nov)."}}}
+{"type":"assistant","message":{"id":"msg_2","role":"assistant","content":[{"type":"text","text":"Este mes vence el IVA bimestral (28 nov)."}]}}
+{"type":"result","subtype":"success","is_error":false,"result":"Este mes vence el IVA bimestral (28 nov).","session_id":"s1"}
