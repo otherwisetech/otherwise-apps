@@ -4680,7 +4680,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "chrono",
@@ -4701,7 +4701,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "flate2",
  "otherwise-apps-i18n",
@@ -4718,12 +4718,12 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.2.0"
+version = "0.2.1"
 
 [[package]]
 name = "otherwise-link"
-version = "0.1.0"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.1.0#0b2969806dcac2adc79c9f21f6bd72a98d8e0be2"
+version = "0.2.0"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.2.0#8e4cc8c298e9c5c37a7c02bc061e1c8fbee50b2f"
 dependencies = [
  "chrono",
  "rusqlite",
@@ -4734,8 +4734,8 @@ dependencies = [
 
 [[package]]
 name = "otherwise-mcp-hub"
-version = "0.1.0"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.1.0#0b2969806dcac2adc79c9f21f6bd72a98d8e0be2"
+version = "0.2.0"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.2.0#8e4cc8c298e9c5c37a7c02bc061e1c8fbee50b2f"
 dependencies = [
  "chrono",
  "otherwise-link",

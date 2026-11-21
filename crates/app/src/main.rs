@@ -3,6 +3,7 @@
 
 mod app;
 mod cards;
+mod data_root;
 mod dialogs;
 mod hub;
 mod jobs;

@@ -11,7 +11,10 @@ crates/core  otherwise-apps-core: catalog (+ validation), version comparison, as
              Linux .desktop and Windows shortcuts, running-app quit. No UI.
 crates/app   `otherwise-apps` desktop app (GPUI + gpui-component). app.rs: state, checks, jobs;
              cards.rs: grid / list; dialogs.rs: modals, settings, About; jobs.rs: background work;
-             hub.rs: Today page, Entities page, Settings → Hub, otherwise:// handling
+             hub.rs: Today page, Entities page, Settings → Hub, otherwise:// handling;
+             data_root.rs: Settings → Otherwise data folder (otherwise-link `relocate`: plan,
+             confirmation listing what moves, verified move / copy / use-existing, cloud status,
+             registry lock and conflicted-copy warnings)
              (`otherwise-apps mcp` runs the otherwise-hub MCP server, main.rs)
 tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 ```
@@ -42,6 +45,8 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
   enables them. Never edit the user's Claude / Codex / MCP config: Settings shows the
   `claude mcp add` command to copy. Forward other apps' links with `open_app_link` (never back
   to `otherwise://`). Merges and deletes in the registry go through a confirmation.
+  Moving the data root always goes through the confirmation that lists what moves, and is
+  refused while an app has its data open (its lock).
 - Comments: sparse, only non-obvious why.
 - GPUI pins: `Cargo.lock` pins the same zed / gpui-component revs as the other apps. Never
   `cargo update` them; building only core can prune them from the lock — restore it.

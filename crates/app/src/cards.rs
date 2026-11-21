@@ -26,7 +26,7 @@ fn os_name(os: Os) -> String {
     }
 }
 
-fn reveal_label(os: Os) -> String {
+pub(crate) fn reveal_label(os: Os) -> String {
     match os {
         Os::Macos => i18n::t!("app.menu.reveal_macos"),
         Os::Windows => i18n::t!("app.menu.reveal_windows"),
