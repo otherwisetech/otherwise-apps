@@ -4680,7 +4680,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -4701,7 +4701,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "flate2",
  "otherwise-apps-i18n",
@@ -4718,7 +4718,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.2.1"
+version = "0.3.0"
 
 [[package]]
 name = "otherwise-link"

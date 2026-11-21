@@ -8,13 +8,17 @@ Same conventions as genealogy-rs, diskmap, rama and mosaico.
 crates/i18n  otherwise-apps-i18n: embedded translation catalogs, t!/tn!/tv! macros, i18n guard tests
 crates/core  otherwise-apps-core: catalog (+ validation), version comparison, asset selection,
              SHA-256 verification, download, unpack, install / replace / uninstall, detection,
-             Linux .desktop and Windows shortcuts, running-app quit. No UI.
+             Linux .desktop and Windows shortcuts, running-app quit; agent_cli.rs (the Assistant's
+             headless Claude Code / Codex / opencode runs with the hub attached for one run) and
+             conversation.rs (its history under <data root>/otherwise-apps/assistant/). No UI.
 crates/app   `otherwise-apps` desktop app (GPUI + gpui-component). app.rs: state, checks, jobs;
              cards.rs: grid / list; dialogs.rs: modals, settings, About; jobs.rs: background work;
              hub.rs: Today page, Entities page, Settings → Hub, otherwise:// handling;
              data_root.rs: Settings → Otherwise data folder (otherwise-link `relocate`: plan,
              confirmation listing what moves, verified move / copy / use-existing, cloud status,
              registry lock and conflicted-copy warnings)
+             assistant.rs: the Assistant page (chat over the hub, streaming, tool chips, history);
+             Vcity invitation in About, Help menu and under the apps grid
              (`otherwise-apps mcp` runs the otherwise-hub MCP server, main.rs)
 tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 ```
@@ -45,6 +49,9 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
   enables them. Never edit the user's Claude / Codex / MCP config: Settings shows the
   `claude mcp add` command to copy. Forward other apps' links with `open_app_link` (never back
   to `otherwise://`). Merges and deletes in the registry go through a confirmation.
+  The Assistant passes the hub to the agent CLI only on its command line / environment
+  (temporary `--mcp-config`, `-c` overrides, `OPENCODE_CONFIG_CONTENT`), turns off its built-in
+  file / shell / web tools, and never writes the user's agent config. Tests use fake CLIs.
   Moving the data root always goes through the confirmation that lists what moves, and is
   refused while an app has its data open (its lock).
 - Comments: sparse, only non-obvious why.

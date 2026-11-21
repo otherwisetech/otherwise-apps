@@ -28,6 +28,7 @@ pub enum Page {
     Apps,
     Today,
     Entities,
+    Assistant,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -224,6 +225,11 @@ impl Launcher {
         match p {
             Page::Today => self.reload_today(cx),
             Page::Entities => self.reload_entities(cx),
+            Page::Assistant => {
+                if self.assistant.found.is_none() {
+                    self.detect_agents(cx);
+                }
+            }
             Page::Apps => {}
         }
         cx.notify();
@@ -235,6 +241,7 @@ impl Launcher {
         if link.app == ME {
             match link.at(0) {
                 Some("today") => self.set_page(Page::Today, cx),
+                Some("assistant") => self.set_page(Page::Assistant, cx),
                 Some("entities") => {
                     self.hub.selected = link.at(1).and_then(|s| Uuid::parse_str(s).ok());
                     self.set_page(Page::Entities, cx);
@@ -257,6 +264,7 @@ impl Launcher {
             self.page = match l.at(0) {
                 Some("entities") => Page::Entities,
                 Some("today") => Page::Today,
+                Some("assistant") => Page::Assistant,
                 _ => Page::Apps,
             };
             cx.notify();
@@ -391,6 +399,7 @@ impl Launcher {
         let has_link = link.is_some();
         let hover = t.raised;
         let ev = e.clone();
+        let question = i18n::t!("app.assistant.ask_about", app = apps::display_name(&e.app), title = e.title.clone(), body = e.body.clone().unwrap_or_default());
         div()
             .id(SharedString::from(format!("ev-{}", e.key()))) // i18n-ok: element id
             .flex()
@@ -418,6 +427,19 @@ impl Launcher {
             .child(ui::chip(event_kind_label(e.kind), t.ink_muted, t.border.opacity(0.5)))
             .child(ui::chip(apps::display_name(&e.app), t.accent, t.accent_soft))
             .children(time.map(|x| div().flex_none().text_size(px(12.)).text_color(t.ink_muted).child(x)))
+            .child(
+                ui::outline_button(t, SharedString::from(format!("ask-{}", e.key()))) // i18n-ok: element id
+                    .h(px(26.))
+                    .px(px(8.))
+                    .text_size(px(12.))
+                    .child(ui::icon(IconName::Bot, 13., t.accent))
+                    .child(i18n::t!("app.today.ask"))
+                    .tooltip(|window, cx| gpui_component::tooltip::Tooltip::new(i18n::t!("app.today.ask_tooltip")).build(window, cx))
+                    .on_click(cx.listener(move |this, _, window, cx| {
+                        cx.stop_propagation();
+                        this.ask_about(question.clone(), window, cx);
+                    })),
+            )
             .child(
                 ui::icon_button(t, SharedString::from(format!("dismiss-{}", e.key())), true) // i18n-ok: element id
                     .child(ui::icon(IconName::Close, 13., t.ink_muted))

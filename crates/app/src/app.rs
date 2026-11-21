@@ -1,5 +1,6 @@
 //! The launcher window: catalog state, checks, jobs and the top-level layout. Cards are drawn in
 //! `cards.rs`, modals in `dialogs.rs`.
+use crate::assistant::AssistantState;
 use crate::hub::{HubState, Page};
 use crate::jobs::{self, Job, JobError, Kind, Spec};
 use crate::settings::Settings;
@@ -31,7 +32,7 @@ const TOAST_FOR: Duration = Duration::from_secs(5);
 /// How often the "is a check due?" timer wakes up (the interval itself is in settings).
 const TICK: Duration = Duration::from_secs(60);
 
-actions!(otherwise_apps, [Refresh, ShowAbout, ShowSettings, FocusSearch, CloseModal, ShowApps, ShowToday, ShowEntities]);
+actions!(otherwise_apps, [Refresh, ShowAbout, ShowSettings, FocusSearch, CloseModal, ShowApps, ShowToday, ShowEntities, ShowAssistant]);
 
 pub fn bind_keys(cx: &mut App) {
     cx.bind_keys([
@@ -42,6 +43,7 @@ pub fn bind_keys(cx: &mut App) {
         KeyBinding::new("secondary-1", ShowApps, Some(CONTEXT)),
         KeyBinding::new("secondary-2", ShowToday, Some(CONTEXT)),
         KeyBinding::new("secondary-3", ShowEntities, Some(CONTEXT)),
+        KeyBinding::new("secondary-4", ShowAssistant, Some(CONTEXT)),
     ]);
 }
 
@@ -125,6 +127,7 @@ pub struct Launcher {
     ticking: bool,
     pub page: Page,
     pub hub: HubState,
+    pub assistant: AssistantState,
     _subs: Vec<Subscription>,
 }
 
@@ -163,7 +166,13 @@ impl Launcher {
             s
         });
         let hub = HubState::new(window, cx);
+        let assistant = AssistantState::new(window, cx);
         let subs = vec![
+            cx.subscribe_in(&assistant.input, window, |this, _, ev: &InputEvent, window, cx| {
+                if let InputEvent::PressEnter { shift: false, .. } = ev {
+                    this.send_input(window, cx);
+                }
+            }),
             cx.subscribe_in(&hub.search, window, |this, _, ev: &InputEvent, _, cx| {
                 if let InputEvent::Change = ev {
                     this.reload_entities(cx);
@@ -228,6 +237,7 @@ impl Launcher {
             ticking: false,
             page: Page::Apps,
             hub,
+            assistant,
             _subs: subs,
         };
         this.set_catalog(manifest);
@@ -762,6 +772,8 @@ impl Launcher {
             self.search.update(cx, |s, cx| s.set_placeholder(text, window, cx));
             let text = i18n::t!("app.entities.search");
             self.hub.search.update(cx, |s, cx| s.set_placeholder(text, window, cx));
+            let text = i18n::t!("app.assistant.placeholder");
+            self.assistant.input.update(cx, |s, cx| s.set_placeholder(text, window, cx));
             let text = Layout::default_root(self.target.os).display().to_string();
             self.root_input.update(cx, |s, cx| s.set_placeholder(text, window, cx));
         }
@@ -801,7 +813,7 @@ impl Launcher {
         let page = self.page;
         let attention = self.hub.needs_attention();
         let mut pages = ui::segmented(t);
-        for (p, label, id) in [(Page::Apps, i18n::t!("app.page.apps"), "page-apps"), (Page::Today, i18n::t!("app.page.today"), "page-today"), (Page::Entities, i18n::t!("app.page.entities"), "page-entities")] {
+        for (p, label, id) in [(Page::Apps, i18n::t!("app.page.apps"), "page-apps"), (Page::Today, i18n::t!("app.page.today"), "page-today"), (Page::Entities, i18n::t!("app.page.entities"), "page-entities"), (Page::Assistant, i18n::t!("app.page.assistant"), "page-assistant")] {
             let label = if p == Page::Today && attention > 0 { format!("{label} {attention}") } else { label };
             pages = pages.child(ui::segment(t, id, p == page).child(label).on_click(cx.listener(move |this, _, _, cx| this.set_page(p, cx))));
         }
@@ -894,7 +906,33 @@ impl Launcher {
             .track_scroll(&self.list_scroll)
             .children(self.render_self_banner(t, cx))
             .child(div().p(px(24.)).child(content))
+            .child(self.render_vcity(t))
             .into_any_element()
+    }
+
+    /// A quiet invitation under the apps.
+    fn render_vcity(&self, t: &Tokens) -> impl IntoElement {
+        let accent = t.accent;
+        div().px(px(24.)).pb(px(24.)).child(
+            div()
+                .id("vcity-card")
+                .flex()
+                .items_center()
+                .gap(px(12.))
+                .px(px(14.))
+                .py(px(10.))
+                .rounded(px(12.))
+                .border_1()
+                .border_color(t.border)
+                .text_size(px(12.))
+                .text_color(t.ink_muted)
+                .cursor_pointer()
+                .hover(move |s| s.border_color(accent))
+                .child(ui::icon(IconName::Globe, 16., t.ink_muted))
+                .child(div().flex_1().min_w_0().child(i18n::t!("app.vcity.card")))
+                .child(div().flex_none().text_color(accent).font_weight(FontWeight::MEDIUM).child(i18n::t!("app.vcity.card_link")))
+                .on_click(|_, _, cx| cx.open_url(crate::VCITY_URL)),
+        )
     }
 
     fn sources_label(&self) -> String {
@@ -976,6 +1014,7 @@ impl Render for Launcher {
             Page::Apps => self.render_body(&t, window, cx),
             Page::Today => self.render_today(&t, cx),
             Page::Entities => self.render_entities(&t, cx),
+            Page::Assistant => self.render_assistant(&t, cx),
         };
         div()
             .key_context(CONTEXT)
@@ -994,6 +1033,7 @@ impl Render for Launcher {
             .on_action(cx.listener(|this, _: &ShowApps, _, cx| this.set_page(Page::Apps, cx)))
             .on_action(cx.listener(|this, _: &ShowToday, _, cx| this.set_page(Page::Today, cx)))
             .on_action(cx.listener(|this, _: &ShowEntities, _, cx| this.set_page(Page::Entities, cx)))
+            .on_action(cx.listener(|this, _: &ShowAssistant, _, cx| this.set_page(Page::Assistant, cx)))
             .relative()
             .flex()
             .flex_col()
