@@ -101,6 +101,8 @@ pub enum Modal {
     Restart { install: PathBuf, executable: PathBuf, version: String },
     Settings,
     About,
+    /// Settings → Otherwise data folder → Change…: what would move to `to`.
+    DataRoot { from: PathBuf, to: PathBuf, list: String, offer: crate::data_root::Offer, cloud: Option<String> },
 }
 
 pub struct Launcher {

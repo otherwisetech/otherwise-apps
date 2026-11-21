@@ -25,7 +25,7 @@ impl Launcher {
             .into_any_element()
     }
 
-    fn panel(&self, t: &Tokens, width: f32, cx: &mut Context<Self>) -> Stateful<Div> {
+    pub(crate) fn panel(&self, t: &Tokens, width: f32, cx: &mut Context<Self>) -> Stateful<Div> {
         div()
             .id("modal-card")
             .relative()
@@ -87,6 +87,7 @@ impl Launcher {
                 .into_any_element(),
             Modal::Settings => self.render_settings(t, window, cx).into_any_element(),
             Modal::About => self.render_about(t, cx).into_any_element(),
+            Modal::DataRoot { .. } => self.render_data_root_modal(t, cx)?,
         };
         Some(self.backdrop(t, card, cx))
     }
@@ -150,6 +151,7 @@ impl Launcher {
             .child(Self::setting_row(t, i18n::t!("app.settings.notify"), None, notify))
             .child(Self::setting_row(t, i18n::t!("app.settings.location"), location_hint, location))
             .child(Self::setting_row(t, i18n::t!("app.settings.verify"), None, div().text_size(px(12.)).line_height(px(17.)).text_color(t.ink_muted).child(i18n::t!("app.settings.verify_body"))))
+            .child(self.render_data_root_settings(t, cx))
             .child(self.render_hub_settings(t, cx))
     }
 
