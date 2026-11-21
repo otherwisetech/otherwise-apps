@@ -39,6 +39,14 @@ cat > "$app/Contents/Info.plist" <<PLIST
   <key>CFBundleVersion</key><string>$version</string>
   <key>LSMinimumSystemVersion</key><string>11.0</string>
   <key>NSHighResolutionCapable</key><true/>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key><string>io.github.otherwisetech.otherwise-apps</string>
+      <key>CFBundleTypeRole</key><string>Viewer</string>
+      <key>CFBundleURLSchemes</key><array><string>otherwise</string></array>
+    </dict>
+  </array>
   <key>NSHumanReadableCopyright</key><string>Otherwise Technologies LLC · MIT OR Apache-2.0</string>
 </dict>
 </plist>

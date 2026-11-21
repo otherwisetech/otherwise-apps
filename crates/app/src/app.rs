@@ -1,5 +1,6 @@
 //! The launcher window: catalog state, checks, jobs and the top-level layout. Cards are drawn in
 //! `cards.rs`, modals in `dialogs.rs`.
+use crate::hub::{HubState, Page};
 use crate::jobs::{self, Job, JobError, Kind, Spec};
 use crate::settings::Settings;
 use crate::theme::{self, SANS, Tokens, tokens};
@@ -30,7 +31,7 @@ const TOAST_FOR: Duration = Duration::from_secs(5);
 /// How often the "is a check due?" timer wakes up (the interval itself is in settings).
 const TICK: Duration = Duration::from_secs(60);
 
-actions!(otherwise_apps, [Refresh, ShowAbout, ShowSettings, FocusSearch, CloseModal]);
+actions!(otherwise_apps, [Refresh, ShowAbout, ShowSettings, FocusSearch, CloseModal, ShowApps, ShowToday, ShowEntities]);
 
 pub fn bind_keys(cx: &mut App) {
     cx.bind_keys([
@@ -38,6 +39,9 @@ pub fn bind_keys(cx: &mut App) {
         KeyBinding::new("secondary-f", FocusSearch, Some(CONTEXT)),
         KeyBinding::new("secondary-,", ShowSettings, Some(CONTEXT)),
         KeyBinding::new("escape", CloseModal, Some(CONTEXT)),
+        KeyBinding::new("secondary-1", ShowApps, Some(CONTEXT)),
+        KeyBinding::new("secondary-2", ShowToday, Some(CONTEXT)),
+        KeyBinding::new("secondary-3", ShowEntities, Some(CONTEXT)),
     ]);
 }
 
@@ -87,6 +91,8 @@ pub struct Card {
 pub enum Pending {
     Run { id: String, kind: Kind, quit_first: bool },
     Uninstall { id: String, quit_first: bool },
+    Merge { keep: uuid::Uuid, drop: uuid::Uuid },
+    DeleteEntity { id: uuid::Uuid },
 }
 
 pub enum Modal {
@@ -115,6 +121,8 @@ pub struct Launcher {
     placeholder_locale: &'static str,
     focus: FocusHandle,
     ticking: bool,
+    pub page: Page,
+    pub hub: HubState,
     _subs: Vec<Subscription>,
 }
 
@@ -152,7 +160,13 @@ impl Launcher {
             }
             s
         });
+        let hub = HubState::new(window, cx);
         let subs = vec![
+            cx.subscribe_in(&hub.search, window, |this, _, ev: &InputEvent, _, cx| {
+                if let InputEvent::Change = ev {
+                    this.reload_entities(cx);
+                }
+            }),
             cx.subscribe_in(&search, window, |_, _, ev: &InputEvent, _, cx| {
                 if let InputEvent::Change = ev {
                     cx.notify();
@@ -170,6 +184,11 @@ impl Launcher {
             cx.observe_window_activation(window, |this, window, cx| {
                 if window.is_window_active() {
                     this.detect_all();
+                    this.rediscover(cx);
+                    this.reload_today(cx);
+                    if this.page == Page::Entities {
+                        this.reload_entities(cx);
+                    }
                     cx.notify();
                 }
             }),
@@ -205,11 +224,15 @@ impl Launcher {
             placeholder_locale: "",
             focus,
             ticking: false,
+            page: Page::Apps,
+            hub,
             _subs: subs,
         };
         this.set_catalog(manifest);
         this.refresh(true, cx);
         this.schedule_checks(cx);
+        this.rediscover(cx);
+        this.watch_links(window, cx);
         crate::star::refresh(this.settings.check_hours() != 0, cx);
         this
     }
@@ -248,6 +271,7 @@ impl Launcher {
             c.status = pipeline::status(&c.entry, c.installed.as_ref(), self.target);
         }
         crate::notify::badge(self.update_count());
+        self.publish_own_today();
     }
 
     pub fn update_count(&self) -> usize {
@@ -365,6 +389,7 @@ impl Launcher {
                         if due && !this.any_job() {
                             this.refresh(true, cx);
                         }
+                        this.reload_today(cx);
                         cx.notify();
                     })
                     .is_ok();
@@ -591,6 +616,8 @@ impl Launcher {
         match action {
             Pending::Run { id, kind, quit_first } => self.start(&id, kind, quit_first, cx),
             Pending::Uninstall { id, quit_first } => self.uninstall(&id, quit_first, cx),
+            Pending::Merge { keep, drop } => self.merge_entities(keep, drop, cx),
+            Pending::DeleteEntity { id } => self.delete_entity(id, cx),
         }
         cx.notify();
     }
@@ -731,6 +758,8 @@ impl Launcher {
             self.placeholder_locale = loc;
             let text = i18n::t!("app.search.placeholder");
             self.search.update(cx, |s, cx| s.set_placeholder(text, window, cx));
+            let text = i18n::t!("app.entities.search");
+            self.hub.search.update(cx, |s, cx| s.set_placeholder(text, window, cx));
             let text = Layout::default_root(self.target.os).display().to_string();
             self.root_input.update(cx, |s, cx| s.set_placeholder(text, window, cx));
         }
@@ -767,6 +796,14 @@ impl Launcher {
             this.modal = Some(Modal::Settings);
             cx.notify();
         }));
+        let page = self.page;
+        let attention = self.hub.needs_attention();
+        let mut pages = ui::segmented(t);
+        for (p, label, id) in [(Page::Apps, i18n::t!("app.page.apps"), "page-apps"), (Page::Today, i18n::t!("app.page.today"), "page-today"), (Page::Entities, i18n::t!("app.page.entities"), "page-entities")] {
+            let label = if p == Page::Today && attention > 0 { format!("{label} {attention}") } else { label };
+            pages = pages.child(ui::segment(t, id, p == page).child(label).on_click(cx.listener(move |this, _, _, cx| this.set_page(p, cx))));
+        }
+        let apps_page = page == Page::Apps;
         div()
             .flex()
             .flex_none()
@@ -779,11 +816,9 @@ impl Launcher {
             .bg(t.surface)
             .child(div().flex().flex_none().items_center().justify_center().size(px(32.)).rounded(px(9.)).bg(t.brand).child(ui::logo_glyph(18., gpui::white())))
             .child(div().flex().flex_col().min_w_0().flex_1().child(div().text_size(px(15.)).font_weight(FontWeight::SEMIBOLD).child(crate::APP_NAME)).child(div().text_size(px(11.)).text_color(if updates > 0 { t.update } else { t.ink_muted }).truncate().child(summary)))
-            .child(self.render_search(t))
-            .child(sort)
-            .child(toggle)
-            .child(refresh)
-            .when(updates > 0, |d| {
+            .child(pages)
+            .when(apps_page, |d| d.child(self.render_search(t)).child(sort).child(toggle).child(refresh))
+            .when(apps_page && updates > 0, |d| {
                 d.child(ui::filled_button(t, "update-all", t.accent).child(glyph(ui::UPDATE, 15., t.on_fill())).child(i18n::t!("app.topbar.update_all", n = updates)).on_click(cx.listener(|this, _, _, cx| this.update_all(cx))))
             })
             .child(settings)
@@ -935,7 +970,11 @@ impl Render for Launcher {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         self.sync_placeholder(window, cx);
         let t = tokens(cx);
-        let body = self.render_body(&t, window, cx);
+        let body = match self.page {
+            Page::Apps => self.render_body(&t, window, cx),
+            Page::Today => self.render_today(&t, cx),
+            Page::Entities => self.render_entities(&t, cx),
+        };
         div()
             .key_context(CONTEXT)
             .track_focus(&self.focus)
@@ -950,6 +989,9 @@ impl Render for Launcher {
             }))
             .on_action(cx.listener(|this, _: &FocusSearch, window, cx| this.search.update(cx, |s, cx| s.focus(window, cx))))
             .on_action(cx.listener(|this, _: &CloseModal, _, cx| this.close_modal(cx)))
+            .on_action(cx.listener(|this, _: &ShowApps, _, cx| this.set_page(Page::Apps, cx)))
+            .on_action(cx.listener(|this, _: &ShowToday, _, cx| this.set_page(Page::Today, cx)))
+            .on_action(cx.listener(|this, _: &ShowEntities, _, cx| this.set_page(Page::Entities, cx)))
             .relative()
             .flex()
             .flex_col()

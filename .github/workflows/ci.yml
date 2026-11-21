@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-22.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Test core crates
+        run: cargo test -p otherwise-apps-i18n -p otherwise-apps-core
+      - name: Test and lint the app
+        if: runner.os == 'macOS'
+        run: |
+          cargo test -p otherwise-apps-app
+          cargo clippy --workspace --all-targets -- -D warnings

@@ -34,6 +34,7 @@ impl Launcher {
             .gap(px(12.))
             .w(px(width))
             .max_h(relative(0.9))
+            .overflow_y_scroll()
             .p(px(24.))
             .rounded(px(18.))
             .border_1()
@@ -149,6 +150,7 @@ impl Launcher {
             .child(Self::setting_row(t, i18n::t!("app.settings.notify"), None, notify))
             .child(Self::setting_row(t, i18n::t!("app.settings.location"), location_hint, location))
             .child(Self::setting_row(t, i18n::t!("app.settings.verify"), None, div().text_size(px(12.)).line_height(px(17.)).text_color(t.ink_muted).child(i18n::t!("app.settings.verify_body"))))
+            .child(self.render_hub_settings(t, cx))
     }
 
     fn render_about(&self, t: &Tokens, cx: &mut Context<Self>) -> impl IntoElement {

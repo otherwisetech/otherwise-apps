@@ -10,7 +10,9 @@ crates/core  otherwise-apps-core: catalog (+ validation), version comparison, as
              SHA-256 verification, download, unpack, install / replace / uninstall, detection,
              Linux .desktop and Windows shortcuts, running-app quit. No UI.
 crates/app   `otherwise-apps` desktop app (GPUI + gpui-component). app.rs: state, checks, jobs;
-             cards.rs: grid / list; dialogs.rs: modals, settings, About; jobs.rs: background work
+             cards.rs: grid / list; dialogs.rs: modals, settings, About; jobs.rs: background work;
+             hub.rs: Today page, Entities page, Settings → Hub, otherwise:// handling
+             (`otherwise-apps mcp` runs the otherwise-hub MCP server, main.rs)
 tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 ```
 
@@ -34,6 +36,12 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
   https://otherwisetech.com/apps.json. Refresh it when apps are added.
 - Release asset names must stay `otherwise-apps-<platform>.zip|.tar.gz` and the bundle
   `Otherwise Apps.app` / `io.github.otherwisetech.otherwise-apps`: self-update depends on them.
+- **The hub uses otherwise-link** (github.com/otherwisetech/otherwise-link, by tag): discovery,
+  links, Today files, the entity registry and `hub.json` follow its docs/SPEC.md. The shared
+  registry stays off until the user turns it on; MCP write tools stay off until the user
+  enables them. Never edit the user's Claude / Codex / MCP config: Settings shows the
+  `claude mcp add` command to copy. Forward other apps' links with `open_app_link` (never back
+  to `otherwise://`). Merges and deletes in the registry go through a confirmation.
 - Comments: sparse, only non-obvious why.
 - GPUI pins: `Cargo.lock` pins the same zed / gpui-component revs as the other apps. Never
   `cargo update` them; building only core can prune them from the lock — restore it.
