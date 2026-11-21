@@ -1,6 +1,0 @@
-{"type":"thread.started","thread_id":"t1"}
-{"type":"turn.started"}
-{"type":"item.started","item":{"id":"i0","type":"mcp_tool_call","server":"otherwise","tool":"nodo.devices","arguments":{"status":"down"},"status":"in_progress"}}
-{"type":"item.completed","item":{"id":"i0","type":"mcp_tool_call","server":"otherwise","tool":"nodo.devices","status":"completed","result":{"content":[{"type":"text","text":"[]"}]}}}
-{"type":"item.completed","item":{"id":"i1","type":"agent_message","text":"No hay equipos caídos."}}
-{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":5}}

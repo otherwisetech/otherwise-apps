@@ -53,22 +53,24 @@ Otherwise Apps is also the hub of the apps, through
   properties, devices, sites and domains the apps know. **Off until you turn it on.** Search by
   name, alias, tax id, plate, MAC or host name; see which apps use each entity and open it in
   them; edit name, aliases, tags and notes; merge duplicates (always after a confirmation).
-- **Assistant** (⌘4): ask questions across every installed app ("What's due this month at
-  Otherwise SAS?", "Which devices are down?", "October spending by category") and get answers
-  with your own data, using **your own** Claude Code (`claude`), Codex (`codex`) or opencode
-  (`opencode`) subscription. Each question runs that CLI headless with the hub attached for that
-  run only (a temporary `--mcp-config`, `-c` overrides or `OPENCODE_CONFIG_CONTENT`): your
-  Claude / Codex / opencode configuration is never touched, and its file, shell and web tools are
-  turned off. Read-only unless you allow write tools in Settings → Hub. Answers stream in, with
-  the app tools used shown as chips; conversations are kept in
-  `<Otherwise data folder>/otherwise-apps/assistant/`. What the assistant reads goes to the
-  provider of the CLI you chose. Today items have an **Ask** button that opens the Assistant on
-  that item. If the CLI isn't signed in, the page tells you which command to run.
+- **Assistant panel** (⌘J, or ⌘4 / the robot button; from every page): the shared
+  [otherwise-agent-panel](https://github.com/otherwisetech/otherwise-agent-panel), docked as a
+  bar, below, on the right or full window. Ask questions across every installed app ("What's
+  due this month at Otherwise SAS?", "Which devices are down?") with **your own** Claude Code,
+  Codex or opencode subscription; pick the agent, model and permission mode (read-only, ask
+  before changing, automatic). **Chat** streams answers with the app tools used as chips;
+  **Terminal** opens the agent itself in an embedded terminal. Attach images, PDFs and files by
+  dropping or pasting them. The hub is attached for that session only (a temporary
+  `--mcp-config`, `-c` overrides or `OPENCODE_CONFIG_CONTENT`): your Claude / Codex / opencode
+  configuration is never touched, and their file, shell and web tools are off. Write tools exist
+  only when you allow them in Settings → Hub (and never in read-only mode). The agent knows which
+  page you are on. Conversations are kept in `<Otherwise data folder>/otherwise-apps/assistant/`;
+  what the assistant reads goes to the provider you chose. Today items have an **Ask** button.
 - **Settings → Hub**: shared entities on/off, the command that adds the MCP server to Claude
   Code (`claude mcp add otherwise-hub -- "…/otherwise-apps" mcp`, to copy and run yourself),
   "Allow assistants to make changes" (off by default) and which apps' tools are offered.
 - **Links**: Otherwise Apps handles `otherwise://` links. `otherwise://otherwise-apps/today`,
-  `…/entities/<id>`, `…/assistant` and `…/hub` open its pages; a link to another app
+  `…/entities/<id>`, `…/assistant` (the panel) and `…/hub` open its pages; a link to another app
   (`otherwise://vigia/item/42`) is passed on to that app, or tells you it isn't installed.
 
 ## Where the catalog comes from

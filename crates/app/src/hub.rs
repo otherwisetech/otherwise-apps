@@ -28,7 +28,6 @@ pub enum Page {
     Apps,
     Today,
     Entities,
-    Assistant,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -225,11 +224,6 @@ impl Launcher {
         match p {
             Page::Today => self.reload_today(cx),
             Page::Entities => self.reload_entities(cx),
-            Page::Assistant => {
-                if self.assistant.found.is_none() {
-                    self.detect_agents(cx);
-                }
-            }
             Page::Apps => {}
         }
         cx.notify();
@@ -241,7 +235,7 @@ impl Launcher {
         if link.app == ME {
             match link.at(0) {
                 Some("today") => self.set_page(Page::Today, cx),
-                Some("assistant") => self.set_page(Page::Assistant, cx),
+                Some("assistant") => self.show_panel(window, cx),
                 Some("entities") => {
                     self.hub.selected = link.at(1).and_then(|s| Uuid::parse_str(s).ok());
                     self.set_page(Page::Entities, cx);
@@ -264,7 +258,6 @@ impl Launcher {
             self.page = match l.at(0) {
                 Some("entities") => Page::Entities,
                 Some("today") => Page::Today,
-                Some("assistant") => Page::Assistant,
                 _ => Page::Apps,
             };
             cx.notify();

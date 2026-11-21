@@ -2,7 +2,7 @@
 #![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]
 
 mod app;
-mod assistant;
+mod agent;
 mod cards;
 mod data_root;
 mod dialogs;
@@ -136,7 +136,16 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     // the MCP hub: stdin / stdout only, no window
     if args.first().map(String::as_str) == Some("mcp") {
-        if let Err(e) = otherwise_mcp_hub::run_stdio() {
+        let read_only = args.iter().any(|a| a == agent::READ_ONLY_FLAG);
+        let served = if read_only {
+            // the AI panel's "Solo lectura": write tools hidden and refused whatever hub.json says
+            let mut cfg = otherwise_mcp_hub::Config::system();
+            cfg.writes = Some(false);
+            otherwise_mcp_hub::Hub::start(cfg).serve(std::io::stdin().lock(), std::io::stdout().lock())
+        } else {
+            otherwise_mcp_hub::run_stdio()
+        };
+        if let Err(e) = served {
             eprintln!("otherwise-hub: {e}"); // i18n-ok: developer diagnostic
             std::process::exit(1);
         }
@@ -172,6 +181,8 @@ fn main() {
         cx.on_action(|_: &OpenWebsite, cx| cx.open_url(COMPANY_URL));
         cx.on_action(|_: &OpenVcity, cx| cx.open_url(VCITY_URL));
         gpui_component::set_locale(i18n::locale());
+        otherwise_agent_panel::ui::init(cx);
+        otherwise_agent_panel::i18n::set_locale(i18n::locale());
         set_app_menus(cx);
         cx.on_window_closed(|cx, _| {
             if cx.windows().is_empty() {
@@ -188,7 +199,12 @@ fn main() {
         cx.spawn(async move |cx| {
             cx.open_window(window_options, |window, cx| {
                 let view = cx.new(|cx| app::Launcher::new(window, cx));
-                cx.new(|cx| Root::new(view, window, cx))
+                let focus = view.read(cx).focus_handle();
+                let host: std::rc::Rc<dyn otherwise_agent_panel::ui::AgentHost> = std::rc::Rc::new(agent::Host { launcher: view.downgrade() });
+                let dock = cx.new(|cx| otherwise_agent_panel::ui::AgentDock::new(view.clone(), Some(focus), host, window, cx));
+                let panel = dock.read(cx).panel().downgrade();
+                view.update(cx, |v, _| v.panel = Some(panel));
+                cx.new(|cx| Root::new(dock, window, cx))
             })
             .expect("open window");
         })

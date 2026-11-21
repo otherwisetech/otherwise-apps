@@ -1,6 +1,5 @@
 //! The launcher window: catalog state, checks, jobs and the top-level layout. Cards are drawn in
 //! `cards.rs`, modals in `dialogs.rs`.
-use crate::assistant::AssistantState;
 use crate::hub::{HubState, Page};
 use crate::jobs::{self, Job, JobError, Kind, Spec};
 use crate::settings::Settings;
@@ -127,7 +126,8 @@ pub struct Launcher {
     ticking: bool,
     pub page: Page,
     pub hub: HubState,
-    pub assistant: AssistantState,
+    /// The docked AI panel (set by main.rs once the dock exists).
+    pub panel: Option<WeakEntity<otherwise_agent_panel::ui::AgentPanel>>,
     _subs: Vec<Subscription>,
 }
 
@@ -166,13 +166,7 @@ impl Launcher {
             s
         });
         let hub = HubState::new(window, cx);
-        let assistant = AssistantState::new(window, cx);
         let subs = vec![
-            cx.subscribe_in(&assistant.input, window, |this, _, ev: &InputEvent, window, cx| {
-                if let InputEvent::PressEnter { shift: false, .. } = ev {
-                    this.send_input(window, cx);
-                }
-            }),
             cx.subscribe_in(&hub.search, window, |this, _, ev: &InputEvent, _, cx| {
                 if let InputEvent::Change = ev {
                     this.reload_entities(cx);
@@ -237,7 +231,7 @@ impl Launcher {
             ticking: false,
             page: Page::Apps,
             hub,
-            assistant,
+            panel: None,
             _subs: subs,
         };
         this.set_catalog(manifest);
@@ -705,10 +699,15 @@ impl Launcher {
         cx.notify();
     }
 
+    pub fn focus_handle(&self) -> FocusHandle {
+        self.focus.clone()
+    }
+
     pub fn set_language(&mut self, code: &'static str, cx: &mut Context<Self>) {
         if i18n::set_locale(code) {
             self.settings = Settings::update(|s| s.language = Some(code.to_string()));
             gpui_component::set_locale(code);
+            otherwise_agent_panel::i18n::set_locale(code);
             crate::set_app_menus(cx);
             cx.refresh_windows();
         }
@@ -772,8 +771,6 @@ impl Launcher {
             self.search.update(cx, |s, cx| s.set_placeholder(text, window, cx));
             let text = i18n::t!("app.entities.search");
             self.hub.search.update(cx, |s, cx| s.set_placeholder(text, window, cx));
-            let text = i18n::t!("app.assistant.placeholder");
-            self.assistant.input.update(cx, |s, cx| s.set_placeholder(text, window, cx));
             let text = Layout::default_root(self.target.os).display().to_string();
             self.root_input.update(cx, |s, cx| s.set_placeholder(text, window, cx));
         }
@@ -810,10 +807,11 @@ impl Launcher {
             this.modal = Some(Modal::Settings);
             cx.notify();
         }));
+        let assistant = ui::icon_button(t, "assistant", true).child(ui::icon(IconName::Bot, 16., t.ink)).tooltip(|window, cx| gpui_component::tooltip::Tooltip::new(i18n::t!("app.assistant.toggle")).build(window, cx)).on_click(cx.listener(|this, _, window, cx| this.toggle_panel(window, cx)));
         let page = self.page;
         let attention = self.hub.needs_attention();
         let mut pages = ui::segmented(t);
-        for (p, label, id) in [(Page::Apps, i18n::t!("app.page.apps"), "page-apps"), (Page::Today, i18n::t!("app.page.today"), "page-today"), (Page::Entities, i18n::t!("app.page.entities"), "page-entities"), (Page::Assistant, i18n::t!("app.page.assistant"), "page-assistant")] {
+        for (p, label, id) in [(Page::Apps, i18n::t!("app.page.apps"), "page-apps"), (Page::Today, i18n::t!("app.page.today"), "page-today"), (Page::Entities, i18n::t!("app.page.entities"), "page-entities")] {
             let label = if p == Page::Today && attention > 0 { format!("{label} {attention}") } else { label };
             pages = pages.child(ui::segment(t, id, p == page).child(label).on_click(cx.listener(move |this, _, _, cx| this.set_page(p, cx))));
         }
@@ -835,6 +833,7 @@ impl Launcher {
             .when(apps_page && updates > 0, |d| {
                 d.child(ui::filled_button(t, "update-all", t.accent).child(glyph(ui::UPDATE, 15., t.on_fill())).child(i18n::t!("app.topbar.update_all", n = updates)).on_click(cx.listener(|this, _, _, cx| this.update_all(cx))))
             })
+            .child(assistant)
             .child(settings)
     }
 
@@ -1010,11 +1009,13 @@ impl Render for Launcher {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         self.sync_placeholder(window, cx);
         let t = tokens(cx);
+        if cx.try_global::<otherwise_agent_panel::ui::PanelStyle>().is_none_or(|s| s.dark != t.dark) {
+            cx.set_global(crate::agent::style(&t));
+        }
         let body = match self.page {
             Page::Apps => self.render_body(&t, window, cx),
             Page::Today => self.render_today(&t, cx),
             Page::Entities => self.render_entities(&t, cx),
-            Page::Assistant => self.render_assistant(&t, cx),
         };
         div()
             .key_context(CONTEXT)
@@ -1033,7 +1034,7 @@ impl Render for Launcher {
             .on_action(cx.listener(|this, _: &ShowApps, _, cx| this.set_page(Page::Apps, cx)))
             .on_action(cx.listener(|this, _: &ShowToday, _, cx| this.set_page(Page::Today, cx)))
             .on_action(cx.listener(|this, _: &ShowEntities, _, cx| this.set_page(Page::Entities, cx)))
-            .on_action(cx.listener(|this, _: &ShowAssistant, _, cx| this.set_page(Page::Assistant, cx)))
+            .on_action(cx.listener(|this, _: &ShowAssistant, window, cx| this.show_panel(window, cx)))
             .relative()
             .flex()
             .flex_col()
