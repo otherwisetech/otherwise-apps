@@ -17,6 +17,7 @@ otherwise-core.workspace = true
 anyhow.workspace = true
 otherwise-link.workspace = true
 otherwise-mcp-hub.workspace = true
+otherwise-agent-panel.workspace = true
 chrono.workspace = true
 uuid = "1"
 # GitHub star count (one GET a day)
