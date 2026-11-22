@@ -3535,6 +3535,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "keyring"
+version = "3.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eebcc3aff044e5944a8fbaf69eb277d11986064cba30c468730e8b9909fb551c"
+dependencies = [
+ "byteorder",
+ "linux-keyutils",
+ "log",
+ "security-framework 2.11.1",
+ "security-framework 3.7.0",
+ "windows-sys 0.60.2",
+ "zeroize",
+]
+
+[[package]]
 name = "khronos-egl"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3696,6 +3711,16 @@ name = "linktime-proc-macro"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e57c38c1e860fd37c604281cdfb1dd2216977fd76a50f85ba2f388ef3219616"
+
+[[package]]
+name = "linux-keyutils"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "83270a18e9f90d0707c41e9f35efada77b64c0e6f3f1810e71c8368a864d5590"
+dependencies = [
+ "bitflags 2.13.1",
+ "libc",
+]
 
 [[package]]
 name = "linux-raw-sys"
@@ -4730,14 +4755,14 @@ dependencies = [
  "gpui",
  "gpui-component",
  "libc",
- "otherwise-link",
+ "otherwise-link 0.2.0",
  "serde",
  "serde_json",
 ]
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -4745,11 +4770,12 @@ dependencies = [
  "gpui-component",
  "gpui-component-assets",
  "gpui_platform",
+ "keyring",
  "objc",
  "otherwise-agent-panel",
  "otherwise-apps-core",
  "otherwise-apps-i18n",
- "otherwise-link",
+ "otherwise-link 0.3.0",
  "otherwise-mcp-hub",
  "serde_json",
  "ureq",
@@ -4759,11 +4785,12 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
+ "chrono",
  "flate2",
  "otherwise-apps-i18n",
- "otherwise-link",
+ "otherwise-link 0.3.0",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -4771,12 +4798,13 @@ dependencies = [
  "tempfile",
  "trash",
  "ureq",
+ "uuid",
  "zip",
 ]
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.4.0"
+version = "0.5.0"
 
 [[package]]
 name = "otherwise-link"
@@ -4791,12 +4819,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "otherwise-mcp-hub"
-version = "0.2.0"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.2.0#8e4cc8c298e9c5c37a7c02bc061e1c8fbee50b2f"
+name = "otherwise-link"
+version = "0.3.0"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.3.0#5e027f3106cd0eea088538bbc9146def6661d8f5"
 dependencies = [
  "chrono",
- "otherwise-link",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "uuid",
+]
+
+[[package]]
+name = "otherwise-mcp-hub"
+version = "0.3.0"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.3.0#5e027f3106cd0eea088538bbc9146def6661d8f5"
+dependencies = [
+ "chrono",
+ "otherwise-link 0.3.0",
  "serde_json",
  "uuid",
 ]
@@ -5905,7 +5945,7 @@ dependencies = [
  "openssl-probe",
  "rustls-pki-types",
  "schannel",
- "security-framework",
+ "security-framework 3.7.0",
 ]
 
 [[package]]
@@ -6067,6 +6107,19 @@ name = "seahash"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
+
+[[package]]
+name = "security-framework"
+version = "2.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "897b2245f0b511c87893af39b033e5ca9cce68824c4d7e7630b5a1d339658d02"
+dependencies = [
+ "bitflags 2.13.1",
+ "core-foundation 0.9.4",
+ "core-foundation-sys",
+ "libc",
+ "security-framework-sys",
+]
 
 [[package]]
 name = "security-framework"
@@ -8470,6 +8523,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b"
 dependencies = [
  "windows-targets 0.52.6",
+]
+
+[[package]]
+name = "windows-sys"
+version = "0.60.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2f500e4d28234f72040990ec9d39e3a6b950f9f22d3dba18416c35882612bcb"
+dependencies = [
+ "windows-targets 0.53.5",
 ]
 
 [[package]]

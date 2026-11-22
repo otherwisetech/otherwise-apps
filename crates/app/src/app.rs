@@ -31,7 +31,7 @@ const TOAST_FOR: Duration = Duration::from_secs(5);
 /// How often the "is a check due?" timer wakes up (the interval itself is in settings).
 const TICK: Duration = Duration::from_secs(60);
 
-actions!(otherwise_apps, [Refresh, ShowAbout, ShowSettings, FocusSearch, CloseModal, ShowApps, ShowToday, ShowEntities, ShowAssistant]);
+actions!(otherwise_apps, [Refresh, ShowAbout, ShowSettings, FocusSearch, CloseModal, ShowApps, ShowToday, ShowEntities, ShowAssistant, ShowCalendar]);
 
 pub fn bind_keys(cx: &mut App) {
     cx.bind_keys([
@@ -43,6 +43,7 @@ pub fn bind_keys(cx: &mut App) {
         KeyBinding::new("secondary-2", ShowToday, Some(CONTEXT)),
         KeyBinding::new("secondary-3", ShowEntities, Some(CONTEXT)),
         KeyBinding::new("secondary-4", ShowAssistant, Some(CONTEXT)),
+        KeyBinding::new("secondary-5", ShowCalendar, Some(CONTEXT)),
     ]);
 }
 
@@ -102,6 +103,7 @@ pub enum Modal {
     Restart { install: PathBuf, executable: PathBuf, version: String },
     Settings,
     About,
+    CalendarSources,
     /// Settings → Otherwise data folder → Change…: what would move to `to`.
     DataRoot { from: PathBuf, to: PathBuf, list: String, offer: crate::data_root::Offer, cloud: Option<String> },
 }
@@ -126,6 +128,7 @@ pub struct Launcher {
     ticking: bool,
     pub page: Page,
     pub hub: HubState,
+    pub cal: crate::calendar::CalState,
     /// The docked AI panel (set by main.rs once the dock exists).
     pub panel: Option<WeakEntity<otherwise_agent_panel::ui::AgentPanel>>,
     _subs: Vec<Subscription>,
@@ -166,6 +169,7 @@ impl Launcher {
             s
         });
         let hub = HubState::new(window, cx);
+        let cal = crate::calendar::CalState::new(&hub.root, window, cx);
         let subs = vec![
             cx.subscribe_in(&hub.search, window, |this, _, ev: &InputEvent, _, cx| {
                 if let InputEvent::Change = ev {
@@ -193,6 +197,9 @@ impl Launcher {
                     this.reload_today(cx);
                     if this.page == Page::Entities {
                         this.reload_entities(cx);
+                    }
+                    if this.page == Page::Calendar {
+                        this.reload_calendar(cx);
                     }
                     cx.notify();
                 }
@@ -231,6 +238,7 @@ impl Launcher {
             ticking: false,
             page: Page::Apps,
             hub,
+            cal,
             panel: None,
             _subs: subs,
         };
@@ -811,7 +819,7 @@ impl Launcher {
         let page = self.page;
         let attention = self.hub.needs_attention();
         let mut pages = ui::segmented(t);
-        for (p, label, id) in [(Page::Apps, i18n::t!("app.page.apps"), "page-apps"), (Page::Today, i18n::t!("app.page.today"), "page-today"), (Page::Entities, i18n::t!("app.page.entities"), "page-entities")] {
+        for (p, label, id) in [(Page::Apps, i18n::t!("app.page.apps"), "page-apps"), (Page::Today, i18n::t!("app.page.today"), "page-today"), (Page::Entities, i18n::t!("app.page.entities"), "page-entities"), (Page::Calendar, i18n::t!("app.page.calendar"), "page-calendar")] {
             let label = if p == Page::Today && attention > 0 { format!("{label} {attention}") } else { label };
             pages = pages.child(ui::segment(t, id, p == page).child(label).on_click(cx.listener(move |this, _, _, cx| this.set_page(p, cx))));
         }
@@ -1016,6 +1024,7 @@ impl Render for Launcher {
             Page::Apps => self.render_body(&t, window, cx),
             Page::Today => self.render_today(&t, cx),
             Page::Entities => self.render_entities(&t, cx),
+            Page::Calendar => self.render_calendar(&t, cx),
         };
         div()
             .key_context(CONTEXT)
@@ -1034,6 +1043,7 @@ impl Render for Launcher {
             .on_action(cx.listener(|this, _: &ShowApps, _, cx| this.set_page(Page::Apps, cx)))
             .on_action(cx.listener(|this, _: &ShowToday, _, cx| this.set_page(Page::Today, cx)))
             .on_action(cx.listener(|this, _: &ShowEntities, _, cx| this.set_page(Page::Entities, cx)))
+            .on_action(cx.listener(|this, _: &ShowCalendar, _, cx| this.show_calendar(cx)))
             .on_action(cx.listener(|this, _: &ShowAssistant, window, cx| this.show_panel(window, cx)))
             .relative()
             .flex()

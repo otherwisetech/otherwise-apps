@@ -8,10 +8,15 @@ Same conventions as genealogy-rs, diskmap, rama and mosaico.
 crates/i18n  otherwise-apps-i18n: embedded translation catalogs, t!/tn!/tv! macros, i18n guard tests
 crates/core  otherwise-apps-core: catalog (+ validation), version comparison, asset selection,
              SHA-256 verification, download, unpack, install / replace / uninstall, detection,
-             Linux .desktop and Windows shortcuts, running-app quit. No UI.
+             Linux .desktop and Windows shortcuts, running-app quit; calendar.rs (merge of the apps'
+             events feeds, holidays, .ics overlays, combined otherwise.ics) and vcity.rs (device-code
+             sign-in, refresh, read-only events / bookings). No UI.
 crates/app   `otherwise-apps` desktop app (GPUI + gpui-component). app.rs: state, checks, jobs;
              cards.rs: grid / list; dialogs.rs: modals, settings, About; jobs.rs: background work;
              hub.rs: Today page, Entities page, Settings → Hub, otherwise:// handling;
+             calendar.rs: Calendar page (⌘5: month / week / agenda, filters, sources modal,
+             combined ICS, Vcity sign-in; core calendar.rs + vcity.rs hold the logic), secrets.rs
+             (keychain);
              data_root.rs: Settings → Otherwise data folder (otherwise-link `relocate`: plan,
              confirmation listing what moves, verified move / copy / use-existing, cloud status,
              registry lock and conflicted-copy warnings)
@@ -54,6 +59,10 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
   `OPENCODE_CONFIG_CONTENT`), turns off its built-in file / shell / web tools, and never writes
   the user's agent config; its tests use fake CLIs. History stays under
   `<data root>/otherwise-apps/assistant/` (0.3 conversations load).
+  Calendar: read-only over the apps' `events.json`; busy-only events never leave the page with
+  details (ICS export, agent context and MCP get "Busy"); .ics URLs are fetched only on add /
+  refresh; Vcity tokens only in the OS keychain (`secrets.rs`), never logged or written to the
+  data root, redirects refused; Vcity tests use a local mock server, never vcity.io.
   Moving the data root always goes through the confirmation that lists what moves, and is
   refused while an app has its data open (its lock).
 - Comments: sparse, only non-obvious why.

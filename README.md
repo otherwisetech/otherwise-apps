@@ -41,7 +41,7 @@ Windows and Linux. UI in Spanish, English, Portuguese and French.
   install location on Windows and Linux. The Dock icon shows the number of pending updates on
   macOS, and a system notification announces each new release once.
 
-## Hub: Today, Entities and MCP
+## Hub: Today, Calendar, Entities and MCP
 
 Otherwise Apps is also the hub of the apps, through
 [otherwise-link](https://github.com/otherwisetech/otherwise-link):
@@ -53,6 +53,22 @@ Otherwise Apps is also the hub of the apps, through
   properties, devices, sites and domains the apps know. **Off until you turn it on.** Search by
   name, alias, tax id, plate, MAC or host name; see which apps use each entity and open it in
   them; edit name, aliases, tags and notes; merge duplicates (always after a confirmation).
+- **Calendar** (⌘5): every app's dates in one month / week / agenda view — Vigía's due dates
+  and renewals, expense's planned payments, payroll, subscriptions, tax deadlines and month
+  closes (private by default: shown here, "Busy" everywhere else), genealogy-rs birthdays and
+  anniversaries (opt-in), Brújula's audits and action-plan due dates, Helio's maintenance — each
+  app in its own color, with filters by app and by shared entity. Click an event to open it in
+  its app. Public holidays (Colombia, US, Wyoming, Spain, Mexico, Brazil, Canada; computed, the
+  same as Vigía and expense) and read-only `.ics` calendars (a file or a URL, kept as a copy so
+  they work offline, refreshed only when you ask) overlay it. **Copy ICS link** keeps one
+  combined `<Otherwise data folder>/otherwise-apps/calendar/otherwise.ics` up to date (while the
+  app runs) for Apple Calendar's *New Calendar Subscription*; Google Calendar needs an http
+  address, so use **Export .ics** and import it there. Optionally **Connect Vcity** (Settings →
+  Hub or Calendar → Sources): the same browser sign-in as the `vcity` CLI, the session in the
+  system keychain only, and your organizations' events and bookings read-only (bookings shown as
+  private). Apps publish `<data folder>/<app>/events.json` (otherwise-link SPEC §9); the
+  assistant sees the visible range (private events without details) and the hub MCP server
+  offers `calendar_events(from, to, apps?)`.
 - **Assistant panel** (⌘J, or ⌘4 / the robot button; from every page): the shared
   [otherwise-agent-panel](https://github.com/otherwisetech/otherwise-agent-panel), docked as a
   bar, below, on the right or full window. Ask questions across every installed app ("What's
@@ -70,6 +86,7 @@ Otherwise Apps is also the hub of the apps, through
   Code (`claude mcp add otherwise-hub -- "…/otherwise-apps" mcp`, to copy and run yourself),
   "Allow assistants to make changes" (off by default) and which apps' tools are offered.
 - **Links**: Otherwise Apps handles `otherwise://` links. `otherwise://otherwise-apps/today`,
+  `…/calendar?date=YYYY-MM-DD`,
   `…/entities/<id>`, `…/assistant` (the panel) and `…/hub` open its pages; a link to another app
   (`otherwise://vigia/item/42`) is passed on to that app, or tells you it isn't installed.
 
@@ -118,7 +135,8 @@ entry) to the Trash after confirmation and tells you where its data still is.
 
 Network use: the catalog, GitHub's public release API (anonymous, 60 requests per hour) and the
 release files themselves, plus this repository's star count (`api.github.com/repos/otherwisetech/otherwise-apps`,
-once a day, shown next to *Star on GitHub*; off when automatic checks are off). No telemetry.
+once a day, shown next to *Star on GitHub*; off when automatic checks are off); `.ics` URLs you add
+(only when you add or refresh them) and, if you connect it, vcity.io. No telemetry.
 
 ## Install
 

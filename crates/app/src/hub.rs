@@ -28,6 +28,7 @@ pub enum Page {
     Apps,
     Today,
     Entities,
+    Calendar,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -132,7 +133,7 @@ fn weekday(d: NaiveDate) -> String {
     }
 }
 
-fn date_label(d: NaiveDate) -> String {
+pub fn date_label(d: NaiveDate) -> String {
     i18n::t!("app.today.date", weekday = weekday(d), day = d.day(), month = d.month(), year = d.year())
 }
 
@@ -224,6 +225,10 @@ impl Launcher {
         match p {
             Page::Today => self.reload_today(cx),
             Page::Entities => self.reload_entities(cx),
+            Page::Calendar => {
+                self.reload_calendar(cx);
+                self.reload_vcity(cx);
+            }
             Page::Apps => {}
         }
         cx.notify();
@@ -235,6 +240,12 @@ impl Launcher {
         if link.app == ME {
             match link.at(0) {
                 Some("today") => self.set_page(Page::Today, cx),
+                Some("calendar") => {
+                    if let Some(d) = link.get("date").and_then(|d| NaiveDate::parse_from_str(d, "%Y-%m-%d").ok()) {
+                        self.cal.cursor = d;
+                    }
+                    self.set_page(Page::Calendar, cx);
+                }
                 Some("assistant") => self.show_panel(window, cx),
                 Some("entities") => {
                     self.hub.selected = link.at(1).and_then(|s| Uuid::parse_str(s).ok());
@@ -258,6 +269,7 @@ impl Launcher {
             self.page = match l.at(0) {
                 Some("entities") => Page::Entities,
                 Some("today") => Page::Today,
+                Some("calendar") => Page::Calendar,
                 _ => Page::Apps,
             };
             cx.notify();
@@ -967,5 +979,6 @@ impl Launcher {
             .child(row(i18n::t!("app.hub.mcp"), Some(i18n::t!("app.hub.mcp_hint")), command.into_any_element()))
             .child(row(i18n::t!("app.hub.writes"), Some(i18n::t!("app.hub.writes_hint")), writes.into_any_element()))
             .child(row(i18n::t!("app.hub.apps"), None, list.into_any_element()))
+            .child(row(i18n::t!("app.cal.vcity"), Some(i18n::t!("app.cal.vcity_hint")), self.render_vcity_control(t, cx).into_any_element()))
     }
 }
