@@ -69,6 +69,16 @@ pub fn get_text(url: &str, limit: u64) -> Result<String, NetError> {
     Ok(resp.body_mut().with_config().limit(limit).read_to_string()?)
 }
 
+/// A calendar (.ics) from an http(s) URL, at most 16 MiB.
+pub fn get_calendar(url: &str) -> Result<String, NetError> {
+    let l = url.trim().to_ascii_lowercase();
+    if !(l.starts_with("https://") || l.starts_with("http://")) {
+        return Err(NetError::Transport(i18n::t!("core.net.not_http")));
+    }
+    let mut resp = api().get(url.trim()).header("Accept", "text/calendar, */*").call()?;
+    Ok(resp.body_mut().with_config().limit(16 << 20).read_to_string()?)
+}
+
 pub fn get_bytes(url: &str, limit: u64) -> Result<Vec<u8>, NetError> {
     let mut resp = api().get(url).call()?;
     Ok(resp.body_mut().with_config().limit(limit).read_to_vec()?)

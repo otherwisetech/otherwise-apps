@@ -3,12 +3,14 @@
 
 mod app;
 mod agent;
+mod calendar;
 mod cards;
 mod data_root;
 mod dialogs;
 mod hub;
 mod jobs;
 mod notify;
+mod secrets;
 mod settings;
 mod star;
 mod theme;

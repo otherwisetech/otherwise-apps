@@ -25,3 +25,4 @@ core.net.size = The download is incomplete ({got} of {want} bytes).
 # verification
 core.verify.missing = GitHub has not published a SHA-256 checksum for this file, so it can’t be verified and was not installed.
 core.verify.mismatch = The download does not match GitHub’s SHA-256 checksum (expected {expected}…, got {actual}…). It was deleted and nothing was installed.
+core.net.not_http = Only http(s) addresses are supported.

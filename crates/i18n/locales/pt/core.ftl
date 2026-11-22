@@ -25,3 +25,4 @@ core.net.size = O download está incompleto ({got} de {want} bytes).
 # verificação
 core.verify.missing = O GitHub não publicou uma soma SHA-256 para este arquivo, então ele não pode ser verificado e não foi instalado.
 core.verify.mismatch = O download não confere com a soma SHA-256 do GitHub (esperado {expected}…, recebido {actual}…). Ele foi apagado e nada foi instalado.
+core.net.not_http = Apenas endereços http(s) são aceitos.

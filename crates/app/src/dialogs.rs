@@ -87,6 +87,7 @@ impl Launcher {
                 .into_any_element(),
             Modal::Settings => self.render_settings(t, window, cx).into_any_element(),
             Modal::About => self.render_about(t, cx).into_any_element(),
+            Modal::CalendarSources => self.panel(t, 600., cx).child(self.render_calendar_sources(t, cx)).into_any_element(),
             Modal::DataRoot { .. } => self.render_data_root_modal(t, cx)?,
         };
         Some(self.backdrop(t, card, cx))

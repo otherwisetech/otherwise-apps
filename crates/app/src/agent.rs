@@ -34,7 +34,7 @@ impl AgentHost for Host {
         Some(
             "This is Otherwise Apps, the launcher of Otherwise Technologies' desktop apps (expense, Vigía, Nodo and others). \
              The MCP server \"otherwise\" is the Otherwise hub: app tools are named <app>.<tool> (for example vigia.due, nodo.devices, expense.search_transactions), \
-             plus today (what needs attention), entities_search / entities_get (shared people, companies, devices…) and open_link. \
+             plus today (what needs attention), calendar_events (the user's calendar across apps for a date range: due dates, payments, birthdays, audits, holidays), entities_search / entities_get (shared people, companies, devices…) and open_link. \
              If an app's tools are missing, say which app would have to be installed or enabled. Write tools exist only when the user turned them on in Settings → Hub."
                 .into(),
         )
@@ -93,6 +93,7 @@ impl Launcher {
             Page::Apps => "Apps (the catalog of Otherwise apps: install, update)",
             Page::Today => "Today (what needs attention across the installed apps)",
             Page::Entities => "Entities (the shared registry of people, companies, devices)",
+            Page::Calendar => return self.calendar_context().to_string(),
         };
         let mut v = serde_json::json!({ "page": page });
         if self.page == Page::Apps {

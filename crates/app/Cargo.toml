@@ -23,6 +23,8 @@ uuid = "1"
 # GitHub star count (one GET a day)
 ureq = { version = "3", default-features = false, features = ["rustls"] }
 serde_json.workspace = true
+# the Vcity session token (Calendar → Vcity), same as expense
+keyring = { version = "3", features = ["apple-native", "windows-native", "linux-native"] }
 gpui.workspace = true
 gpui_platform.workspace = true
 gpui-component.workspace = true
