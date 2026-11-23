@@ -138,7 +138,11 @@ impl Shared {
 
 /// The real apps and folders of this computer.
 pub fn system_engine() -> Engine {
-    Engine::new(Locations::system(), otherwise_link::apps::known_specs(), state::dir())
+    let loc = Locations::system();
+    let specs = otherwise_link::apps::all_specs(&loc);
+    let mut e = Engine::new(loc, specs, state::dir());
+    e.refresh_specs = true;
+    e
 }
 
 /// The worker loop: scan, run what is due (one at a time), drain notifications, publish the
