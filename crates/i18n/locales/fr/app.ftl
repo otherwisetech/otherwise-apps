@@ -415,3 +415,21 @@ app.cal.wd_thu = jeu.
 app.cal.wd_fri = ven.
 app.cal.wd_sat = sam.
 app.cal.wd_sun = dim.
+
+# Réglages → Otherwise Helper
+app.helper.title = Otherwise Helper
+app.helper.login = Ouvrir à la connexion
+app.helper.login_label = Ouvrir Otherwise Helper à la connexion et le garder dans la barre des menus
+app.helper.login_hint = Vérifie le courrier, les appareils et les calendriers et affiche les rappels même quand vos apps sont fermées. Léger : un seul petit processus pour toutes les apps.
+app.helper.login_approval = En attente de votre accord dans Réglages Système → Général → Ouverture.
+app.helper.login_unsupported = L’ouverture à la connexion requiert macOS 13 ou ultérieur.
+app.helper.not_bundled = Cette copie d’Otherwise Apps n’inclut pas le helper.
+app.helper.quiet = Mode silencieux
+app.helper.quiet_label = Aucune notification (les tâches en arrière-plan continuent)
+app.helper.quiet_hint = Coupe d’un coup les notifications de toutes les apps.
+app.helper.apps = Apps
+app.helper.apps_hint = Seules les apps installées qui ont des tâches en arrière-plan apparaissent.
+app.helper.no_apps = Aucune app installée n’a encore de tâche en arrière-plan.
+app.helper.app_jobs = {app} : travailler en arrière-plan
+app.helper.app_notifications = notifications
+app.helper.unknown_job = Tâche en arrière-plan inconnue

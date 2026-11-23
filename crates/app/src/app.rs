@@ -128,6 +128,8 @@ pub struct Launcher {
     ticking: bool,
     pub page: Page,
     pub hub: HubState,
+    /// Settings → Otherwise Helper.
+    pub helper: crate::helper::HelperView,
     pub cal: crate::calendar::CalState,
     /// The docked AI panel (set by main.rs once the dock exists).
     pub panel: Option<WeakEntity<otherwise_agent_panel::ui::AgentPanel>>,
@@ -194,6 +196,7 @@ impl Launcher {
                 if window.is_window_active() {
                     this.detect_all();
                     this.rediscover(cx);
+                    this.reload_helper(cx);
                     this.reload_today(cx);
                     if this.page == Page::Entities {
                         this.reload_entities(cx);
@@ -238,6 +241,7 @@ impl Launcher {
             ticking: false,
             page: Page::Apps,
             hub,
+            helper: crate::helper::HelperView::default(),
             cal,
             panel: None,
             _subs: subs,
@@ -246,6 +250,7 @@ impl Launcher {
         this.refresh(true, cx);
         this.schedule_checks(cx);
         this.rediscover(cx);
+        this.reload_helper(cx);
         this.watch_links(window, cx);
         crate::star::refresh(this.settings.check_hours() != 0, cx);
         this

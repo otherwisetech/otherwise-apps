@@ -7,6 +7,7 @@ mod calendar;
 mod cards;
 mod data_root;
 mod dialogs;
+mod helper;
 mod hub;
 mod jobs;
 mod notify;
@@ -155,6 +156,10 @@ fn main() {
     }
     let settings = settings::Settings::load();
     i18n::set_locale(settings::initial_language(&settings));
+    // a background job run by Otherwise Helper: no window
+    if args.first().map(String::as_str) == Some("background") {
+        std::process::exit(helper::run_cli(&args[1..]));
+    }
     if matches!(std::env::args().nth(1).as_deref(), Some("-h" | "--help")) {
         println!("{}", i18n::t!("app.cli.usage"));
         return;
@@ -211,5 +216,6 @@ fn main() {
             .expect("open window");
         })
         .detach();
+        helper::on_launch();
     });
 }
