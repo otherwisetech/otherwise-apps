@@ -6,7 +6,7 @@
 //! - [`engine`]: installed apps with jobs, running the due one, draining notifications.
 //! - [`sched`]: what is due and why the rest waits (pause, battery saver, memory, offline).
 //! - [`runner`]: one run with its timeout and memory ceiling.
-//! - [`state`]: last runs and shown notifications (`~/.otherwise/helper/state.json`).
+//! - [`state`]: last runs and shown notifications (this computer's folder, never the data root).
 //! - [`menu`]: the menu as data. [`sys`]: memory pressure, network, processes.
 //! - `mac` (in the binary): NSStatusItem, UNUserNotificationCenter, SMAppService.
 pub mod engine;
@@ -130,6 +130,7 @@ pub fn work(shared: Arc<Shared>, mut engine: Engine, low_power: &dyn Fn() -> boo
         }
         let root = Root::system();
         let settings = HubSettings::load(&root).background;
+        engine.refresh_leases(&root, &settings);
         let c = sched::Conditions { now: Utc::now(), low_power: low_power(), pressure: sys::memory_pressure(), online: sys::online() };
         let open = |r: &otherwise_link::background::Registered| r.installed.executable.as_deref().is_some_and(sys::running);
         publish(&shared, &engine, &settings, &c, &open, lang);

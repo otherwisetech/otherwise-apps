@@ -31,3 +31,5 @@ helper.cli.login_approval = Falta sua aprovação em Ajustes do Sistema → Gera
 helper.cli.login_unsupported = Abrir ao iniciar a sessão requer macOS 13 ou posterior e o helper dentro do Otherwise Apps.
 helper.cli.login_failed = Não foi possível mudar o início de sessão: {error}
 helper.cli.running = Já há outro Otherwise Helper em execução.
+helper.wait.elsewhere = executando em {device}
+helper.wait.no_lease = aguardando: não é possível gravar na pasta de dados

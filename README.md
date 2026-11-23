@@ -107,6 +107,11 @@ the menu bar:
 - a **menu** with each app's last run and status, Pause for 1 hour, Open Otherwise Apps,
   Settings, About and Quit.
 
+With the data folder on OneDrive (or any synced folder) used from two computers, each app's
+jobs run on one of them only (a lease in the app's folder; the other shows "running on …" and
+takes over if the first one is gone for 10 minutes). What the helper remembers about its own runs
+stays on each computer, outside the data folder.
+
 It starts at login by default after the first launch (macOS 13+, `SMAppService`; it appears in
 System Settings → General → Login Items as Otherwise Helper). Settings → Otherwise Helper turns
 that off, sets quiet mode, and switches each app's jobs and notifications. Linux and Windows

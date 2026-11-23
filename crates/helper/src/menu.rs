@@ -52,7 +52,9 @@ where
     } else {
         i18n::t!("helper.job.never", job = label)
     };
-    let wait = match d.wait {
+    let wait = match &d.wait {
+        Some(Wait::Elsewhere(host)) => Some(i18n::t!("helper.wait.elsewhere", device = host)),
+        Some(Wait::NoLease) => Some(i18n::t!("helper.wait.no_lease")),
         Some(Wait::Off) => Some(i18n::t!("helper.wait.off")),
         Some(Wait::LowPower) => Some(i18n::t!("helper.wait.low_power")),
         Some(Wait::Memory) => Some(i18n::t!("helper.wait.memory")),

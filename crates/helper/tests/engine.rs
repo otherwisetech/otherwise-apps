@@ -39,8 +39,16 @@ impl World {
         Locations { os: Os::Macos, mac_dirs: vec![self.apps.clone()], roots: vec![], path: vec![] }
     }
 
+    /// This computer ("Mac A"), holding its leases.
     fn engine(&self) -> Engine {
-        Engine::new(self.loc(), known_specs(), self.state.clone())
+        self.engine_as("Mac A", &self.state)
+    }
+
+    fn engine_as(&self, host: &str, state: &std::path::Path) -> Engine {
+        let mut e = Engine::new(self.loc(), known_specs(), state.to_path_buf());
+        e.me = Some(otherwise_link::lock::Me { host: host.into(), pid: 1 });
+        e.refresh_leases(&self.root, &BackgroundSettings::default());
+        e
     }
 
     /// expense.app whose `expense` binary is `script`, declaring `jobs`.
@@ -168,6 +176,7 @@ fn app_removed_while_running_then_reinstalled() {
     // reinstalled: the next scan finds it and it runs again
     w.install(&w.notifying_script(), vec![mail()]);
     e.rescan();
+    e.refresh_leases(&w.root, &s);
     assert_eq!(e.apps.len(), 1);
     assert!(!e.gone.contains("expense"));
     assert!(matches!(e.step(&s, &later, &never_open, &mut run_real, &chrono::Local), Step::Ran { .. }));
@@ -265,4 +274,49 @@ fn notifications_respect_quiet_and_per_app_switches() {
     assert!(e.notifications(&w.root, &muted, Utc::now()).is_empty());
     background::notify(&w.root, "expense", &Notification::new("c", "C")).unwrap();
     assert_eq!(e.notifications(&w.root, &BackgroundSettings::default(), Utc::now()).len(), 1);
+}
+
+#[test]
+fn two_computers_on_one_synced_root_run_each_job_once() {
+    let w = world();
+    w.install(&w.notifying_script(), vec![mail()]);
+    let s = BackgroundSettings::default();
+    let mut a = w.engine();
+    // Mac B: same data root (synced), its own device state
+    let b_state = w.state.with_file_name("state-b");
+    let mut b = w.engine_as("Mac B", &b_state);
+    assert!(a.held.contains_key("expense") && !b.held.contains_key("expense"));
+    let waits: Vec<_> = b.decisions(&s, &normal(), &never_open, &chrono::Local).into_iter().map(|d| d.wait).collect();
+    assert_eq!(waits, [Some(Wait::Elsewhere("Mac A".into()))]);
+    assert_eq!(b.step(&s, &normal(), &never_open, &mut |_| unreachable!("Mac B must not run it"), &chrono::Local), Step::Nothing);
+    let items = menu::build(&b.apps, &b.decisions(&s, &normal(), &never_open, &chrono::Local), &b.state, "en", Utc::now(), &chrono::Local);
+    assert!(items.iter().any(|i| matches!(i, Item::Text(t) if t.contains("Mac A"))), "{items:?}");
+    // A runs it; its notification is drained by A only
+    assert!(matches!(a.step(&s, &normal(), &never_open, &mut run_real, &chrono::Local), Step::Ran { .. }));
+    assert!(b.notifications(&w.root, &s, Utc::now()).is_empty());
+    assert!(background::pending(&w.root, "expense"), "left for the lease holder");
+    assert_eq!(a.notifications(&w.root, &s, Utc::now()).len(), 1);
+    // device state stays per computer
+    assert!(a.state.job("expense", "mail").last_ok.is_some() && b.state.job("expense", "mail").last_ok.is_none());
+    // A goes away: after the lease lapses, B takes over
+    b.clock = Some(otherwise_link::lock::now() + otherwise_link::lock::STALE_AFTER.as_secs() as i64 + 5);
+    b.refresh_leases(&w.root, &s);
+    assert!(b.held.contains_key("expense"));
+    assert!(matches!(b.step(&s, &normal(), &never_open, &mut run_real, &chrono::Local), Step::Ran { .. }));
+    // and A, back later, waits for B
+    a.clock = b.clock.map(|c| c + 30);
+    a.refresh_leases(&w.root, &s);
+    assert_eq!(a.waiting.get("expense"), Some(&Wait::Elsewhere("Mac B".into())));
+}
+
+#[test]
+fn turning_jobs_off_lets_go_of_the_lease() {
+    let w = world();
+    w.install("exit 0", vec![mail()]);
+    let mut a = w.engine();
+    assert!(a.held.contains_key("expense"));
+    let mut off = BackgroundSettings::default();
+    BackgroundSettings::set(&mut off.jobs_off, "expense", false);
+    a.refresh_leases(&w.root, &off);
+    assert!(a.held.is_empty() && a.waiting.is_empty());
 }
