@@ -72,7 +72,7 @@ Otherwise Apps is also the hub of the apps, through
 - **Assistant panel** (⌘J, or ⌘4 / the robot button; from every page): the shared
   [otherwise-agent-panel](https://github.com/otherwisetech/otherwise-agent-panel), docked as a
   bar, below, on the right or full window. Ask questions across every installed app ("What's
-  due this month at Otherwise SAS?", "Which devices are down?") with **your own** Claude Code,
+  due this month?", "Which devices are down?"; the starter questions only mention installed apps) with **your own** Claude Code,
   Codex or opencode subscription; pick the agent, model and permission mode (read-only, ask
   before changing, automatic). **Chat** streams answers with the app tools used as chips;
   **Terminal** opens the agent itself in an embedded terminal. Attach images, PDFs and files by

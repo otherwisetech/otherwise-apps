@@ -174,6 +174,12 @@ impl Controller {
     /// Called by the timer: menu, icon, pending notifications.
     fn refresh(&self) {
         let iv = self.ivars();
+        if iv.shared.updated.load(Ordering::Relaxed) {
+            // a newer helper was installed with Otherwise Apps: hand over to it
+            otherwise_helper::relaunch();
+            NSApplication::sharedApplication(self.mtm()).terminate(None);
+            return;
+        }
         let icon = if iv.shared.paused.load(Ordering::Relaxed) {
             1
         } else if iv.shared.busy.load(Ordering::Relaxed) {

@@ -295,10 +295,10 @@ app.data.left_body = Os dados já estão seguros em {to}. Estes originais não p
 app.data.error_title = Não foi possível alterar a pasta de dados
 app.data.error = Nada foi alterado. {detail}
 # assistente
-app.assistant.suggest_due = O que vence este mês na Otherwise SAS?
+app.assistant.suggest_due = O que vence este mês?
 app.assistant.suggest_today = Resumo de hoje
 app.assistant.suggest_down = Quais equipamentos estão fora do ar?
-app.assistant.suggest_spend = Gastos de outubro por categoria
+app.assistant.suggest_spend = Gastos deste mês por categoria
 app.assistant.ask_about = Conte-me mais sobre isto do {app}: “{title}” {body}
 app.assistant.toggle = Assistente (⌘J)
 app.today.ask = Perguntar

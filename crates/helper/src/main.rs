@@ -30,9 +30,13 @@ fn run() {
     };
     let shared = Arc::new(Shared::default());
     let engine = system_engine();
+    let exe = std::env::current_exe().ok();
+    let started = exe.as_deref().and_then(otherwise_helper::exe_identity);
     let worker = {
         let shared = shared.clone();
-        std::thread::Builder::new().name("jobs".into()).spawn(move || otherwise_helper::work(shared, engine, &low_power))
+        let exe = exe.clone();
+        let updated = move || matches!((&exe, started), (Some(p), Some(s)) if otherwise_helper::replaced(p, s));
+        std::thread::Builder::new().name("jobs".into()).spawn(move || otherwise_helper::work(shared, engine, &low_power, &updated))
     };
     #[cfg(target_os = "macos")]
     mac::run(shared.clone());
@@ -51,6 +55,9 @@ fn run() {
         if let Ok(w) = worker {
             let _ = w.join();
         }
+        if shared.updated.load(std::sync::atomic::Ordering::Relaxed) {
+            otherwise_helper::relaunch();
+        }
         return;
     }
     #[allow(unreachable_code)]
@@ -59,7 +66,11 @@ fn run() {
         shared.wake.notify_all();
         let _ = w.join();
     }
+    if shared.updated.load(std::sync::atomic::Ordering::Relaxed) {
+        otherwise_helper::relaunch();
+    }
 }
+
 
 fn low_power() -> bool {
     #[cfg(target_os = "macos")]

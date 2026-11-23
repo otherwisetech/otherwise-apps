@@ -4,7 +4,7 @@ members = ["crates/i18n", "crates/core", "crates/app", "crates/helper"]
 default-members = ["crates/i18n", "crates/core", "crates/helper"]
 
 [workspace.package]
-version = "0.6.1"
+version = "0.6.2"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT OR Apache-2.0"
