@@ -26,3 +26,13 @@ core.net.size = The download is incomplete ({got} of {want} bytes).
 core.verify.missing = GitHub has not published a SHA-256 checksum for this file, so it can’t be verified and was not installed.
 core.verify.mismatch = The download does not match GitHub’s SHA-256 checksum (expected {expected}…, got {actual}…). It was deleted and nothing was installed.
 core.net.not_http = Only http(s) addresses are supported.
+
+# background jobs run by Otherwise Helper
+core.background.sync = Refresh calendar subscriptions
+core.background.upcoming = Upcoming events
+core.background.synced.one = {n} subscription up to date
+core.background.synced.other = {n} subscriptions up to date
+core.background.sync_failed = {n} subscription(s) couldn't be refreshed
+core.background.starts_at = Starts at {time}
+core.background.next = Next: {title} · {when}
+core.background.no_events = No events in the next 7 days

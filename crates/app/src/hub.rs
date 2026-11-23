@@ -251,7 +251,7 @@ impl Launcher {
                     self.hub.selected = link.at(1).and_then(|s| Uuid::parse_str(s).ok());
                     self.set_page(Page::Entities, cx);
                 }
-                Some("hub") => {
+                Some("hub" | "settings") => {
                     self.modal = Some(Modal::Settings);
                     cx.notify();
                 }

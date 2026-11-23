@@ -26,3 +26,13 @@ core.net.size = La descarga está incompleta ({got} de {want} bytes).
 core.verify.missing = GitHub no ha publicado una suma SHA-256 para este archivo, así que no se puede verificar y no se instaló.
 core.verify.mismatch = La descarga no coincide con la suma SHA-256 de GitHub (se esperaba {expected}…, llegó {actual}…). Se borró y no se instaló nada.
 core.net.not_http = Solo se admiten direcciones http(s).
+
+# trabajos en segundo plano (Otherwise Helper)
+core.background.sync = Actualizar suscripciones de calendario
+core.background.upcoming = Próximos eventos
+core.background.synced.one = {n} suscripción al día
+core.background.synced.other = {n} suscripciones al día
+core.background.sync_failed = No se pudieron actualizar {n} suscripción(es)
+core.background.starts_at = Empieza a las {time}
+core.background.next = Siguiente: {title} · {when}
+core.background.no_events = Sin eventos en los próximos 7 días

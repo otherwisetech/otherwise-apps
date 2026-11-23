@@ -1,0 +1,34 @@
+[package]
+name = "otherwise-helper"
+description = "Otherwise Helper: runs installed Otherwise apps' background jobs and shows their notifications from the menu bar"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "otherwise_helper"
+
+[[bin]]
+name = "otherwise-helper"
+path = "src/main.rs"
+
+# No GPUI and no other app's code: the helper only runs each app's own binary.
+[dependencies]
+i18n.workspace = true
+otherwise-link.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+libc = "0.2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+block2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSString", "NSObject", "NSTimer", "NSDate", "NSRunLoop", "NSProcessInfo", "NSBundle", "NSError", "NSThread", "NSArray", "NSDictionary", "block2"] }
+objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "NSApplication", "NSResponder", "NSStatusBar", "NSStatusItem", "NSStatusBarButton", "NSButton", "NSControl", "NSView", "NSMenu", "NSMenuItem", "NSImage", "NSAlert", "NSRunningApplication", "NSCell", "objc2-core-foundation"] }
+objc2-user-notifications = { version = "0.3", default-features = false, features = ["std", "UNUserNotificationCenter", "UNNotification", "UNNotificationContent", "UNNotificationRequest", "UNNotificationResponse", "UNNotificationTrigger", "UNNotificationSettings", "block2"] }
+
+[dev-dependencies]
+tempfile = "3"

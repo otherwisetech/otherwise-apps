@@ -10,7 +10,8 @@ crates/core  otherwise-apps-core: catalog (+ validation), version comparison, as
              SHA-256 verification, download, unpack, install / replace / uninstall, detection,
              Linux .desktop and Windows shortcuts, running-app quit; calendar.rs (merge of the apps'
              events feeds, holidays, .ics overlays, combined otherwise.ics) and vcity.rs (device-code
-             sign-in, refresh, read-only events / bookings). No UI.
+             sign-in, refresh, read-only events / bookings), background.rs (the launcher's jobs:
+             calendar-sync, upcoming). No UI.
 crates/app   `otherwise-apps` desktop app (GPUI + gpui-component). app.rs: state, checks, jobs;
              cards.rs: grid / list; dialogs.rs: modals, settings, About; jobs.rs: background work;
              hub.rs: Today page, Entities page, Settings → Hub, otherwise:// handling;
@@ -25,6 +26,16 @@ crates/app   `otherwise-apps` desktop app (GPUI + gpui-component). app.rs: state
              Today "Preguntar"; main.rs makes the AgentDock the window's root view;
              Vcity invitation in About, Help menu and under the apps grid
              (`otherwise-apps mcp` runs the otherwise-hub MCP server, main.rs)
+             helper.rs: `otherwise-apps background manifest|run <job>` (no window), starting
+             Otherwise Helper, Settings → Otherwise Helper
+crates/helper otherwise-helper (lib + bin, **no GPUI**): Otherwise Helper, the menu-bar process
+             that runs installed apps' background jobs (otherwise-link `background`): engine.rs
+             (scan, verify-before-run, state, notification drain), sched.rs (due / waits: pause,
+             Low Power Mode, memory pressure, offline, app open; backoff, jitter), runner.rs
+             (timeout, memory ceiling, process group), sys.rs, menu.rs (menu as data), state.rs
+             (~/.otherwise/helper/state.json), mac.rs (NSStatusItem, UNUserNotificationCenter,
+             SMAppService). Bundled as Otherwise Apps.app/Contents/Library/LoginItems/
+             Otherwise Helper.app by script/bundle-macos.sh.
 tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 ```
 
@@ -61,10 +72,18 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
   `<data root>/otherwise-apps/assistant/` (0.3 conversations load).
   Calendar: read-only over the apps' `events.json`; busy-only events never leave the page with
   details (ICS export, agent context and MCP get "Busy"); .ics URLs are fetched only on add /
-  refresh; Vcity tokens only in the OS keychain (`secrets.rs`), never logged or written to the
+  refresh and by the helper's hourly `calendar-sync` job (stale copies only; a failure keeps the
+  last copy); Vcity tokens only in the OS keychain (`secrets.rs`), never logged or written to the
   data root, redirects refused; Vcity tests use a local mock server, never vcity.io.
   Moving the data root always goes through the confirmation that lists what moves, and is
   refused while an app has its data open (its lock).
+- **Otherwise Helper runs nothing for apps that aren't installed.** Jobs come only from the
+  `otherwise-background.json` inside an installed bundle (never the data root); every run
+  re-verifies the install (`background::plan`); gone apps are dropped quietly (no error loop,
+  no notification), their outbox and data left alone. The helper never downloads, installs or
+  suggests installing anything, and links no app's code. It stays GPUI-free (target: tens of
+  MB idle). Start at login is on by default after the first launch with the helper, off with
+  one switch in Settings.
 - Comments: sparse, only non-obvious why.
 - GPUI pins: `Cargo.lock` pins the same zed / gpui-component revs as the other apps. Never
   `cargo update` them; building only core can prune them from the lock — restore it.
@@ -72,6 +91,6 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 ## Validate
 
 ```
-cargo test -p otherwise-apps-i18n -p otherwise-apps-core -p otherwise-apps-app
+cargo test -p otherwise-apps-i18n -p otherwise-apps-core -p otherwise-apps-app -p otherwise-helper
 cargo clippy --workspace --all-targets
 ```

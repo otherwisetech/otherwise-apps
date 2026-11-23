@@ -3,6 +3,7 @@
 //! uninstalling, and finding what is already installed; the Calendar page's data (`calendar`) and
 //! the optional Vcity source (`vcity`).
 pub mod archive;
+pub mod background;
 pub mod calendar;
 pub mod catalog;
 pub mod detect;

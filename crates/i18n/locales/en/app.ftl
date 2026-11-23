@@ -415,3 +415,21 @@ app.cal.wd_thu = Thu
 app.cal.wd_fri = Fri
 app.cal.wd_sat = Sat
 app.cal.wd_sun = Sun
+
+# Settings → Otherwise Helper
+app.helper.title = Otherwise Helper
+app.helper.login = Start at login
+app.helper.login_label = Start Otherwise Helper at login and keep it in the menu bar
+app.helper.login_hint = Checks mail, devices and calendars and shows reminders while your apps are closed. Light: one small process for every app.
+app.helper.login_approval = Waiting for your approval in System Settings → General → Login Items.
+app.helper.login_unsupported = Start at login needs macOS 13 or later.
+app.helper.not_bundled = This copy of Otherwise Apps doesn't include the helper.
+app.helper.quiet = Quiet mode
+app.helper.quiet_label = No notifications (background work keeps running)
+app.helper.quiet_hint = Turns off every app's notifications at once.
+app.helper.apps = Apps
+app.helper.apps_hint = Only installed apps that have background work are listed.
+app.helper.no_apps = No installed app has background work yet.
+app.helper.app_jobs = {app}: run in background
+app.helper.app_notifications = notifications
+app.helper.unknown_job = Unknown background job

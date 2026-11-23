@@ -7,7 +7,7 @@
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
-const SCANNED: &[&str] = &["../app/src", "../core/src", "src"];
+const SCANNED: &[&str] = &["../app/src", "../core/src", "../helper/src", "src"];
 
 /// Calls whose literal arguments end up on screen: methods (`.child("…")`), free helpers
 /// (`section_title(t, "…")`), `Type::fn` constructors and the `#[error("…")]` attribute.

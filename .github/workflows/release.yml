@@ -60,10 +60,11 @@ jobs:
       - name: Build (Linux)
         if: runner.os == 'Linux'
         run: |
-          cargo build -p otherwise-apps-app --release
+          cargo build -p otherwise-apps-app -p otherwise-helper --release
           pkg=otherwise-apps-${{ matrix.name }}
           mkdir -p dist/$pkg
-          cp target/release/otherwise-apps dist/$pkg/
+          cp target/release/otherwise-apps target/release/otherwise-helper dist/$pkg/
+          target/release/otherwise-apps background manifest > dist/$pkg/otherwise-background.json
           cp packaging/linux/otherwise-apps.desktop dist/$pkg/
           cp crates/app/assets/logo/otherwise-apps-icon-512.png dist/$pkg/otherwise-apps.png
           cp README.md LICENSE-MIT LICENSE-APACHE dist/$pkg/
@@ -74,10 +75,11 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          cargo build -p otherwise-apps-app --release
+          cargo build -p otherwise-apps-app -p otherwise-helper --release
           $pkg = "otherwise-apps-${{ matrix.name }}"
           New-Item -ItemType Directory -Force -Path dist/$pkg | Out-Null
-          Copy-Item target/release/otherwise-apps.exe dist/$pkg/
+          Copy-Item target/release/otherwise-apps.exe, target/release/otherwise-helper.exe dist/$pkg/
+          target/release/otherwise-apps.exe background manifest | Out-File -Encoding utf8NoBOM dist/$pkg/otherwise-background.json
           Copy-Item README.md, LICENSE-MIT, LICENSE-APACHE dist/$pkg/
           Compress-Archive -Path dist/$pkg -DestinationPath dist/$pkg.zip
           Remove-Item -Recurse dist/$pkg

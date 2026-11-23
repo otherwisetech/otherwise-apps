@@ -415,3 +415,21 @@ app.cal.wd_thu = qui
 app.cal.wd_fri = sex
 app.cal.wd_sat = sáb
 app.cal.wd_sun = dom
+
+# Ajustes → Otherwise Helper
+app.helper.title = Otherwise Helper
+app.helper.login = Abrir ao iniciar a sessão
+app.helper.login_label = Abrir o Otherwise Helper ao iniciar a sessão e mantê-lo na barra de menus
+app.helper.login_hint = Verifica e-mail, dispositivos e calendários e mostra lembretes mesmo com os apps fechados. Leve: um só processo pequeno para todos os apps.
+app.helper.login_approval = Falta sua aprovação em Ajustes do Sistema → Geral → Itens de Início.
+app.helper.login_unsupported = Abrir ao iniciar a sessão requer macOS 13 ou posterior.
+app.helper.not_bundled = Esta cópia do Otherwise Apps não inclui o helper.
+app.helper.quiet = Modo silencioso
+app.helper.quiet_label = Sem notificações (o trabalho em segundo plano continua)
+app.helper.quiet_hint = Desliga de uma vez as notificações de todos os apps.
+app.helper.apps = Apps
+app.helper.apps_hint = Só aparecem os apps instalados que têm trabalho em segundo plano.
+app.helper.no_apps = Nenhum app instalado tem trabalho em segundo plano ainda.
+app.helper.app_jobs = {app}: trabalhar em segundo plano
+app.helper.app_notifications = notificações
+app.helper.unknown_job = Trabalho em segundo plano desconhecido

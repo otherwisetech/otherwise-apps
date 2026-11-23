@@ -154,6 +154,7 @@ impl Launcher {
             .child(Self::setting_row(t, i18n::t!("app.settings.verify"), None, div().text_size(px(12.)).line_height(px(17.)).text_color(t.ink_muted).child(i18n::t!("app.settings.verify_body"))))
             .child(self.render_data_root_settings(t, cx))
             .child(self.render_hub_settings(t, cx))
+            .child(self.render_helper_settings(t, cx))
     }
 
     fn render_about(&self, t: &Tokens, cx: &mut Context<Self>) -> impl IntoElement {
