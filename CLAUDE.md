@@ -33,7 +33,7 @@ crates/helper otherwise-helper (lib + bin, **no GPUI**): Otherwise Helper, the m
              (scan, verify-before-run, state, notification drain), sched.rs (due / waits: pause,
              Low Power Mode, memory pressure, offline, app open; backoff, jitter), runner.rs
              (timeout, memory ceiling, process group), sys.rs, menu.rs (menu as data), state.rs
-             (~/.otherwise/helper/state.json), mac.rs (NSStatusItem, UNUserNotificationCenter,
+             (<device dir>/helper/state.json, never the data root), mac.rs (NSStatusItem, UNUserNotificationCenter,
              SMAppService). Bundled as Otherwise Apps.app/Contents/Library/LoginItems/
              Otherwise Helper.app by script/bundle-macos.sh.
 tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
@@ -84,6 +84,10 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
   suggests installing anything, and links no app's code. It stays GPUI-free (target: tens of
   MB idle). Start at login is on by default after the first launch with the helper, off with
   one switch in Settings.
+  **One computer per data root**: per app, only the holder of the otherwise-link lease
+  (`<root>/<app>/background.lock.json`) runs its jobs and drains its outbox; others show
+  "running on <host>". Device state (runs, backoff, pause, shown) lives in
+  `paths::device_dir()`, never in the data root (0.6.0's `~/.otherwise/helper` is moved once).
 - Comments: sparse, only non-obvious why.
 - GPUI pins: `Cargo.lock` pins the same zed / gpui-component revs as the other apps. Never
   `cargo update` them; building only core can prune them from the lock — restore it.

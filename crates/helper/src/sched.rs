@@ -25,8 +25,12 @@ pub struct Conditions {
 }
 
 /// Why a job isn't running now.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Wait {
+    /// Another computer using the same data root runs this app's jobs (its name).
+    Elsewhere(String),
+    /// The lease couldn't be taken (the data root isn't writable right now).
+    NoLease,
     /// Scheduled for later.
     Until(DateTime<Utc>),
     Paused,
@@ -95,8 +99,9 @@ pub struct Decision {
 }
 
 /// Every job of every installed app, with what it waits for. `open(app)` says whether the app
-/// has a window open.
-pub fn decide<Tz: TimeZone>(apps: &[Registered], settings: &BackgroundSettings, state: &State, c: &Conditions, open: &dyn Fn(&Registered) -> bool, tz: &Tz) -> Vec<Decision> {
+/// has a window open; `lease(app)` is `None` when this computer holds the app's lease, else why
+/// not ([`Wait::Elsewhere`], [`Wait::NoLease`]).
+pub fn decide<Tz: TimeZone>(apps: &[Registered], settings: &BackgroundSettings, state: &State, c: &Conditions, open: &dyn Fn(&Registered) -> bool, lease: &dyn Fn(&str) -> Option<Wait>, tz: &Tz) -> Vec<Decision> {
     let mut out = vec![];
     for r in apps {
         let app = r.spec.id.as_str();
@@ -105,6 +110,8 @@ pub fn decide<Tz: TimeZone>(apps: &[Registered], settings: &BackgroundSettings, 
             let js = state.job(app, &j.id);
             let wait = if !settings.jobs_on(app) {
                 Some(Wait::Off)
+            } else if let Some(w) = lease(app) {
+                Some(w)
             } else if state.paused(c.now) {
                 Some(Wait::Paused)
             } else {

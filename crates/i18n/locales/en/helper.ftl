@@ -31,3 +31,5 @@ helper.cli.login_approval = Waiting for your approval in System Settings → Gen
 helper.cli.login_unsupported = Start at login needs macOS 13 or later, and the helper inside Otherwise Apps.
 helper.cli.login_failed = Couldn't change start at login: {error}
 helper.cli.running = Another Otherwise Helper is already running.
+helper.wait.elsewhere = running on {device}
+helper.wait.no_lease = waiting: the data folder can't be written

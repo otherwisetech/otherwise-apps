@@ -137,6 +137,7 @@ fn once() {
     let mut e = system_engine();
     let root = otherwise_link::Root::system();
     let settings = otherwise_link::settings::HubSettings::load(&root).background;
+    e.refresh_leases(&root, &settings);
     let lang = otherwise_helper::language();
     let c = otherwise_helper::sched::Conditions { now: chrono::Utc::now(), low_power: low_power(), pressure: otherwise_helper::sys::memory_pressure(), online: otherwise_helper::sys::online() };
     let open = |r: &otherwise_link::background::Registered| r.installed.executable.as_deref().is_some_and(otherwise_helper::sys::running);

@@ -31,3 +31,5 @@ helper.cli.login_approval = En attente de votre accord dans Réglages Système �
 helper.cli.login_unsupported = L’ouverture à la connexion requiert macOS 13 ou ultérieur et le helper dans Otherwise Apps.
 helper.cli.login_failed = Impossible de modifier l’ouverture à la connexion : {error}
 helper.cli.running = Un autre Otherwise Helper est déjà en cours d’exécution.
+helper.wait.elsewhere = s’exécute sur {device}
+helper.wait.no_lease = en attente : impossible d’écrire dans le dossier de données

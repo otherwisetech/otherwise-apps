@@ -1,6 +1,7 @@
 //! What the helper remembers on this computer: last runs, failures, the notifications it already
-//! showed, a pause. Kept next to the pointer file (`~/.otherwise/helper/state.json`), never in
-//! the (possibly synced) data root: two computers run their own schedules.
+//! showed, a pause. In this computer's own folder (otherwise-link `paths::device_dir()`, e.g.
+//! `~/Library/Application Support/com.otherwisetech.device/helper/state.json`), never in the
+//! (possibly synced, movable) data root.
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -42,9 +43,28 @@ pub fn key(app: &str, job: &str) -> String {
     format!("{app}/{job}")
 }
 
-/// `~/.otherwise/helper` (the pointer folder, which never moves).
+/// `<device dir>/helper`. Otherwise Apps 0.6.0 kept it in `~/.otherwise/helper`, which is also
+/// the default data root: moved over once.
 pub fn dir() -> PathBuf {
-    otherwise_link::paths::Home::system().pointer_dir().join("helper")
+    let dir = otherwise_link::paths::device_dir().join("helper");
+    let old = otherwise_link::paths::Home::system().pointer_dir().join("helper");
+    adopt_old(&old, &dir);
+    dir
+}
+
+/// Moves 0.6.0's state file into `dir` (once) and removes that old folder of ours.
+pub fn adopt_old(old: &Path, dir: &Path) {
+    if !old.is_dir() {
+        return;
+    }
+    if !file_in(dir).exists()
+        && let Ok(s) = std::fs::read_to_string(file_in(old))
+    {
+        let _ = otherwise_link::fsutil::write_atomic(&file_in(dir), s.as_bytes());
+    }
+    let _ = std::fs::remove_file(file_in(old));
+    let _ = std::fs::remove_file(old.join("instance.lock"));
+    let _ = std::fs::remove_dir(old);
 }
 
 pub fn file_in(dir: &Path) -> PathBuf {
@@ -101,5 +121,20 @@ mod tests {
         // forgotten after the keep window
         let mut s = back;
         assert!(s.mark_shown("expense/a", now + chrono::Duration::days(SHOWN_KEEP_DAYS + 1)));
+    }
+
+    #[test]
+    fn state_from_060_moves_to_the_device_folder() {
+        let t = tempfile::tempdir().unwrap();
+        let (old, new) = (t.path().join("root/helper"), t.path().join("device/helper"));
+        let s = State { paused_until: Some(Utc::now()), ..Default::default() };
+        s.save(&old).unwrap();
+        std::fs::write(old.join("instance.lock"), "").unwrap();
+        adopt_old(&old, &new);
+        assert_eq!(State::load(&new).paused_until, s.paused_until);
+        assert!(!old.exists(), "the default data root keeps no device state");
+        // a second time is a no-op
+        adopt_old(&old, &new);
+        assert!(file_in(&new).exists());
     }
 }
