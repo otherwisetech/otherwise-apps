@@ -4762,7 +4762,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "anyhow",
  "chrono",
@@ -4785,7 +4785,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "chrono",
  "flate2",
@@ -4804,11 +4804,11 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.6.1"
+version = "0.6.2"
 
 [[package]]
 name = "otherwise-helper"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "block2 0.6.2",
  "chrono",

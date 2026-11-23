@@ -295,10 +295,10 @@ app.data.left_body = The data is safely in {to}. These originals could not be de
 app.data.error_title = Could not change the data folder
 app.data.error = Nothing was changed. {detail}
 # assistant
-app.assistant.suggest_due = What's due this month at Otherwise SAS?
+app.assistant.suggest_due = What's due this month?
 app.assistant.suggest_today = Today's summary
 app.assistant.suggest_down = Which devices are down?
-app.assistant.suggest_spend = October spending by category
+app.assistant.suggest_spend = Spending this month by category
 app.assistant.ask_about = Tell me more about this from {app}: “{title}” {body}
 app.assistant.toggle = Assistant (⌘J)
 app.today.ask = Ask

@@ -22,7 +22,7 @@ use otherwise_link::Root;
 use otherwise_link::apps::{AppSpec, Locations, Os};
 use otherwise_link::background::Notification;
 use otherwise_link::settings::HubSettings;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Condvar, Mutex};
 use std::time::{Duration, Instant};
@@ -70,6 +70,40 @@ pub fn language() -> &'static str {
     i18n::DEFAULT
 }
 
+/// Inode and modification time of a file: tells an update (the bundle replaced) apart.
+pub fn exe_identity(p: &Path) -> Option<(u64, i64)> {
+    let m = std::fs::metadata(p).ok()?;
+    #[cfg(unix)]
+    let ino = std::os::unix::fs::MetadataExt::ino(&m);
+    #[cfg(not(unix))]
+    let ino = m.len();
+    let mtime = m.modified().ok()?.duration_since(std::time::UNIX_EPOCH).ok()?.as_secs() as i64;
+    Some((ino, mtime))
+}
+
+/// Was the executable at `path` replaced since we started (`started`)? A missing file is not
+/// (yet) a replacement: the old bundle went to the Trash and the new one isn't there yet.
+pub fn replaced(path: &Path, started: (u64, i64)) -> bool {
+    exe_identity(path).is_some_and(|now| now != started)
+}
+
+/// Starts the newly installed helper a moment after this process is gone (it holds the
+/// single-instance lock): the bundle through LaunchServices on macOS, else the binary.
+pub fn relaunch() {
+    let Ok(exe) = std::env::current_exe() else { return };
+    #[cfg(unix)]
+    {
+        let app = exe.ancestors().nth(3).filter(|a| cfg!(target_os = "macos") && a.extension().is_some_and(|x| x == "app"));
+        let (script, arg) = match app {
+            Some(a) => ("sleep 3; exec /usr/bin/open -g \"$0\"", a.to_path_buf()), // i18n-ok: shell
+            None => ("sleep 3; exec \"$0\"", exe.clone()), // i18n-ok: shell
+        };
+        let _ = std::process::Command::new("/bin/sh").arg("-c").arg(script).arg(arg).stdin(std::process::Stdio::null()).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null()).spawn();
+    }
+    #[cfg(not(unix))]
+    let _ = exe;
+}
+
 /// Requests from the menu to the worker.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Command {
@@ -91,6 +125,8 @@ pub struct Shared {
     /// Something is running (for the icon).
     pub busy: AtomicBool,
     pub paused: AtomicBool,
+    /// The worker stopped because a newer helper was installed.
+    pub updated: AtomicBool,
 }
 
 impl Shared {
@@ -106,8 +142,9 @@ pub fn system_engine() -> Engine {
 }
 
 /// The worker loop: scan, run what is due (one at a time), drain notifications, publish the
-/// menu. `low_power` is read by the platform shell.
-pub fn work(shared: Arc<Shared>, mut engine: Engine, low_power: &dyn Fn() -> bool) {
+/// menu. `low_power` is read by the platform shell; `updated()` says our own executable was
+/// replaced (Otherwise Apps updated): the loop then ends so the new helper can start.
+pub fn work(shared: Arc<Shared>, mut engine: Engine, low_power: &dyn Fn() -> bool, updated: &dyn Fn() -> bool) {
     let mut last_scan = Instant::now();
     let mut lang = language();
     i18n::set_locale(lang);
@@ -123,6 +160,11 @@ pub fn work(shared: Arc<Shared>, mut engine: Engine, low_power: &dyn Fn() -> boo
             }
         }
         if last_scan.elapsed() >= RESCAN_EVERY {
+            if updated() {
+                shared.updated.store(true, Ordering::Relaxed);
+                shared.quit.store(true, Ordering::Relaxed);
+                return;
+            }
             engine.rescan();
             lang = language();
             i18n::set_locale(lang);
@@ -202,5 +244,23 @@ pub fn post_plain(title: &str, body: &str) {
             ps(body)
         );
         let _ = Cmd::new("powershell").args(["-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-Command", &script]).stdout(Stdio::null()).stderr(Stdio::null()).spawn();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn notices_its_executable_being_replaced() {
+        let t = tempfile::tempdir().unwrap();
+        let exe = t.path().join("otherwise-helper");
+        std::fs::write(&exe, "old").unwrap();
+        let started = super::exe_identity(&exe).unwrap();
+        assert!(!super::replaced(&exe, started));
+        // the bundle goes to the Trash: not yet a replacement
+        std::fs::rename(&exe, t.path().join("trashed")).unwrap();
+        assert!(!super::replaced(&exe, started));
+        // the new bundle lands at the same path
+        std::fs::write(&exe, "new").unwrap();
+        assert!(super::replaced(&exe, started));
     }
 }

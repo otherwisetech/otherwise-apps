@@ -46,8 +46,44 @@ impl AgentHost for Host {
     }
 
     fn suggestions(&self) -> Vec<String> {
-        vec![i18n::t!("app.assistant.suggest_due"), i18n::t!("app.assistant.suggest_today"), i18n::t!("app.assistant.suggest_down"), i18n::t!("app.assistant.suggest_spend")]
+        suggestion_keys(&installed_ids()).into_iter().map(|k| i18n::t!(k)).collect()
     }
+}
+
+/// Starter questions for the apps that are installed: nothing about an app that isn't there.
+/// The summary works with any app (Today, calendar).
+pub fn suggestion_keys(installed: &[String]) -> Vec<&'static str> {
+    let has = |id: &str| installed.iter().any(|i| i == id);
+    let mut keys = vec![];
+    if has("expense") {
+        keys.push("app.assistant.suggest_due");
+    }
+    keys.push("app.assistant.suggest_today");
+    if has("vigia") || has("nodo") {
+        keys.push("app.assistant.suggest_down");
+    }
+    if has("expense") {
+        keys.push("app.assistant.suggest_spend");
+    }
+    keys
+}
+
+/// Installed app ids (otherwise-link discovery), looked up at most every 30 s: the panel asks
+/// for suggestions while it draws.
+fn installed_ids() -> Vec<String> {
+    use std::sync::{Mutex, OnceLock};
+    use std::time::{Duration, Instant};
+    type Cached = Option<(Instant, Vec<String>)>;
+    static CACHE: OnceLock<Mutex<Cached>> = OnceLock::new();
+    let mut c = CACHE.get_or_init(|| Mutex::new(None)).lock().unwrap();
+    if let Some((at, ids)) = c.as_ref()
+        && at.elapsed() < Duration::from_secs(30)
+    {
+        return ids.clone();
+    }
+    let ids: Vec<String> = otherwise_link::apps::discover(&otherwise_link::apps::Locations::system()).into_iter().map(|(s, _)| s.id).collect();
+    *c = Some((Instant::now(), ids.clone()));
+    ids
 }
 
 /// This executable as the hub for a panel session in `mode`.
@@ -146,7 +182,7 @@ impl Launcher {
 
 #[cfg(test)]
 mod tests {
-    use super::{READ_ONLY_FLAG, hub_server};
+    use super::{READ_ONLY_FLAG, hub_server, suggestion_keys};
     use otherwise_agent_panel::PermissionMode;
     use std::path::Path;
 
@@ -158,5 +194,22 @@ mod tests {
         assert_eq!(ro.args, ["mcp", READ_ONLY_FLAG]);
         assert_eq!(hub_server(exe, PermissionMode::Ask).args, ["mcp"], "the other modes follow Settings → Hub");
         assert_eq!(hub_server(exe, PermissionMode::Auto).program, exe);
+    }
+
+    #[test]
+    fn suggestions_follow_the_installed_apps() {
+        let ids = |v: &[&str]| v.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        assert_eq!(suggestion_keys(&[]), ["app.assistant.suggest_today"], "only the summary without apps");
+        assert_eq!(suggestion_keys(&ids(&["expense"])), ["app.assistant.suggest_due", "app.assistant.suggest_today", "app.assistant.suggest_spend"]);
+        assert_eq!(suggestion_keys(&ids(&["nodo"])), ["app.assistant.suggest_today", "app.assistant.suggest_down"]);
+        assert_eq!(suggestion_keys(&ids(&["vigia", "rama"])), ["app.assistant.suggest_today", "app.assistant.suggest_down"]);
+        assert_eq!(suggestion_keys(&ids(&["expense", "vigia", "nodo"])).len(), 4);
+        // no company names or fixed months in any language
+        for lang in ["es", "en", "pt", "fr"] {
+            for k in suggestion_keys(&ids(&["expense", "vigia"])) {
+                let t = i18n::tr_in(lang, k);
+                assert!(!t.contains("SAS") && !t.to_lowercase().contains("octob") && !t.to_lowercase().contains("octub"), "{lang} {k}: {t}");
+            }
+        }
     }
 }

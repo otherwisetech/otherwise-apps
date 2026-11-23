@@ -295,10 +295,10 @@ app.data.left_body = Les données sont en sécurité dans {to}. Ces originaux n'
 app.data.error_title = Impossible de changer le dossier de données
 app.data.error = Rien n'a été modifié. {detail}
 # assistant
-app.assistant.suggest_due = Qu'est-ce qui arrive à échéance ce mois-ci chez Otherwise SAS ?
+app.assistant.suggest_due = Qu'est-ce qui arrive à échéance ce mois-ci ?
 app.assistant.suggest_today = Résumé du jour
 app.assistant.suggest_down = Quels appareils sont hors service ?
-app.assistant.suggest_spend = Dépenses d'octobre par catégorie
+app.assistant.suggest_spend = Dépenses de ce mois par catégorie
 app.assistant.ask_about = Dis-m'en plus sur ceci venant de {app} : « {title} » {body}
 app.assistant.toggle = Assistant (⌘J)
 app.today.ask = Demander
