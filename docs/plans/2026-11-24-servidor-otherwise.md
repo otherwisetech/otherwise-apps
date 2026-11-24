@@ -49,7 +49,14 @@ el código sugiere otra cosa. Las referencias son a los repos en `~/` en la fech
    `otherwise-remote`).
 9. **El contrato HTTP es el mismo que implementará la sincronización con Vcity:** hello,
    instantánea, ops, cursor y eventos. Al cliente no le importa si habla con el Studio o con Vcity.
-10. **Riesgo principal detectado en el Studio:** los 3 runners de CI corren como **el mismo usuario
+10. **Licencias por tamaño de equipo** (revisado tras la revisión del usuario):
+    - la licencia es del equipo y fija un máximo de miembros activos;
+    - el servidor cuenta las identidades distintas en 30 días;
+    - el servidor informa a Vcity solo conteos anónimos;
+    - la aplicación es suave: aviso, gracia y luego solo lectura para los miembros de más (§10.2).
+
+    Primero va expense Business, luego Brújula y luego Vigía (§12).
+11. **Riesgo principal detectado en el Studio:** los 3 runners de CI corren como **el mismo usuario
     de macOS** que tendría el servidor. Por eso "viene de localhost" no puede significar "es de
     confianza" (ver §6.1).
 
@@ -85,7 +92,8 @@ el código sugiere otra cosa. Las referencias son a los repos en `~/` en la fech
   lectura con la última instantánea.
 - **Reemplazar el data root ni la reubicación de otherwise-link:** Local sigue siendo exactamente lo
   de hoy.
-- **Licencias de equipo:** son VC-251, todavía abierto; aquí solo se deja el gancho.
+- **Cobro, tienda y precios de los tramos:** son de Vcity. Aquí solo se define qué cuenta y comprueba el
+  servidor (§10.2).
 
 ---
 
@@ -214,8 +222,10 @@ otherwise-link exige subir de versión app por app.
    que la app incruste el componente en su barra propia.
 8. **Licencias inexistentes en código:** VC-249 todavía no está en otherwise-link. Surco y Voltia
    tienen el gancho `features[]`.
-9. **Brújula no tiene un modo "Empresa" en el código.** Tiene `ROLES` (`store.rs:53`) y el
-   multiusuario está "pendiente de la reunión de socios" (`ARCHITECTURE.md:76-83`).
+9. **El modo Empresa de Brújula está en construcción** (rama `feat/empresa-mode`, `docs/EMPRESA.md`,
+   con otherwise-ui), pero sigue siendo monousuario. Según `EMPRESA.md`, las firmas "llegará[n]
+   con la versión multiusuario y el servidor". Tiene `ROLES` (`store.rs:53`), y quién hospeda el
+   servidor sigue "pendiente de la reunión de socios" (`ARCHITECTURE.md:76-83`).
 10. **Windows no tiene appsock;** irrelevante para el servidor (el Studio es macOS), pero sí para
     los clientes.
 
@@ -555,7 +565,7 @@ el camino largo.
 | Conectado | Punto verde | Normal |
 | Conectando o sincronizando réplica | Punto girando | Muestra la réplica anterior si existe |
 | Sin conexión | Punto gris y franja "Sin conexión · datos de 14:05" | Solo lectura (§4.6) |
-| Solo lectura | Candado y franja con el motivo | Rol `viewer`, sin licencia, cliente más viejo que el servidor, o libro de empresa en expense me |
+| Solo lectura | Candado y franja con el motivo | Rol `viewer`, sin licencia, miembro por encima del tramo tras la gracia, cliente más viejo que el servidor, o libro de empresa en expense me |
 | Incompatible | Punto ámbar | "Actualiza la app" o "El servidor tiene una versión más vieja" |
 | Sin acceso | Punto rojo | `401`/`403`: "Pide acceso al dueño del servidor" |
 
@@ -709,38 +719,125 @@ the platform" como opción 1 (`ARCHITECTURE.md:76-83`). Se propone:
 - **Qué no se reutiliza de Vcity:** no se pretende que el Studio hable Yjs ni Surreal. El nivel
   común es el contrato HTTP, no el motor.
 
-### 10.2 Licencias
+### 10.2 Licencias: por tamaño de equipo (revisado 2026-11-24)
 
-Puntos de partida del plan de Vcity:
-- la licencia es **por persona y por dispositivo**, con 3 dispositivos;
-- el token está firmado, se verifica offline, dura 14 días y es estado del dispositivo;
-- sin licencia, la app queda en solo lectura, pero exportar siempre funciona.
+**Cambio respecto al plan de Vcity del 2026-11-23.** Allí la licencia era por persona y con 3
+dispositivos. El usuario la cambió, tras revisar este plan, por una **licencia por tamaño de
+equipo**, más telemetría mínima para comprobar que se respeta. El plan de Vcity y la estrategia de
+la suite se corrigen en PRs aparte. Se mantiene todo lo demás:
+- prueba gratis;
+- 7 días de gracia tras un cobro fallido;
+- 14 días offline;
+- actualizaciones gratis;
+- licencias regaladas;
+- "sin licencia = solo lectura, exportar siempre funciona".
 
-Con un servidor:
+**Modelo:**
 
-1. **Los tokens nunca viajan.** Cada cliente verifica **su** token localmente (VC-249 en
-   otherwise-link). Sin licencia, su `RemoteBackend` es de solo lectura, igual que en Local. Esto
-   ya cubre al usuario en sus 3 dispositivos.
-2. **El servidor es un dispositivo:** el Studio ocupa un puesto de la licencia del `owner`
-   (el Helper del Studio renueva su token). Sin licencia válida en el servidor, el servidor sirve en
-   **solo lectura** para todos. Así los jobs que escriben (correo) dependen de la licencia de quien
-   hospeda los datos, que es coherente: "la licencia limita la edición, no los datos".
-3. **Otra persona** (el hermano) editando el libro del usuario: con la licencia por persona, el
-   servidor debería saber si esa persona tiene licencia **sin recibir su token**. Opciones (pregunta
-   abierta):
-   - (a) Vcity añade al token un claim de "puede editar en servidores de X" o un **comprobante
-     corto** (JWS de 10 min con `sub`, `app` y `aud=<servidor>`) que el cliente pide a Vcity y
-     presenta al servidor. No es el token del dispositivo ni sirve fuera de ese servidor.
-   - (b) licencias de equipo (VC-251): el `owner` compra N puestos y asigna miembros;
-   - (c) para familia y socios, el servidor permite a los miembros que el `owner` invite sin
-     comprobar licencia (cuentan dentro de su licencia), con un tope pequeño.
+- **Dueño:** la licencia es del **equipo u org**, es decir, del `owner` que la compra en la tienda
+  Vcity de la marca.
+- **Límite:** fija un **máximo de miembros activos**.
+- **Quién edita:** cualquier miembro del equipo se conecta a los servidores de ese equipo y edita
+  dentro del tramo. El hermano, por ejemplo, es un miembro más. No hay comprobantes por persona ni
+  tokens de cliente que viajen.
+- **Tramos de ejemplo**, por decidir (precios y nombres son del plan de Vcity):
 
-   Se recomienda (c) para el pilotaje y (a) o (b) cuando se venda.
-4. **Apps de código abierto** (Nodo, genealogy, Mi Huerta): "la licencia cubre los servicios", así
-   que el servidor Otherwise podría ser uno de esos servicios de pago para apps libres. Es una
-   decisión comercial (pregunta abierta).
-5. **Brújula:** su `modules.licensed_until` pasa a ser controlado por el servidor
-   (`ARCHITECTURE.md`). El servidor rechaza las operaciones de módulos no licenciados.
+  | Tramo | Miembros activos | Pensado para |
+  |---|---|---|
+  | Individual | 1 | Una persona, sus equipos |
+  | Pequeño | hasta 3 | Socios, familia (el caso usuario + hermano) |
+  | Equipo | hasta 10 | Pyme |
+  | Empresa | hasta 25 | Empresa mediana (Brújula modo Empresa) |
+  | A medida | más de 25, u on-prem | Contrato aparte |
+
+- **Dispositivos:** no hay límite duro por miembro. Se cuentan solo como señal en la telemetría.
+  El límite de 3 dispositivos desaparece como regla.
+
+**Conteo de puestos, en el servidor:**
+
+- **Qué cuenta:** las **identidades distintas activas en una ventana móvil de 30 días**. Hoy son
+  logins de Tailscale (`whois`, §6.1); con Vcity cloud serán cuentas Vcity.
+- **Qué es "activo":** al menos una petición autenticada a un documento de una app de pago. El
+  `hello` solo no cuenta.
+- **Liberar un puesto:** el `owner` quita a un miembro en "Ajustes del servidor" y el puesto queda
+  libre **en el acto**, sin esperar los 30 días. Queda registrado en la auditoría.
+- **Licencia en el servidor:** el servidor tiene **el** token de licencia del equipo. Es estado del
+  dispositivo, en el keychain del Studio, y lo renueva el Helper con la sesión Vcity del `owner`.
+  Ese token trae `licence_id`, `tier`, `maxMembers`, `apps[]`, `features[]` y `validUntil`.
+- **Sin servidor, en Local:** cada miembro activa su equipo con su cuenta Vcity dentro de la
+  licencia del equipo (VC-251), y Vcity cuenta las cuentas distintas con tokens vivos. Es el mismo
+  límite contado del otro lado.
+
+**Telemetría mínima y que preserva la privacidad:**
+
+- **Cuándo:** una vez al día, **dentro de la misma llamada de renovación del token** que el Helper
+  ya hace. No hay conexión nueva ni SDK de analítica.
+- **Qué se envía, exactamente:**
+
+  ```json
+  {
+    "schema": 1,
+    "licenceId": "lic_8f2c…",
+    "serverId": "srv_3b9a…",
+    "app": "expense",
+    "appVersion": "0.9.3",
+    "window": "30d",
+    "activeMembers": 3,
+    "memberHashes": ["9f1c2a7d0b4e6a11", "…"],
+    "devices": 5,
+    "activeDays": 22
+  }
+  ```
+
+  Qué significa cada campo:
+  - `serverId`: un uuid aleatorio de la instalación del servidor; no es el nombre del equipo.
+  - `memberHashes`: el HMAC-SHA256 de cada identidad con una **sal secreta del servidor**, que nunca
+    sale de él, truncado a 64 bits. Vcity puede deduplicar entre informes del mismo servidor, pero
+    no puede revertir un hash ni cruzarlo con correos ni con otros servidores.
+  - `devices`: los nodos de Tailscale distintos en la ventana.
+  - `activeDays`: cuántos de los últimos 30 días hubo alguna escritura.
+
+  Es una línea por app de pago y por servidor. Si un equipo tiene varios servidores, Vcity suma los
+  miembros, lo que da una cota superior y favorece al cliente ante la duda.
+- **Qué nunca se envía:** nombres, correos, logins, IPs del tailnet, nombres de libros o espacios,
+  contenidos, montos, contrapartes, operaciones ni frecuencia por persona.
+- **Divulgación:**
+  - en la app: "Ajustes del servidor → Qué enviamos a Vcity", que muestra **el último JSON
+    enviado, tal cual**;
+  - en el texto de la licencia y en los términos de la tienda.
+- **¿Obligatoria u opcional?** Se recomienda que sea **obligatoria en los tramos de pago**, porque
+  es parte de la comprobación de licencia, con divulgación clara. Quien no la acepte tiene el tramo
+  "A medida" (por ejemplo, licencia offline con conteo contractual). Las apps **gratis no tienen
+  telemetría ni licencia**: expense me, Mi Huerta y las de código abierto (Nodo, genealogy). Su
+  modo servidor, si existe, no informa nada.
+
+**Aplicación suave:**
+
+1. **Tramo + 1:** el `owner` ve una franja: "4 miembros activos este mes; tu plan Pequeño incluye
+   3". Los miembros no ven nada.
+2. **Gracia de 14 días** desde el primer día por encima del tramo, para subir de tramo o liberar un
+   puesto.
+3. **Después,** los miembros **por encima del tramo** pasan a **solo lectura** en ese servidor. Se
+   eligen por orden de llegada: los más recientes primero. Nunca pasa a solo lectura el `owner`, y
+   nunca se pierden, cifran ni ocultan datos. Exportar sigue funcionando.
+4. **Servidor offline:** sigue aplicando el último tramo conocido durante la **ventana de 14 días
+   ya decidida**. Pasado ese plazo sin contacto con Vcity, el servidor queda en solo lectura para
+   todos hasta que renueve.
+
+**Otros puntos:**
+
+- **Apps de código abierto:** "la licencia cubre los servicios". El servidor Otherwise podría ser un
+  servicio de pago para apps libres, o gratis para ellas. Es una decisión comercial pendiente; si
+  fuera de pago, usaría el mismo tramo y la misma telemetría.
+- **Brújula:** `modules.licensed_until` pasa a ser controlado por el servidor, que rechaza las
+  operaciones de módulos no licenciados. El tramo por miembros reemplaza la idea de "por
+  organización + módulos + usuarios" de `ROADMAP.md:61-62`; los módulos siguen siendo
+  `features[]`.
+- **Tarjetas de Vcity afectadas:** VC-246 (producto: `maxMembers` y tramo en lugar de
+  `maxDevices`), VC-248 (entitlements, devices, licence API y tokens: el token pasa a ser de
+  equipo, más el endpoint de telemetría), VC-249 (módulo de licencia en otherwise-link: conteo y
+  telemetría en el servidor) y **VC-251** (licencias de equipo: deja de estar abierto, porque es el
+  modelo base). El detalle está en el PR del plan de Vcity; no se editaron tarjetas del tablero.
 
 ---
 
@@ -762,22 +859,30 @@ Con un servidor:
 
 ### Preguntas abiertas (para el usuario)
 
+La anterior pregunta 2 (cómo edita el hermano) queda **resuelta** con la licencia por tamaño de
+equipo: él es un miembro del equipo y ocupa un puesto del tramo (§10.2).
+
 1. **Runners de CI en otro usuario macOS** del Studio: ¿sí? Sin eso, el servidor no puede distinguir
-   con seguridad a un workflow de CI de un cliente legítimo en loopback.
-2. **El hermano y las licencias:** ¿los miembros invitados editan bajo la licencia del `owner` (con
-   un tope) mientras no exista VC-251, o se exige su propia licencia desde el principio?
-3. **Dónde vive el data root del Studio:** ¿disco local con copias cifradas a OneDrive o a un disco
+   con seguridad a un workflow de CI de un cliente legítimo en loopback. Además, ahora el keychain
+   del Studio guarda el token de licencia del equipo.
+2. **Dónde vive el data root del Studio:** ¿disco local con copias cifradas a OneDrive o a un disco
    externo, o seguir en OneDrive? Se recomienda disco local.
-4. **Configuración de secretos remotos:** ¿solo en el Studio (Compartir pantalla), o un endpoint de
+3. **Configuración de secretos remotos:** ¿solo en el Studio (Compartir pantalla), o un endpoint de
    solo escritura para `owner`?
-5. **Sin conexión en expense:** ¿basta con solo lectura más captura de recibos encolada, o se
+4. **Sin conexión en expense:** ¿basta con solo lectura más captura de recibos encolada, o se
    necesita editar offline desde el principio? Editar offline cambia mucho el coste.
+5. **Tramos y telemetría:**
+   - ¿Los tramos 1 / 3 / 10 / 25 / a medida, y la gracia de 14 días, valen como punto de partida?
+   - ¿El tramo es por app o por la suite completa?
+   - ¿La telemetría es obligatoria en los tramos de pago, como se recomienda?
 
 Otras, de menor prioridad:
 - ¿`tailscale serve` hacia un socket Unix funciona en la variante instalada?
 - ¿Las cabeceras de identidad funcionan con la política actual de etiquetas del tailnet?
-- ¿Brújula "Empresa" es multiusuario sobre el servidor Otherwise, o espera la decisión de los socios
-  sobre Vcity como plataforma?
+- ¿El modo Empresa de Brújula se sirve desde el servidor Otherwise, o espera la decisión de los
+  socios sobre Vcity como plataforma? El contrato es el mismo en ambos casos.
+- ¿Vigía es de pago o libre? `apps::KNOWN` dice `open_source: false`, y el repo es MIT/Apache.
+  Decide si su modo servidor lleva licencia y telemetría.
 - ¿El servidor es un servicio de pago para las apps libres?
 - ¿Inicio de sesión automático en el Studio tras un corte?
 - ¿El extractor LLM de expense corre en el Studio (con Ollama)?
@@ -785,7 +890,24 @@ Otras, de menor prioridad:
 
 ---
 
-## 12. Plan por fases (cortes pequeños)
+## 12. Qué apps tendría más sentido hacer ahora
+
+Se ordenan por el **valor del uso multiusuario y siempre encendido** frente al **coste**, medido
+contra el código. Coincide con el orden que propuso el coordinador, con un matiz sobre Nodo.
+
+| # | App | Valor multiusuario | Coste (lo que ya existe) | Veredicto |
+|---|---|---|---|---|
+| 1 | **expense Business** | Alto: el usuario y el hermano ya comparten libros por OneDrive, con el lock "abierto en otro computador"; los jobs de correo y extractos ganan por correr siempre en un solo lugar | **El más bajo:** appsock (único escritor, `revision`, `undo`, `propose`), 96 `ops::OPS` con esquema, CLI sin ventana "para servidores", jobs listos | **Ahora** (fases 1-2) |
+| 2 | **Brújula** | Muy alto: el modo Empresa (`feat/empresa-mode`) es multiusuario por naturaleza (personas que reportan, aprueban y firman); ROADMAP lo pide | Medio: op log con HLC y `unsynced()`/`merge()` listo para sync. Faltan el filtro por rol, la cadena de hash y los sellos del servidor. Depende de la decisión de los socios | **Después de expense** (fase 3), cuando el modo Empresa entre a main |
+| 3 | **Vigía** | Medio: vencimientos y recordatorios compartidos en familia (SOAT, seguros, documentos); los jobs `reminders` y `checks` en un solo lugar evitan avisos duplicados | Bajo a medio: CLI completa con `--json`, pero SQLite mutable sin op log; hay que extraer un `ops.rs` de los verbos de la CLI | **Tercera** (fase 4) |
+| 4 | Nodo | Bajo como multiusuario, **alto como "siempre encendido"**: el Studio es el mejor monitor del tailnet | Bajo: CLI, job `monitor` y MCP con escrituras | Junto a Vigía si sale barato; es libre, así que sin licencia |
+| 5 | Mi Huerta | Bajo a medio (un jardín de familia) | Bajo: documento con `revision` y propose_* | Más adelante; gratis |
+| 6 | Surco, Voltia, Helio, CACFU, genealogy | Bajo: son cálculos o archivos de una persona | Medio, porque no tienen `serve` y algunas ni MCP | Solo "abrir y guardar en el servidor", si alguien lo pide |
+| — | **expense me** | No aplica: es la edición gratis y **personal** | — | **Se queda local**, sin modo servidor ni telemetría. Si el usuario quiere sus libros personales en el Studio, eso es expense Business (o un libro no compartido en el servidor) |
+
+---
+
+## 13. Plan por fases (cortes pequeños)
 
 Cada fase deja algo usable y no rompe Local. Ninguna fase cambia la configuración del Studio sin que
 el usuario lo pida.
@@ -859,7 +981,8 @@ el usuario lo pida.
 - **otherwise-ui:** `components/servers.rs` (`ServerSwitcher`) con estados y menú, y su ejemplo en
   `examples/gallery.rs`. expense lo usa.
 - **Licencia:** si VC-249 ya existe, el servidor exige la licencia propia para escribir y los
-  clientes la suya (§10.2). Si no, se deja el gancho.
+  conteo de miembros más la telemetría de §10.2. Si no, el conteo y la franja de tramo funcionan
+  igual en local y la telemetría queda apagada.
 - **Pruebas:**
   - dos clientes de prueba escribiendo en paralelo, con orden serializado, la misma clave idempotente
     escrita una sola vez, y `conflict` con `base_revision` vieja;
@@ -887,14 +1010,13 @@ el usuario lo pida.
 - **Requisito previo:** la decisión de los socios sobre "Vcity como plataforma" frente a servidor
   propio. El contrato es el mismo, así que esta fase no se pierde si gana Vcity.
 
-### Fase 4: Vigía, Nodo, Mi Huerta (y expense me)
+### Fase 4: Vigía, Nodo, Mi Huerta (expense me se queda local)
 
 - **Vigía:** `vigia-core/src/ops.rs` (de los verbos de la CLI) y `vigia serve`; jobs solo en el
   servidor.
 - **Nodo:** `nodo serve`; `monitor` en el Studio.
 - **Mi Huerta:** documento con `revision`, y propose_* aplicadas en el servidor.
-- **expense me:** viene casi gratis por expense-core; los libros personales nunca se comparten por
-  defecto.
+- **expense me:** **sin modo servidor** (§12): es la edición gratis y personal, y se queda local.
 - **Pruebas:** por app, `serve` sobre datos de prueba, más los mismos tests de contrato de la
   fase 0. El hub muestra la vista "Servidores".
 
