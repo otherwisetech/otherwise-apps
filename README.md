@@ -84,7 +84,9 @@ Otherwise Apps is also the hub of the apps, through
   what the assistant reads goes to the provider you chose. Today items have an **Ask** button.
 - **Settings → Hub**: shared entities on/off, the command that adds the MCP server to Claude
   Code (`claude mcp add otherwise-hub -- "…/otherwise-apps" mcp`, to copy and run yourself),
-  "Allow assistants to make changes" (off by default) and which apps' tools are offered.
+  "Allow assistants to make changes" (off by default) and which apps' tools are offered. An app
+  whose own settings don't allow agent changes (expense's Settings → Assistant) is offered
+  **read-only** instead of being dropped, and marked "Read-only" there with how to allow it.
 - **Links**: Otherwise Apps handles `otherwise://` links. `otherwise://otherwise-apps/today`,
   `…/calendar?date=YYYY-MM-DD`,
   `…/entities/<id>`, `…/assistant` (the panel) and `…/hub` open its pages; a link to another app

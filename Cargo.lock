@@ -3122,7 +3122,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.62.2",
+ "windows-core 0.57.0",
 ]
 
 [[package]]
@@ -4762,7 +4762,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "anyhow",
  "chrono",
@@ -4775,7 +4775,7 @@ dependencies = [
  "otherwise-agent-panel",
  "otherwise-apps-core",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.2",
+ "otherwise-link 0.5.3",
  "otherwise-mcp-hub",
  "serde_json",
  "ureq",
@@ -4785,12 +4785,12 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "chrono",
  "flate2",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.2",
+ "otherwise-link 0.5.3",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -4804,11 +4804,11 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.6.3"
+version = "0.6.4"
 
 [[package]]
 name = "otherwise-helper"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "block2 0.6.2",
  "chrono",
@@ -4818,7 +4818,7 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "objc2-user-notifications",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.2",
+ "otherwise-link 0.5.3",
  "serde",
  "serde_json",
  "tempfile",
@@ -4838,8 +4838,8 @@ dependencies = [
 
 [[package]]
 name = "otherwise-link"
-version = "0.5.2"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.2#c6a45c847caa514bc49e1b1b2a8a0370856aab7f"
+version = "0.5.3"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.3#028f6e00a4caaaf73bdf5da083ce613768eec97d"
 dependencies = [
  "chrono",
  "rusqlite",
@@ -4850,11 +4850,11 @@ dependencies = [
 
 [[package]]
 name = "otherwise-mcp-hub"
-version = "0.5.2"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.2#c6a45c847caa514bc49e1b1b2a8a0370856aab7f"
+version = "0.5.3"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.3#028f6e00a4caaaf73bdf5da083ce613768eec97d"
 dependencies = [
  "chrono",
- "otherwise-link 0.5.2",
+ "otherwise-link 0.5.3",
  "serde_json",
  "uuid",
 ]
@@ -6923,7 +6923,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.4",
  "windows-sys 0.61.2",
