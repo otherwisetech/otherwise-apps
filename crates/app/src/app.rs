@@ -516,7 +516,7 @@ impl Launcher {
         self.queue.retain(|q| q != id);
     }
 
-    /// Queues every app with an update; Otherwise Apps itself goes last (it may restart).
+    /// Queues every app with an update; Otherwise Hub itself goes last (it may restart).
     pub fn update_all(&mut self, cx: &mut Context<Self>) {
         let mut ids: Vec<String> = self.cards.iter().filter(|c| matches!(c.status, Status::Update { .. }) && c.job.is_none()).map(|c| c.entry.id.clone()).collect();
         ids.sort_by_key(|id| id == catalog::SELF_ID);
@@ -861,7 +861,7 @@ impl Launcher {
             .child(div().flex_1().min_w_0().text_size(px(13.)).child(Input::new(&self.search).appearance(false).small()))
     }
 
-    /// Shown above the grid when Otherwise Apps itself has an update.
+    /// Shown above the grid when Otherwise Hub itself has an update.
     fn render_self_banner(&self, t: &Tokens, cx: &mut Context<Self>) -> Option<impl IntoElement> {
         let c = self.cards.iter().find(|c| c.entry.is_self())?;
         let Status::Update { to, .. } = &c.status else { return None };

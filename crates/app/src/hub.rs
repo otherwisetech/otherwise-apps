@@ -385,7 +385,7 @@ impl Launcher {
     // ── Today ───────────────────────────────────────────────────────────────────────────────
 
     pub fn reload_today(&mut self, cx: &mut Context<Self>) {
-        // the data root may have moved (another Otherwise Apps window, or Settings)
+        // the data root may have moved (another Otherwise Hub window, or Settings)
         self.hub.root = Root::system();
         let root = self.hub.root.clone();
         let task = cx.background_executor().spawn(async move { today::read(&root, Utc::now()) });

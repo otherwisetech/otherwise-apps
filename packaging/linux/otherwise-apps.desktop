@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Otherwise Apps
+Name=Otherwise Hub
 GenericName=App launcher
 Comment=Install and update Otherwise Technologies' open-source desktop apps
 Exec=otherwise-apps %u

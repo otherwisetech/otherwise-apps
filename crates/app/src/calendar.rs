@@ -214,8 +214,10 @@ pub fn color(t: &Tokens, key: &str, hint: Option<&str>) -> Hsla {
     }
     match key {
         "vigia" => hex(0x1F8A8A),
-        "expense" => hex(0xE07B24),
-        "genealogy" => hex(0x2E8B57),
+        // expense Business navy, expense me green (their accents, suite docs §4)
+        "expense" => hex(0x1F3F6E),
+        "expense-me" => hex(0x1F7A52),
+        "genealogy" => hex(0x7A9A3A),
         "brujula" => hex(0x8A56C9),
         "helio" => hex(0xC9A227),
         "nodo" => hex(0x3B6FD1),
@@ -505,6 +507,12 @@ impl Launcher {
         self.reload_calendar(cx);
     }
 
+    fn set_show_reminders(&mut self, on: bool, cx: &mut Context<Self>) {
+        self.cal.settings.show_reminders = on;
+        self.save_cal_settings(cx);
+        cx.notify();
+    }
+
     fn set_show_holidays(&mut self, on: bool, cx: &mut Context<Self>) {
         self.cal.settings.show_holidays = on;
         self.save_cal_settings(cx);
@@ -716,7 +724,10 @@ impl Launcher {
         let hover = t.raised;
         let title = if e.title.is_empty() { kind_label(e.kind) } else { e.title.clone() };
         let time = time_label(i);
-        let tip = format!("{} · {} · {}", source_label(&key), kind_label(e.kind), title);
+        let mut tip = format!("{} · {} · {}", source_label(&key), kind_label(e.kind), title);
+        if e.busy_only {
+            tip = format!("{tip}\n{}", i18n::t!("app.cal.private_tip"));
+        }
         div()
             .id(SharedString::from(format!("pill-{}-{n}", i.occ.key()))) // i18n-ok: element id
             .flex()
@@ -733,7 +744,6 @@ impl Launcher {
             .child(div().flex_none().w(px(3.)).h(px(if compact { 12. } else { 16. })).rounded(px(2.)).bg(c))
             .children(time.map(|x| div().flex_none().text_size(px(10.)).text_color(t.ink_muted).child(x)))
             .child(div().flex_1().min_w_0().truncate().text_size(px(if compact { 11. } else { 12. })).when(done, |d| d.line_through().text_color(t.ink_muted)).child(title))
-            .when(e.busy_only, |d| d.child(ui::icon(IconName::EyeOff, 10., t.ink_muted)))
             .into_any_element()
     }
 
@@ -897,7 +907,15 @@ impl Launcher {
                                     .child(div().text_size(px(13.)).font_weight(FontWeight::MEDIUM).truncate().when(done, |x| x.line_through().text_color(t.ink_muted)).child(if e.title.is_empty() { kind_label(e.kind) } else { e.title.clone() }))
                                     .children(e.body.clone().filter(|b| !b.is_empty()).map(|b| div().text_size(px(11.)).text_color(t.ink_muted).truncate().child(b))),
                             )
-                            .when(e.busy_only, |x| x.child(ui::icon(IconName::EyeOff, 12., t.ink_muted)))
+                            .when(e.busy_only, |x| {
+                                x.child(
+                                    div()
+                                        .id(SharedString::from(format!("private-{}", i.occ.key()))) // i18n-ok: element id
+                                        .flex_none()
+                                        .child(ui::icon(IconName::EyeOff, 12., t.ink_muted))
+                                        .tooltip(|window, cx| gpui_component::tooltip::Tooltip::new(i18n::t!("app.cal.private_tip")).build(window, cx)),
+                                )
+                            })
                             .child(ui::chip(kind_label(e.kind), t.ink_muted, t.border.opacity(0.5)))
                             .child(ui::chip(e.category.clone().filter(|_| matches!(i.source, Source::Overlay(_) | Source::Vcity)).unwrap_or_else(|| source_label(&key)), c, c.opacity(0.12))),
                     );
@@ -945,6 +963,31 @@ impl Launcher {
                     .child(div().size(px(8.)).rounded_full().bg(if on { c } else { t.border_strong }))
                     .child(source_label(&k))
                     .on_click(cx.listener(move |this, _, _, cx| this.toggle_source(&key, cx))),
+            );
+        }
+        // reminder days (Vigía's "30 days before"): hidden by default, one chip brings them back
+        let reminders = cal::reminder_count(&self.cal.view, &self.cal.settings);
+        if reminders > 0 {
+            let on = self.cal.settings.show_reminders;
+            row = row.child(
+                div()
+                    .id("cal-reminders")
+                    .flex()
+                    .items_center()
+                    .gap(px(6.))
+                    .px(px(9.))
+                    .py(px(4.))
+                    .rounded(px(12.))
+                    .border_1()
+                    .border_color(if on { t.border_strong } else { t.border })
+                    .bg(if on { t.raised } else { t.surface })
+                    .cursor_pointer()
+                    .text_size(px(12.))
+                    .text_color(if on { t.ink } else { t.ink_muted })
+                    .child(ui::icon(IconName::Bell, 11., if on { t.ink } else { t.ink_muted }))
+                    .child(if on { i18n::tn!("app.cal.reminders_shown", reminders) } else { i18n::tn!("app.cal.reminders_hidden", reminders) })
+                    .tooltip(|window, cx| gpui_component::tooltip::Tooltip::new(i18n::t!("app.cal.reminders_hint")).build(window, cx))
+                    .on_click(cx.listener(move |this, _, _, cx| this.set_show_reminders(!on, cx))),
             );
         }
         // entity filter: only when the registry is on and the range has events about entities
@@ -1082,6 +1125,12 @@ impl Launcher {
             countries = countries.child(ui::segment(t, SharedString::from(format!("country-{}", c.id())), on).border_1().border_color(t.border).child(country_label(c)).on_click(cx.listener(move |this, _, _, cx| this.toggle_country(c, cx)))); // i18n-ok: element id
         }
         let holidays = div().flex().flex_col().gap(px(8.)).child(show).child(countries);
+        let reminders = Switch::new("cal-show-reminders").checked(self.cal.settings.show_reminders).label(i18n::t!("app.cal.reminders_label")).on_click({
+            let w = weak.clone();
+            move |on, _, cx| {
+                w.update(cx, |this, cx| this.set_show_reminders(*on, cx)).ok();
+            }
+        });
         // overlays
         let mut overlays = div().flex().flex_col().gap(px(6.));
         for (n, o) in self.cal.settings.overlays.iter().enumerate() {
@@ -1141,6 +1190,7 @@ impl Launcher {
             .flex()
             .flex_col()
             .child(div().pb(px(8.)).text_size(px(17.)).font_weight(FontWeight::SEMIBOLD).child(i18n::t!("app.cal.sources")))
+            .child(row(i18n::t!("app.cal.reminders"), Some(i18n::t!("app.cal.reminders_hint")), reminders.into_any_element()))
             .child(row(i18n::t!("app.cal.holidays"), Some(i18n::t!("app.cal.holidays_hint")), holidays.into_any_element()))
             .child(row(i18n::t!("app.cal.overlays"), Some(i18n::t!("app.cal.overlays_hint")), overlays.into_any_element()))
             .child(row(i18n::t!("app.cal.combined"), Some(i18n::t!("app.cal.combined_hint")), combined_box.into_any_element()))

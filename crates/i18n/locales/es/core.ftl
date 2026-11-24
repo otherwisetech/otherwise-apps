@@ -1,6 +1,6 @@
 # catálogo
 core.catalog.json = No se pudo leer el catálogo: {detail}
-core.catalog.schema = El catálogo usa el formato {n}, que esta versión no entiende. Actualiza Otherwise Apps.
+core.catalog.schema = El catálogo usa el formato {n}, que esta versión no entiende. Actualiza Otherwise Hub.
 core.catalog.invalid = La entrada «{id}» del catálogo no es válida ({why}).
 # archivos comprimidos
 core.archive.io = No se pudo descomprimir la descarga: {detail}
@@ -12,7 +12,7 @@ core.install.io = No se pudo escribir {path}: {detail}
 core.install.no_payload = La descarga no contiene la app donde se esperaba.
 core.install.wrong_bundle = La descarga contiene otra app ({found} en lugar de {expected}); no se instaló nada.
 core.install.not_writable = No hay permiso para instalar en {path}.
-core.install.not_ours = {path} no es un lugar donde Otherwise Apps instale esta app; no se tocó.
+core.install.not_ours = {path} no es un lugar donde Otherwise Hub instale esta app; no se tocó.
 core.install.trash = No se pudo mover {path} a la papelera: {detail}
 # red
 core.net.rate_limited = GitHub está limitando las solicitudes ahora; inténtalo de nuevo en unos minutos.

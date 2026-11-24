@@ -1,6 +1,6 @@
-# Otherwise Apps
+# Otherwise Hub
 
-<img src="crates/app/assets/logo/otherwise-apps-icon-512.png" width="128" alt="Otherwise Apps icon">
+<img src="crates/app/assets/logo/otherwise-apps-icon-512.png" width="128" alt="Otherwise Hub icon">
 
 Install and update Otherwise Technologies' open-source desktop apps in one place:
 [genealogy-rs](https://github.com/otherwisetech/genealogy-rs),
@@ -14,7 +14,7 @@ Windows and Linux. UI in Spanish, English, Portuguese and French.
 
 ## What you see
 
-- **Top bar**: the Otherwise Apps mark, how many apps are installed and how many updates are
+- **Top bar**: the Otherwise Hub mark, how many apps are installed and how many updates are
   waiting, a search field (⌘F / Ctrl+F) that matches name, tagline and description in your
   language, *Sort by* (name, recently updated, installed first), a grid / list switch, *Check for
   updates* (⌘R), **Update all (n)** when there is anything to update, and Settings (⌘,).
@@ -29,10 +29,10 @@ Windows and Linux. UI in Spanish, English, Portuguese and French.
   show the reason on the card with **Retry**.
 - **"…" menu** per app: Open, Release notes (the GitHub release page), Show in Finder / Explorer /
   folder, GitHub, Website, Reinstall, Uninstall….
-- When Otherwise Apps itself has an update, a banner offers it above the grid; after updating it
+- When Otherwise Hub itself has an update, a banner offers it above the grid; after updating it
   asks to restart.
 - **Footer**: *Checked 2 minutes ago · otherwisetech.com + GitHub* (or *Offline · showing the saved
-  catalog*, with the errors in a tooltip) and, on the right, *Otherwise Apps 0.1.0 · Otherwise
+  catalog*, with the errors in a tooltip) and, on the right, *Otherwise Hub 0.7.1 · Otherwise
   Technologies LLC*, which opens **About** (also in the app menu): logo, version, description,
   credit to Otherwise Technologies LLC, Wyoming, USA with a link to
   [otherwisetech.com](https://otherwisetech.com), the source link and the license.
@@ -47,7 +47,7 @@ Windows and Linux. UI in Spanish, English, Portuguese and French.
 
 ## Hub: Today, Calendar, Entities and MCP
 
-Otherwise Apps is also the hub of the apps, through
+Otherwise Hub is also where the apps meet, through
 [otherwise-link](https://github.com/otherwisetech/otherwise-link):
 
 - **Today** (⌘2): deadlines, alerts and things to review published by every installed app
@@ -92,26 +92,26 @@ Otherwise Apps is also the hub of the apps, through
   "Allow assistants to make changes" (off by default) and which apps' tools are offered. An app
   whose own settings don't allow agent changes (expense's Settings → Assistant) is offered
   **read-only** instead of being dropped, and marked "Read-only" there with how to allow it.
-- **Links**: Otherwise Apps handles `otherwise://` links. `otherwise://otherwise-apps/today`,
+- **Links**: Otherwise Hub handles `otherwise://` links. `otherwise://otherwise-apps/today`,
   `…/calendar?date=YYYY-MM-DD`,
   `…/entities/<id>`, `…/assistant` (the panel) and `…/hub` open its pages; a link to another app
   (`otherwise://vigia/item/42`) is passed on to that app, or tells you it isn't installed.
 
 ## Otherwise Helper (menu bar)
 
-A small background process inside Otherwise Apps (`Contents/Library/LoginItems/Otherwise
+A small background process inside Otherwise Hub (`Contents/Library/LoginItems/Otherwise
 Helper.app`, no GPUI, no window) that keeps working while your apps are closed — like OneDrive in
 the menu bar:
 
 - runs the **background jobs installed apps declare** inside their own bundles
   (`otherwise-background.json`, see otherwise-link SPEC §11): expense checks mail, Vigía checks
-  devices, Otherwise Apps refreshes calendar subscriptions and announces upcoming events. Only
+  devices, Otherwise Hub refreshes calendar subscriptions and announces upcoming events. Only
   installed apps, only their own binaries, re-verified before every run; one job at a time,
   with timeouts and memory ceilings; waits in Low Power Mode, under memory pressure and offline;
   backs off after failures without ever notifying about them;
 - shows their **notifications** (macOS Notification Center, attributed to Otherwise Helper);
   clicking one opens the right app through its `otherwise://` link;
-- a **menu** with each app's last run and status, Pause for 1 hour, Open Otherwise Apps,
+- a **menu** with each app's last run and status, Pause for 1 hour, Open Otherwise Hub,
   Settings, About and Quit.
 
 With the data folder on OneDrive (or any synced folder) used from two computers, each app's
@@ -179,7 +179,7 @@ Download the latest release from
 [GitHub](https://github.com/otherwisetech/otherwise-apps/releases) or
 [otherwisetech.com](https://otherwisetech.com):
 
-- **macOS**: unzip and drag *Otherwise Apps.app* to Applications. It isn't notarized yet, so the
+- **macOS**: unzip and drag *Otherwise Apps.app* to Applications (Finder and the Dock show it as Otherwise Hub; the file keeps its old name so updates and MCP paths keep working). It isn't notarized yet, so the
   first time right-click it and choose *Open*.
 - **Windows**: unzip and run `otherwise-apps.exe` (SmartScreen may ask you to confirm).
 - **Linux**: extract the `.tar.gz` and run `./otherwise-apps`. Needs Vulkan drivers.

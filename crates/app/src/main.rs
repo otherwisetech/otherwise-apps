@@ -27,7 +27,7 @@ use std::sync::Mutex;
 
 actions!(otherwise_apps, [Quit, OpenWebsite, OpenVcity]);
 
-pub(crate) const APP_NAME: &str = "Otherwise Apps"; // i18n-ok: product name
+pub(crate) const APP_NAME: &str = "Otherwise Hub"; // i18n-ok: product name
 pub(crate) const COMPANY: &str = otherwise_ui::COMPANY;
 pub(crate) const COMPANY_URL: &str = otherwise_ui::COMPANY_URL;
 /// The invitation to Vcity (About, Help menu, the Apps page).
