@@ -131,13 +131,15 @@ app.settings.location_hint = Leave empty for the default: {path}. Apps already i
 app.settings.verify = Downloads
 app.settings.verify_body = Every download is checked against the SHA-256 checksum GitHub publishes for it; a file that doesn't match is deleted and never installed. Apps are replaced as a whole and the old copy goes to the Trash; their settings and data are never touched.
 # about
-app.about.footer = {app} {version} · {company}
+app.about.footer_link = About
 app.about.description = Install and update Otherwise Technologies' open-source desktop apps in one place.
 app.about.by = Made by {company}
 app.about.place = Wyoming, USA
 app.about.visit = Visit otherwisetech.com
 app.about.source = Source code on GitHub
 app.about.license = Free and open source · MIT OR Apache-2.0
+app.privacy.local = Your data stays on this computer
+app.privacy.detail = Nothing leaves it unless you ask.
 app.star.label = Star on GitHub
 app.star.tooltip = Like it? Give it a star
 app.star.ask = If this app helps you, a star helps others find it.

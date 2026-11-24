@@ -416,7 +416,7 @@ impl Launcher {
     fn render_event(&self, t: &Tokens, e: &Event, cx: &mut Context<Self>) -> AnyElement {
         let bar = match e.severity {
             Severity::Critical => t.danger,
-            Severity::High => t.update,
+            Severity::High => t.warn,
             Severity::Normal => t.accent,
             Severity::Low => t.border_strong,
         };
@@ -556,7 +556,7 @@ impl Launcher {
                     .p(px(24.))
                     .max_w(px(900.))
                     .child(header)
-                    .when(!errors.is_empty(), |d| d.child(div().text_size(px(11.)).text_color(t.update).child(i18n::t!("app.today.errors", files = errors.join("; ")))))
+                    .when(!errors.is_empty(), |d| d.child(div().text_size(px(11.)).text_color(t.warn).child(i18n::t!("app.today.errors", files = errors.join("; ")))))
                     .child(body),
             )
             .into_any_element()
@@ -895,9 +895,9 @@ impl Launcher {
                         .px(px(12.))
                         .py(px(8.))
                         .rounded(px(10.))
-                        .bg(t.update_soft)
+                        .bg(t.warn_soft)
                         .cursor_pointer()
-                        .child(ui::icon(IconName::TriangleAlert, 14., t.update))
+                        .child(ui::icon(IconName::TriangleAlert, 14., t.warn))
                         .child(div().flex_1().text_size(px(12.)).child(i18n::tn!("app.entities.duplicates", dups)))
                         .child(div().text_size(px(12.)).font_weight(FontWeight::MEDIUM).child(if self.hub.show_duplicates { i18n::t!("app.entities.hide") } else { i18n::t!("app.entities.review") }))
                         .on_click(cx.listener(|this, _, _, cx| {

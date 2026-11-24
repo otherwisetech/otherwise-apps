@@ -40,6 +40,10 @@ Windows and Linux. UI in Spanish, English, Portuguese and French.
   (off, 1, 3, 6, 12 or 24 hours; it also checks at every start), notifications on/off, and the
   install location on Windows and Linux. The Dock icon shows the number of pending updates on
   macOS, and a system notification announces each new release once.
+- **Looks like the rest of the family**: the tokens (Inter, type scale, neutrals, status colours)
+  and the shared chrome (top bar, footer, About, toasts) come from
+  [otherwise-ui](https://github.com/otherwisetech/otherwise-ui); the Hub only picks its petrol
+  accent.
 
 ## Hub: Today, Calendar, Entities and MCP
 
