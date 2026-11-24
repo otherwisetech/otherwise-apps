@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
-members = ["crates/i18n", "crates/core", "crates/app", "crates/helper"]
-default-members = ["crates/i18n", "crates/core", "crates/helper"]
+members = ["crates/i18n", "crates/core", "crates/app", "crates/helper", "crates/server"]
+default-members = ["crates/i18n", "crates/core", "crates/helper", "crates/server"]
 
 [workspace.package]
 version = "0.6.6"
@@ -14,8 +14,11 @@ repository = "https://github.com/otherwisetech/otherwise-apps"
 i18n = { path = "crates/i18n", package = "otherwise-apps-i18n" }
 otherwise-core = { path = "crates/core", package = "otherwise-apps-core" }
 # the shared integration layer (deep links, discovery, entities, Today, MCP hub)
-otherwise-link = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.5.3" }
-otherwise-mcp-hub = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.5.3" }
+otherwise-link = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.6.0" }
+otherwise-mcp-hub = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.6.0" }
+# the client side of an Otherwise server (SPEC §12): /v1 types shared by the server mode
+otherwise-remote = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.6.0" }
+otherwise-server = { path = "crates/server" }
 # the AI panel docked next to every page (Claude Code / Codex / opencode with the hub attached)
 otherwise-agent-panel = { git = "https://github.com/otherwisetech/otherwise-agent-panel", tag = "v0.2.0" }
 # the family design system: tokens (Inter, type scale, colours) and the shared chrome

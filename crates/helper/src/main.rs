@@ -3,6 +3,7 @@
 //!
 //! - `login on|off|status`: start at login (macOS `SMAppService`, the helper's own bundle)
 //! - `status`: installed apps with jobs and their last runs, as JSON
+//! - `server run|status|init|share|unshare|member|tier|doctor`: the server mode
 //! - `once`: run whatever is due now, one job, and exit (no menu, notifications printed as JSON)
 #[cfg(target_os = "macos")]
 mod mac;
@@ -18,6 +19,7 @@ fn main() {
         Some("login") => std::process::exit(login(args.get(1).map(String::as_str).unwrap_or("status"))),
         Some("status") => status(),
         Some("once") => once(),
+        Some("server") => std::process::exit(otherwise_helper::server_mode::main(&args[1..])),
         // launchd / LaunchServices may pass -psn_… or nothing
         _ => run(),
     }

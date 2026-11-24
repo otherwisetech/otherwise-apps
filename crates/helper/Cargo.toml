@@ -18,6 +18,8 @@ path = "src/main.rs"
 [dependencies]
 i18n.workspace = true
 otherwise-link.workspace = true
+otherwise-server.workspace = true
+otherwise-remote.workspace = true
 chrono.workspace = true
 serde.workspace = true
 serde_json.workspace = true

@@ -1,0 +1,24 @@
+[package]
+name = "otherwise-server"
+description = "Otherwise Helper's server mode: the /v1 contract (otherwise-link SPEC §12) on loopback for tailscale serve, Tailscale identity, roles, audit, seats, and the apps' `serve` processes"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "otherwise_server"
+
+# No GPUI, no app code: it runs the apps' own `serve` executables (their manifest).
+[dependencies]
+otherwise-link.workspace = true
+otherwise-remote.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+sha2 = "0.10"
+libc = "0.2"
+
+[dev-dependencies]
+tempfile = "3"

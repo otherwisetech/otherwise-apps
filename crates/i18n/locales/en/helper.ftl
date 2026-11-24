@@ -33,3 +33,5 @@ helper.cli.login_failed = Couldn't change start at login: {error}
 helper.cli.running = Another Otherwise Helper is already running.
 helper.wait.elsewhere = running on {device}
 helper.wait.no_lease = waiting: the data folder can't be written
+helper.server.usage = usage: otherwise-helper server run | status | doctor | init --owner <tailscale login> [--name N] [--max-members N] | share <app> <folder> [--name N] [--id ID] | unshare <app> <id> | member <login> <owner|editor|viewer|agent|remove> [--name N] [--doc app/doc] | tier <max members>
+helper.server.failed = Server mode: {error}

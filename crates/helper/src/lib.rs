@@ -8,11 +8,13 @@
 //! - [`runner`]: one run with its timeout and memory ceiling.
 //! - [`state`]: last runs and shown notifications (this computer's folder, never the data root).
 //! - [`menu`]: the menu as data. [`sys`]: memory pressure, network, processes.
+//! - [`server_mode`]: `otherwise-helper server …`, the server mode (otherwise-server).
 //! - `mac` (in the binary): NSStatusItem, UNUserNotificationCenter, SMAppService.
 pub mod engine;
 pub mod menu;
 pub mod runner;
 pub mod sched;
+pub mod server_mode;
 pub mod state;
 pub mod sys;
 
