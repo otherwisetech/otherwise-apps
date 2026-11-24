@@ -33,3 +33,5 @@ helper.cli.login_failed = Impossible de modifier l’ouverture à la connexion :
 helper.cli.running = Un autre Otherwise Helper est déjà en cours d’exécution.
 helper.wait.elsewhere = s’exécute sur {device}
 helper.wait.no_lease = en attente : impossible d’écrire dans le dossier de données
+helper.server.usage = usage : otherwise-helper server run | status | doctor | init --owner <login tailscale> [--name N] [--max-members N] | share <app> <dossier> [--name N] [--id ID] | unshare <app> <id> | member <login> <owner|editor|viewer|agent|remove> [--name N] [--doc app/doc] | tier <membres max>
+helper.server.failed = Mode serveur : {error}

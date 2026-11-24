@@ -33,3 +33,5 @@ helper.cli.login_failed = No se pudo cambiar el inicio de sesión: {error}
 helper.cli.running = Ya hay otro Otherwise Helper en ejecución.
 helper.wait.elsewhere = se ejecuta en {device}
 helper.wait.no_lease = en espera: no se puede escribir en la carpeta de datos
+helper.server.usage = uso: otherwise-helper server run | status | doctor | init --owner <login de tailscale> [--name N] [--max-members N] | share <app> <carpeta> [--name N] [--id ID] | unshare <app> <id> | member <login> <owner|editor|viewer|agent|remove> [--name N] [--doc app/doc] | tier <máximo de miembros>
+helper.server.failed = Modo servidor: {error}

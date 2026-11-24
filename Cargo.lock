@@ -1159,6 +1159,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "cookie"
+version = "0.18.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d55f2d6c30eeec7d5c6f98bd4395d4abb1895629eab97ee6522d340623615f8a"
+dependencies = [
+ "percent-encoding",
+ "time",
+ "version_check",
+]
+
+[[package]]
+name = "cookie_store"
+version = "0.22.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15b2c103cf610ec6cae3da84a766285b42fd16aad564758459e6ecf128c75206"
+dependencies = [
+ "cookie",
+ "document-features",
+ "idna",
+ "indexmap",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "time",
+ "url",
+]
+
+[[package]]
 name = "core-foundation"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4762,7 +4791,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.6.6"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -4775,7 +4804,7 @@ dependencies = [
  "otherwise-agent-panel",
  "otherwise-apps-core",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.3",
+ "otherwise-link 0.6.0",
  "otherwise-mcp-hub",
  "otherwise-ui",
  "serde_json",
@@ -4786,12 +4815,12 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.6.6"
+version = "0.7.0"
 dependencies = [
  "chrono",
  "flate2",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.3",
+ "otherwise-link 0.6.0",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -4805,11 +4834,11 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.6.6"
+version = "0.7.0"
 
 [[package]]
 name = "otherwise-helper"
-version = "0.6.6"
+version = "0.7.0"
 dependencies = [
  "block2 0.6.2",
  "chrono",
@@ -4819,7 +4848,9 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "objc2-user-notifications",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.3",
+ "otherwise-link 0.6.0",
+ "otherwise-remote",
+ "otherwise-server",
  "serde",
  "serde_json",
  "tempfile",
@@ -4839,8 +4870,8 @@ dependencies = [
 
 [[package]]
 name = "otherwise-link"
-version = "0.5.3"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.3#028f6e00a4caaaf73bdf5da083ce613768eec97d"
+version = "0.6.0"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.6.0#b52624b05544c6afd9bc4f22fef60896b7b2e2c0"
 dependencies = [
  "chrono",
  "rusqlite",
@@ -4851,13 +4882,37 @@ dependencies = [
 
 [[package]]
 name = "otherwise-mcp-hub"
-version = "0.5.3"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.3#028f6e00a4caaaf73bdf5da083ce613768eec97d"
+version = "0.6.0"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.6.0#b52624b05544c6afd9bc4f22fef60896b7b2e2c0"
 dependencies = [
  "chrono",
- "otherwise-link 0.5.3",
+ "otherwise-link 0.6.0",
  "serde_json",
  "uuid",
+]
+
+[[package]]
+name = "otherwise-remote"
+version = "0.6.0"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.6.0#b52624b05544c6afd9bc4f22fef60896b7b2e2c0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "ureq",
+]
+
+[[package]]
+name = "otherwise-server"
+version = "0.7.0"
+dependencies = [
+ "chrono",
+ "libc",
+ "otherwise-link 0.6.0",
+ "otherwise-remote",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
 ]
 
 [[package]]
@@ -7033,6 +7088,7 @@ dependencies = [
  "powerfmt",
  "serde_core",
  "time-core",
+ "time-macros",
 ]
 
 [[package]]
@@ -7040,6 +7096,16 @@ name = "time-core"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e1c906769ad99c88eaa54e728060edef082f8e358ff32030cb7c7d315e81109"
+
+[[package]]
+name = "time-macros"
+version = "0.2.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e689342a48d2ea927c87ea50cabf8594854bf940e9310208848d680d668ed85"
+dependencies = [
+ "num-conv",
+ "time-core",
+]
 
 [[package]]
 name = "tiny-keccak"
@@ -7487,10 +7553,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "972d7902c8735f2695410b8aed7df6ed12a47394aa1c8d7af49f0497b731a94d"
 dependencies = [
  "base64 0.23.1",
+ "cookie_store",
  "log",
  "percent-encoding",
  "rustls",
  "rustls-pki-types",
+ "serde",
+ "serde_json",
  "ureq-proto",
  "utf8-zero",
  "webpki-roots",

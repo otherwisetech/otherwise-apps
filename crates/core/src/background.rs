@@ -38,7 +38,7 @@ pub fn manifest() -> Manifest {
     let mut upcoming = Job::every(UPCOMING, label("core.background.upcoming"), "5m", &["background", "run", UPCOMING]); // i18n-ok: arguments
     upcoming.timeout_secs = Some(60);
     upcoming.memory_mb = Some(200);
-    Manifest { schema: 1, app: cal::APP.into(), jobs: vec![sync, upcoming] }
+    Manifest { schema: 1, app: cal::APP.into(), jobs: vec![sync, upcoming], serve: None }
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]

@@ -61,7 +61,7 @@ impl World {
         let exe = c.join("MacOS/expense");
         fs::write(&exe, format!("#!/bin/sh\n{script}\n")).unwrap();
         fs::set_permissions(&exe, fs::Permissions::from_mode(0o755)).unwrap();
-        fs::write(c.join("Resources").join(background::MANIFEST), Manifest { schema: 1, app: "expense".into(), jobs }.to_json()).unwrap();
+        fs::write(c.join("Resources").join(background::MANIFEST), Manifest { schema: 1, app: "expense".into(), jobs, serve: None }.to_json()).unwrap();
         app
     }
 
@@ -145,7 +145,7 @@ fn a_manifest_without_its_app_gives_no_jobs_and_no_notifications() {
     // left behind in the data root by an app that was deleted
     let stale = w.root.app_dir("expense").join(background::MANIFEST);
     fs::create_dir_all(stale.parent().unwrap()).unwrap();
-    fs::write(&stale, Manifest { schema: 1, app: "expense".into(), jobs: vec![mail()] }.to_json()).unwrap();
+    fs::write(&stale, Manifest { schema: 1, app: "expense".into(), jobs: vec![mail()], serve: None }.to_json()).unwrap();
     background::notify(&w.root, "expense", &Notification::new("x", "From a deleted app")).unwrap();
     let mut e = w.engine();
     assert!(e.apps.is_empty());
@@ -336,7 +336,7 @@ fn the_real_engine_finds_apps_that_describe_themselves_installed_later() {
     fs::write(&exe, "#!/bin/sh\n").unwrap();
     fs::set_permissions(&exe, fs::Permissions::from_mode(0o755)).unwrap();
     fs::write(c.join("Resources").join(otherwise_link::apps::APP_MANIFEST), r#"{"schema":1,"id":"surco-riego","name":"Surco Riego","bundleId":"com.otherwisetech.surco.riego","binary":"surco-riego"}"#).unwrap();
-    fs::write(c.join("Resources").join(background::MANIFEST), Manifest { schema: 1, app: "surco-riego".into(), jobs: vec![mail()] }.to_json()).unwrap();
+    fs::write(c.join("Resources").join(background::MANIFEST), Manifest { schema: 1, app: "surco-riego".into(), jobs: vec![mail()], serve: None }.to_json()).unwrap();
     e.rescan();
     assert_eq!(e.apps.iter().map(|r| r.spec.id.as_str()).collect::<Vec<_>>(), ["surco-riego"]);
     // a test engine keeps the list it was given

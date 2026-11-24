@@ -36,6 +36,19 @@ crates/helper otherwise-helper (lib + bin, **no GPUI**): Otherwise Helper, the m
              (<device dir>/helper/state.json, never the data root), mac.rs (NSStatusItem, UNUserNotificationCenter,
              SMAppService). Bundled as Otherwise Apps.app/Contents/Library/LoginItems/
              Otherwise Helper.app by script/bundle-macos.sh.
+crates/server otherwise-server (lib, **no GPUI, no app code**): Otherwise Helper's server mode,
+             otherwise-link SPEC §12 `/v1` on 127.0.0.1 only, published with `tailscale serve`:
+             identity.rs (serve headers + `tailscale whois`; loopback is NOT trusted: every
+             connection's other end must be the Tailscale app's own signed process, via lsof +
+             codesign), config.rs (<device dir>/server/server.json: shared docs, members, roles,
+             tier, backups), supervisor.rs (the apps' `serve` processes from their manifest, idle
+             stop, memory ceiling, restart on update), http.rs, seats.rs (30-day distinct members,
+             counted and logged only: no telemetry), audit.rs (jsonl, argument hashes only),
+             idem.rs (idempotency keys, 48 h), backup.rs (nightly snapshots, 14/8/12).
+             The helper's `server run|status|doctor|init|share|unshare|member|tier`
+             (helper/src/server_mode.rs) drives it; `run` also runs the jobs worker unless the
+             menu-bar helper does. Tests: a fake Tailscale and a shell-script app, never the
+             network.
 tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 ```
 
@@ -88,6 +101,11 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
   (`<root>/<app>/background.lock.json`) runs its jobs and drains its outbox; others show
   "running on <host>". Device state (runs, backoff, pause, shown) lives in
   `paths::device_dir()`, never in the data root (0.6.0's `~/.otherwise/helper` is moved once).
+- **Server mode never trusts loopback** (CI runners on the server computer run as the same
+  user): no request is answered without a verified Tailscale identity, `trustLoopback` is for
+  test servers only (logged as a warning), the server binds 127.0.0.1 and never changes
+  Tailscale's configuration (it prints the `tailscale serve` command). Documents not shared
+  with a member are 404. Seats are counted locally; nothing is sent to Vcity.
 - Comments: sparse, only non-obvious why.
 - GPUI pins: `Cargo.lock` pins the same zed / gpui-component revs as the other apps. Never
   `cargo update` them; building only core can prune them from the lock — restore it.

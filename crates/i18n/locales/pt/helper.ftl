@@ -33,3 +33,5 @@ helper.cli.login_failed = Não foi possível mudar o início de sessão: {error}
 helper.cli.running = Já há outro Otherwise Helper em execução.
 helper.wait.elsewhere = executando em {device}
 helper.wait.no_lease = aguardando: não é possível gravar na pasta de dados
+helper.server.usage = uso: otherwise-helper server run | status | doctor | init --owner <login do tailscale> [--name N] [--max-members N] | share <app> <pasta> [--name N] [--id ID] | unshare <app> <id> | member <login> <owner|editor|viewer|agent|remove> [--name N] [--doc app/doc] | tier <máximo de membros>
+helper.server.failed = Modo servidor: {error}
