@@ -131,13 +131,15 @@ app.settings.location_hint = Déjalo vacío para usar la predeterminada: {path}.
 app.settings.verify = Descargas
 app.settings.verify_body = Cada descarga se compara con la suma SHA-256 que GitHub publica; si no coincide, se borra y nunca se instala. Las apps se reemplazan completas y la copia anterior va a la papelera; sus ajustes y datos nunca se tocan.
 # acerca de
-app.about.footer = {app} {version} · {company}
+app.about.footer_link = Acerca de
 app.about.description = Instala y actualiza en un solo lugar las apps de escritorio de código abierto de Otherwise Technologies.
 app.about.by = Hecho por {company}
 app.about.place = Wyoming, EE. UU.
 app.about.visit = Visitar otherwisetech.com
 app.about.source = Código fuente en GitHub
 app.about.license = Libre y de código abierto · MIT OR Apache-2.0
+app.privacy.local = Tus datos están en este computador
+app.privacy.detail = Nada sale de aquí sin que tú lo pidas.
 app.star.label = Dar una estrella en GitHub
 app.star.tooltip = ¿Te gusta? Dale una estrella
 app.star.ask = Si esta app te sirve, una estrella ayuda a que otros la encuentren.

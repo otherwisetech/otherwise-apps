@@ -109,8 +109,8 @@ pub fn style(t: &Tokens) -> PanelStyle {
         danger: t.danger,
         danger_soft: t.danger_soft,
         ok: t.ok,
-        note: t.update,
-        note_soft: t.update_soft,
+        note: t.warn,
+        note_soft: t.warn_soft,
         terminal_bg: if t.dark { rgb(0x161514).into() } else { rgb(0xFFFFFF).into() },
         terminal_fg: t.ink,
         mono_font: "Menlo".into(), // i18n-ok: font name

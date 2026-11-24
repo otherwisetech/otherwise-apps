@@ -47,6 +47,10 @@ impl Launcher {
     }
 
     pub fn render_modal(&self, t: &Tokens, window: &mut Window, cx: &mut Context<Self>) -> Option<AnyElement> {
+        // About brings its own frame (otherwise-ui)
+        if matches!(self.modal, Some(Modal::About)) {
+            return Some(self.render_about(t, cx).into_any_element());
+        }
         let card = match self.modal.as_ref()? {
             Modal::Confirm { title, body, confirm, danger, .. } => {
                 let bg = if *danger { t.danger } else { t.accent };
@@ -86,7 +90,7 @@ impl Launcher {
                 )
                 .into_any_element(),
             Modal::Settings => self.render_settings(t, window, cx).into_any_element(),
-            Modal::About => self.render_about(t, cx).into_any_element(),
+            Modal::About => return None,
             Modal::CalendarSources => self.panel(t, 600., cx).child(self.render_calendar_sources(t, cx)).into_any_element(),
             Modal::DataRoot { .. } => self.render_data_root_modal(t, cx)?,
         };
@@ -145,7 +149,7 @@ impl Launcher {
         };
         self.panel(t, 560., cx)
             .gap(px(4.))
-            .child(div().pb(px(8.)).text_size(px(17.)).font_weight(FontWeight::SEMIBOLD).child(i18n::t!("app.settings.title")))
+            .child(div().pb(px(8.)).text_size(px(otherwise_ui::tokens::text::HEADING)).font_weight(FontWeight::SEMIBOLD).child(i18n::t!("app.settings.title")))
             .child(Self::setting_row(t, i18n::t!("app.settings.language"), None, langs))
             .child(Self::setting_row(t, i18n::t!("app.settings.theme"), None, themes))
             .child(Self::setting_row(t, i18n::t!("app.settings.check"), Some(i18n::t!("app.settings.check_hint")), every))
@@ -155,38 +159,20 @@ impl Launcher {
             .child(self.render_data_root_settings(t, cx))
             .child(self.render_hub_settings(t, cx))
             .child(self.render_helper_settings(t, cx))
+            .child(div().pt(px(10.)).border_t_1().border_color(t.border).child(otherwise_ui::privacy_note(t, i18n::t!("app.privacy.local"), Some(i18n::t!("app.privacy.detail").into()))))
     }
 
     fn render_about(&self, t: &Tokens, cx: &mut Context<Self>) -> impl IntoElement {
-        let accent = t.accent;
-        self.panel(t, 420., cx)
-            .items_center()
-            .px(px(32.))
-            .pt(px(32.))
-            .child(img(self.logo.clone()).size(px(88.)))
-            .child(div().flex().items_baseline().gap(px(8.)).child(div().text_size(px(22.)).font_weight(FontWeight::SEMIBOLD).child(crate::APP_NAME)).child(div().text_size(px(13.)).text_color(t.ink_muted).child(crate::VERSION)))
-            .child(div().text_center().text_size(px(13.)).line_height(px(19.)).text_color(t.ink_muted).child(i18n::t!("app.about.description")))
-            .child(div().w_full().h(px(1.)).my(px(4.)).bg(t.border))
-            .child(div().flex().flex_col().items_center().gap(px(2.)).child(div().text_size(px(13.)).child(i18n::t!("app.about.by", company = crate::COMPANY))).child(div().text_size(px(12.)).text_color(t.ink_muted).child(i18n::t!("app.about.place"))))
-            .child(ui::filled_button(t, "about-site", t.accent).mt(px(4.)).child(i18n::t!("app.about.visit")).on_click(|_, _, cx| cx.open_url(crate::COMPANY_URL)))
-            .child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .items_center()
-                    .gap(px(4.))
-                    .child(div().text_center().text_size(px(12.)).line_height(px(17.)).text_color(t.ink_muted).child(i18n::t!("app.vcity.invite")))
-                    .child(div().id("about-vcity").text_size(px(12.)).text_color(accent).cursor_pointer().hover(|s| s.underline()).child(i18n::t!("app.vcity.menu")).on_click(|_, _, cx| cx.open_url(crate::VCITY_URL))),
-            )
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap(px(14.))
-                    .child(div().id("about-source").text_size(px(12.)).text_color(accent).cursor_pointer().hover(|s| s.underline()).child(i18n::t!("app.about.source")).on_click(|_, _, cx| cx.open_url(crate::REPO_URL)))
-                    .child(crate::star::about_button(t, cx)),
-            )
-            .child(crate::star::about_ask(t))
-            .child(div().text_size(px(11.)).text_color(t.ink_muted).child(i18n::t!("app.about.license")))
+        otherwise_ui::AboutModal::new(crate::APP_NAME, crate::VERSION, i18n::t!("app.about.by", company = crate::COMPANY))
+            .logo(self.logo.clone())
+            .description(i18n::t!("app.about.description"))
+            .place(i18n::t!("app.about.place"))
+            .website(i18n::t!("app.about.visit"), crate::COMPANY_URL)
+            .vcity(i18n::t!("app.vcity.invite"), i18n::t!("app.vcity.menu"), crate::VCITY_URL)
+            .source(i18n::t!("app.about.source"), crate::REPO_URL)
+            .extra(crate::star::about_button(t, cx))
+            .extra(crate::star::about_ask(t))
+            .license(i18n::t!("app.about.license"))
+            .on_dismiss(cx.listener(|this, _: &otherwise_ui::Dismiss, _, cx| this.close_modal(cx)))
     }
 }

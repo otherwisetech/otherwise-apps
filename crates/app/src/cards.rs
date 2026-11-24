@@ -78,7 +78,7 @@ impl Launcher {
                     Some(v) => i18n::t!("app.status.installed", version = v),
                     None => i18n::t!("app.status.installed_unknown"),
                 }),
-            Status::Update { from, to } => row.child(ui::chip(i18n::t!("app.status.update", from = from, to = to), t.update, t.update_soft)),
+            Status::Update { from, to } => row.child(ui::chip(i18n::t!("app.status.update", from = from, to = to), t.warn, t.warn_soft)),
             Status::NoRelease => row.text_color(t.ink_muted).child(i18n::t!("app.status.no_release")),
             Status::Unsupported => row.text_color(t.ink_muted).child(i18n::t!("app.status.unsupported", os = os_name(self.target.os))),
         }
@@ -161,7 +161,7 @@ impl Launcher {
                 .when_some(size.filter(|_| !compact), |d, s| d.child(div().text_size(px(11.)).opacity(0.8).child(util::bytes(s))))
                 .on_click(cx.listener(move |this, _, _, cx| this.begin(&id, Kind::Install, cx))),
             Status::Update { to, .. } => {
-                let bg = if t.dark { t.update.opacity(0.9) } else { t.update };
+                let bg = if t.dark { t.warn.opacity(0.9) } else { t.warn };
                 ui::filled_button(t, key("update"), bg).child(glyph(ui::UPDATE, 14., t.on_fill())).child(i18n::t!("app.action.update_to", version = to)).on_click(cx.listener(move |this, _, _, cx| this.begin(&id, Kind::Update, cx)))
             }
             Status::UpToDate { .. } if c.entry.is_self() => ui::outline_button(t, key("self")).text_color(t.ink_muted).cursor_default().child(i18n::t!("app.action.running")),
@@ -251,7 +251,7 @@ impl Launcher {
                 .p(px(18.))
                 .rounded(px(16.))
                 .border_1()
-                .border_color(if highlight { t.update.opacity(0.45) } else { t.border })
+                .border_color(if highlight { t.warn.opacity(0.45) } else { t.border })
                 .bg(t.surface)
                 .child(
                     div()

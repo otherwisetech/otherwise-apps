@@ -131,13 +131,15 @@ app.settings.location_hint = Laissez vide pour l’emplacement par défaut : {pa
 app.settings.verify = Téléchargements
 app.settings.verify_body = Chaque téléchargement est comparé à la somme SHA-256 publiée par GitHub ; un fichier qui ne correspond pas est supprimé et jamais installé. Les apps sont remplacées en entier et l’ancienne copie va à la corbeille ; leurs réglages et données ne sont jamais touchés.
 # à propos
-app.about.footer = {app} {version} · {company}
+app.about.footer_link = À propos
 app.about.description = Installez et mettez à jour au même endroit les apps de bureau open source d’Otherwise Technologies.
 app.about.by = Réalisé par {company}
 app.about.place = Wyoming, États-Unis
 app.about.visit = Visiter otherwisetech.com
 app.about.source = Code source sur GitHub
 app.about.license = Libre et open source · MIT OR Apache-2.0
+app.privacy.local = Vos données restent sur cet ordinateur
+app.privacy.detail = Rien n'en sort sans votre demande.
 app.star.label = Mettre une étoile sur GitHub
 app.star.tooltip = Vous aimez ? Donnez-lui une étoile
 app.star.ask = Si cette app vous est utile, une étoile aide d’autres personnes à la trouver.

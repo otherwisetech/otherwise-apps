@@ -131,13 +131,15 @@ app.settings.location_hint = Deixe vazio para usar o padrão: {path}. Apps insta
 app.settings.verify = Downloads
 app.settings.verify_body = Cada download é comparado com a soma SHA-256 que o GitHub publica; um arquivo que não confere é apagado e nunca instalado. Os apps são substituídos por inteiro e a cópia anterior vai para a lixeira; seus ajustes e dados nunca são tocados.
 # sobre
-app.about.footer = {app} {version} · {company}
+app.about.footer_link = Sobre
 app.about.description = Instale e atualize num só lugar os apps de desktop de código aberto da Otherwise Technologies.
 app.about.by = Feito por {company}
 app.about.place = Wyoming, EUA
 app.about.visit = Visitar otherwisetech.com
 app.about.source = Código-fonte no GitHub
 app.about.license = Livre e de código aberto · MIT OR Apache-2.0
+app.privacy.local = Seus dados ficam neste computador
+app.privacy.detail = Nada sai daqui sem que você peça.
 app.star.label = Dar uma estrela no GitHub
 app.star.tooltip = Gostou? Dê uma estrela
 app.star.ask = Se este app ajuda você, uma estrela ajuda outras pessoas a encontrá-lo.

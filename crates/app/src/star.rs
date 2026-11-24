@@ -189,7 +189,7 @@ pub fn about_button(t: &Tokens, cx: &App) -> Stateful<Div> {
         .hover(move |s| s.border_color(hover))
         .child(crate::ui::icon(IconName::Github, 14., t.ink))
         .child(i18n::t!("app.star.label"))
-        .child(div().pl(px(6.)).border_l_1().border_color(t.border).text_color(t.ink_muted).child(star_count(t.update, 13., count(cx))))
+        .child(div().pl(px(6.)).border_l_1().border_color(t.border).text_color(t.ink_muted).child(star_count(t.warn, 13., count(cx))))
         .on_click(open_repo)
 }
 

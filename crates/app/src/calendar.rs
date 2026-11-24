@@ -1047,7 +1047,7 @@ impl Launcher {
                     .min_h_full()
                     .child(header)
                     .child(self.render_filters(t, cx))
-                    .when(!notes.is_empty(), |d| d.child(div().text_size(px(11.)).text_color(t.update).child(i18n::t!("app.cal.errors", detail = notes.join("; ")))))
+                    .when(!notes.is_empty(), |d| d.child(div().text_size(px(11.)).text_color(t.warn).child(i18n::t!("app.cal.errors", detail = notes.join("; ")))))
                     .when(empty_feeds, |d| d.child(div().text_size(px(12.)).text_color(t.ink_muted).child(i18n::t!("app.cal.no_feeds"))))
                     .child(body),
             )

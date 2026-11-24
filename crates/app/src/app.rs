@@ -828,25 +828,17 @@ impl Launcher {
             pages = pages.child(ui::segment(t, id, p == page).child(label).on_click(cx.listener(move |this, _, _, cx| this.set_page(p, cx))));
         }
         let apps_page = page == Page::Apps;
-        div()
-            .flex()
-            .flex_none()
-            .items_center()
-            .gap(px(8.))
-            .h(px(56.))
-            .px(px(16.))
-            .border_b_1()
-            .border_color(t.border)
-            .bg(t.surface)
-            .child(div().flex().flex_none().items_center().justify_center().size(px(32.)).rounded(px(9.)).bg(t.brand).child(ui::logo_glyph(18., gpui::white())))
-            .child(div().flex().flex_col().min_w_0().flex_1().child(div().text_size(px(15.)).font_weight(FontWeight::SEMIBOLD).child(crate::APP_NAME)).child(div().text_size(px(11.)).text_color(if updates > 0 { t.update } else { t.ink_muted }).truncate().child(summary)))
-            .child(pages)
-            .when(apps_page, |d| d.child(self.render_search(t)).child(sort).child(toggle).child(refresh))
-            .when(apps_page && updates > 0, |d| {
-                d.child(ui::filled_button(t, "update-all", t.accent).child(glyph(ui::UPDATE, 15., t.on_fill())).child(i18n::t!("app.topbar.update_all", n = updates)).on_click(cx.listener(|this, _, _, cx| this.update_all(cx))))
-            })
-            .child(assistant)
-            .child(settings)
+        let mut header = otherwise_ui::AppHeader::new(ui::logo_glyph(otherwise_ui::tokens::size::LOGO_MARK, gpui::white()), crate::APP_NAME).subtitle(summary).action(pages);
+        if updates > 0 {
+            header = header.subtitle_color(t.warn);
+        }
+        if apps_page {
+            header = header.action(self.render_search(t)).action(sort).action(toggle).action(refresh);
+            if updates > 0 {
+                header = header.action(ui::filled_button(t, "update-all", t.accent).child(glyph(ui::UPDATE, 15., t.on_fill())).child(i18n::t!("app.topbar.update_all", n = updates)).on_click(cx.listener(|this, _, _, cx| this.update_all(cx))));
+            }
+        }
+        header.action(assistant).action(settings)
     }
 
     fn render_search(&self, t: &Tokens) -> impl IntoElement {
@@ -923,27 +915,7 @@ impl Launcher {
 
     /// A quiet invitation under the apps.
     fn render_vcity(&self, t: &Tokens) -> impl IntoElement {
-        let accent = t.accent;
-        div().px(px(24.)).pb(px(24.)).child(
-            div()
-                .id("vcity-card")
-                .flex()
-                .items_center()
-                .gap(px(12.))
-                .px(px(14.))
-                .py(px(10.))
-                .rounded(px(12.))
-                .border_1()
-                .border_color(t.border)
-                .text_size(px(12.))
-                .text_color(t.ink_muted)
-                .cursor_pointer()
-                .hover(move |s| s.border_color(accent))
-                .child(ui::icon(IconName::Globe, 16., t.ink_muted))
-                .child(div().flex_1().min_w_0().child(i18n::t!("app.vcity.card")))
-                .child(div().flex_none().text_color(accent).font_weight(FontWeight::MEDIUM).child(i18n::t!("app.vcity.card_link")))
-                .on_click(|_, _, cx| cx.open_url(crate::VCITY_URL)),
-        )
+        div().px(px(24.)).pb(px(24.)).child(otherwise_ui::vcity_card(t, "vcity-card", i18n::t!("app.vcity.card"), i18n::t!("app.vcity.card_link"), crate::VCITY_URL))
     }
 
     fn sources_label(&self) -> String {
@@ -970,50 +942,29 @@ impl Launcher {
             }
         };
         let errors = self.last_errors.join("\n");
-        let ink = t.ink;
-        div()
+        let status = div()
+            .id("footer-status")
             .flex()
-            .flex_none()
             .items_center()
-            .gap(px(12.))
-            .h(px(28.))
-            .px(px(16.))
-            .border_t_1()
-            .border_color(t.border)
-            .bg(t.surface)
-            .text_size(px(11.))
-            .text_color(t.ink_muted)
-            .child(
-                div()
-                    .id("footer-status")
-                    .flex()
-                    .items_center()
-                    .gap(px(6.))
-                    .flex_1()
-                    .min_w_0()
-                    .when(!self.last_errors.is_empty() && !self.checking, |d| {
-                        d.child(ui::icon(IconName::TriangleAlert, 12., t.update)).tooltip(move |window, cx| gpui_component::tooltip::Tooltip::new(errors.clone()).build(window, cx))
-                    })
-                    .child(div().truncate().child(left)),
-            )
-            .child(crate::star::footer_link(t, cx))
-            .child(
-                div()
-                    .id("footer-about")
-                    .flex_none()
-                    .cursor_pointer()
-                    .hover(move |s| s.text_color(ink).underline())
-                    .child(i18n::t!("app.about.footer", app = crate::APP_NAME, version = crate::VERSION, company = crate::COMPANY))
-                    .on_click(cx.listener(|this, _, _, cx| {
-                        this.modal = Some(Modal::About);
-                        cx.notify();
-                    })),
-            )
+            .gap(px(6.))
+            .min_w_0()
+            .when(!self.last_errors.is_empty() && !self.checking, |d| {
+                d.child(ui::icon(IconName::TriangleAlert, 12., t.warn)).tooltip(move |window, cx| gpui_component::tooltip::Tooltip::new(errors.clone()).build(window, cx))
+            })
+            .child(div().truncate().child(left));
+        otherwise_ui::AppFooter::new(crate::APP_NAME, i18n::t!("app.about.footer_link"))
+            .version(crate::VERSION)
+            .status(status)
+            .item(crate::star::footer_link(t, cx))
+            .on_about(cx.listener(|this, _, _, cx| {
+                this.modal = Some(Modal::About);
+                cx.notify();
+            }))
     }
 
     fn render_toast(&self, t: &Tokens) -> Option<impl IntoElement> {
         let (text, _) = self.toast.as_ref()?;
-        Some(div().absolute().bottom(px(40.)).left_0().right_0().flex().justify_center().child(div().px(px(16.)).py(px(10.)).rounded(px(12.)).bg(t.ink).text_color(t.on_fill()).text_size(px(13.)).shadow_lg().child(text.clone())))
+        Some(div().absolute().bottom(px(40.)).left_0().right_0().flex().justify_center().child(otherwise_ui::toast(t, text.clone())))
     }
 }
 
