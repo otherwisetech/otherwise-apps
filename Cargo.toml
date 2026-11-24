@@ -4,7 +4,7 @@ members = ["crates/i18n", "crates/core", "crates/app", "crates/helper"]
 default-members = ["crates/i18n", "crates/core", "crates/helper"]
 
 [workspace.package]
-version = "0.6.3"
+version = "0.6.4"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT OR Apache-2.0"
@@ -14,8 +14,8 @@ repository = "https://github.com/otherwisetech/otherwise-apps"
 i18n = { path = "crates/i18n", package = "otherwise-apps-i18n" }
 otherwise-core = { path = "crates/core", package = "otherwise-apps-core" }
 # the shared integration layer (deep links, discovery, entities, Today, MCP hub)
-otherwise-link = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.5.2" }
-otherwise-mcp-hub = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.5.2" }
+otherwise-link = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.5.3" }
+otherwise-mcp-hub = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.5.3" }
 # the AI panel docked next to every page (Claude Code / Codex / opencode with the hub attached)
 otherwise-agent-panel = { git = "https://github.com/otherwisetech/otherwise-agent-panel", tag = "v0.1.0" }
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }

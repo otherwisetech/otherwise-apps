@@ -16,6 +16,7 @@ use otherwise_link::link::Link;
 use otherwise_link::registry::Registry;
 use otherwise_link::settings::HubSettings;
 use otherwise_link::today::{self, Event, EventKind, Merged, Severity};
+use otherwise_mcp_hub::hub::ChildStatus;
 use std::collections::BTreeMap;
 use uuid::Uuid;
 
@@ -69,6 +70,28 @@ pub struct HubState {
     /// What our own Today file last said, to skip identical rewrites.
     pub published: Option<Vec<Event>>,
     pub scroll: ScrollHandle,
+    /// What the MCP hub found when it last started the apps' servers (Settings → Hub).
+    pub mcp_status: Vec<ChildStatus>,
+    /// Bumped per probe, so a slow old probe can't overwrite a newer one.
+    pub mcp_probe: u64,
+}
+
+/// What Settings → Hub says under an app's switch, from the hub's last probe.
+#[derive(Debug, Clone, PartialEq)]
+pub enum McpNote {
+    /// It refused write mode (its own settings don't allow agent changes): offered read-only.
+    ReadOnly,
+    /// It didn't start at all (both ways): its error.
+    Unavailable(String),
+}
+
+pub fn mcp_note(status: &[ChildStatus], app: &str) -> Option<McpNote> {
+    let s = status.iter().find(|s| s.app == app)?;
+    match (&s.tools, &s.read_only) {
+        (Err(e), _) => Some(McpNote::Unavailable(e.clone())),
+        (Ok(_), Some(_)) => Some(McpNote::ReadOnly),
+        (Ok(_), None) => None,
+    }
 }
 
 impl HubState {
@@ -91,6 +114,8 @@ impl HubState {
             error: None,
             published: None,
             scroll: ScrollHandle::new(),
+            mcp_status: vec![],
+            mcp_probe: 0,
         }
     }
 
@@ -252,8 +277,7 @@ impl Launcher {
                     self.set_page(Page::Entities, cx);
                 }
                 Some("hub" | "settings") => {
-                    self.modal = Some(Modal::Settings);
-                    cx.notify();
+                    self.open_settings(cx);
                 }
                 _ => self.set_page(Page::Apps, cx),
             }
@@ -906,7 +930,34 @@ impl Launcher {
         if let Ok(s) = HubSettings::update(&self.hub.root, |s| s.mcp_writes = on) {
             self.hub.settings = s;
         }
+        self.probe_mcp(cx);
         cx.notify();
+    }
+
+    /// Opens Settings and re-checks the apps' MCP servers (which run read-only, which fail).
+    pub fn open_settings(&mut self, cx: &mut Context<Self>) {
+        self.modal = Some(Modal::Settings);
+        self.probe_mcp(cx);
+        cx.notify();
+    }
+
+    /// Starts the hub as an agent would (hub.json as it is now) and keeps what each app did.
+    /// The hub only ever drops an app's write flag, never adds one.
+    pub fn probe_mcp(&mut self, cx: &mut Context<Self>) {
+        self.hub.mcp_probe += 1;
+        let probe = self.hub.mcp_probe;
+        let task = cx.background_executor().spawn(async move { otherwise_mcp_hub::Hub::start(otherwise_mcp_hub::Config::system()).status() });
+        cx.spawn(async move |this, cx| {
+            let status = task.await;
+            this.update(cx, |this, cx| {
+                if this.hub.mcp_probe == probe {
+                    this.hub.mcp_status = status;
+                    cx.notify();
+                }
+            })
+            .ok();
+        })
+        .detach();
     }
 
     pub fn set_mcp_app(&mut self, app: String, on: bool, cx: &mut Context<Self>) {
@@ -918,6 +969,7 @@ impl Launcher {
         }) {
             self.hub.settings = s;
         }
+        self.probe_mcp(cx);
         cx.notify();
     }
 
@@ -970,6 +1022,24 @@ impl Launcher {
                 let id = id.clone();
                 w.update(cx, |this, cx| this.set_mcp_app(id, *on, cx)).ok();
             }));
+            let note = if self.hub.settings.mcp_enabled(&s.id) { mcp_note(&self.hub.mcp_status, &s.id) } else { None };
+            match note {
+                Some(McpNote::ReadOnly) => {
+                    list = list.child(
+                        div()
+                            .pl(px(44.))
+                            .flex()
+                            .flex_col()
+                            .gap(px(2.))
+                            .child(div().text_size(px(11.)).font_weight(FontWeight::SEMIBOLD).text_color(t.ink).child(i18n::t!("app.hub.read_only")))
+                            .child(div().text_size(px(11.)).line_height(px(16.)).text_color(t.ink_muted).child(i18n::t!("app.hub.read_only_hint", app = s.name))),
+                    );
+                }
+                Some(McpNote::Unavailable(e)) => {
+                    list = list.child(div().pl(px(44.)).text_size(px(11.)).line_height(px(16.)).text_color(t.danger).child(i18n::t!("app.hub.unavailable", detail = e)));
+                }
+                None => {}
+            }
         }
         div()
             .flex()
@@ -980,5 +1050,23 @@ impl Launcher {
             .child(row(i18n::t!("app.hub.writes"), Some(i18n::t!("app.hub.writes_hint")), writes.into_any_element()))
             .child(row(i18n::t!("app.hub.apps"), None, list.into_any_element()))
             .child(row(i18n::t!("app.cal.vcity"), Some(i18n::t!("app.cal.vcity_hint")), self.render_vcity_control(t, cx).into_any_element()))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{ChildStatus, McpNote, mcp_note};
+
+    fn st(app: &str, tools: Result<usize, String>, read_only: Option<&str>) -> ChildStatus {
+        ChildStatus { app: app.into(), name: app.into(), program: String::new(), tools, read_only: read_only.map(Into::into) }
+    }
+
+    #[test]
+    fn mcp_notes_follow_the_hub_probe() {
+        let status = [st("expense", Ok(53), Some("exited with code 4")), st("vigia", Ok(9), None), st("nodo", Err("with writes: boom; read-only: boom".into()), None)];
+        assert_eq!(mcp_note(&status, "expense"), Some(McpNote::ReadOnly));
+        assert_eq!(mcp_note(&status, "vigia"), None, "write mode accepted: nothing to say");
+        assert_eq!(mcp_note(&status, "nodo"), Some(McpNote::Unavailable("with writes: boom; read-only: boom".into())));
+        assert_eq!(mcp_note(&status, "rama"), None, "not probed yet");
     }
 }

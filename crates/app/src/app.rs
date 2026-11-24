@@ -817,8 +817,7 @@ impl Launcher {
             .tooltip(|window, cx| gpui_component::tooltip::Tooltip::new(i18n::t!("app.topbar.refresh")).build(window, cx))
             .when(!checking, |d| d.on_click(cx.listener(|this, _, _, cx| this.refresh(false, cx))));
         let settings = ui::icon_button(t, "settings", true).child(ui::icon(IconName::Settings, 16., t.ink)).tooltip(|window, cx| gpui_component::tooltip::Tooltip::new(i18n::t!("app.settings.title")).build(window, cx)).on_click(cx.listener(|this, _, _, cx| {
-            this.modal = Some(Modal::Settings);
-            cx.notify();
+            this.open_settings(cx);
         }));
         let assistant = ui::icon_button(t, "assistant", true).child(ui::icon(IconName::Bot, 16., t.ink)).tooltip(|window, cx| gpui_component::tooltip::Tooltip::new(i18n::t!("app.assistant.toggle")).build(window, cx)).on_click(cx.listener(|this, _, window, cx| this.toggle_panel(window, cx)));
         let page = self.page;
@@ -1040,8 +1039,7 @@ impl Render for Launcher {
                 cx.notify();
             }))
             .on_action(cx.listener(|this, _: &ShowSettings, _, cx| {
-                this.modal = Some(Modal::Settings);
-                cx.notify();
+                this.open_settings(cx);
             }))
             .on_action(cx.listener(|this, _: &FocusSearch, window, cx| this.search.update(cx, |s, cx| s.focus(window, cx))))
             .on_action(cx.listener(|this, _: &CloseModal, _, cx| this.close_modal(cx)))
