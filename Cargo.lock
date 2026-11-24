@@ -4747,8 +4747,8 @@ dependencies = [
 
 [[package]]
 name = "otherwise-agent-panel"
-version = "0.1.0"
-source = "git+https://github.com/otherwisetech/otherwise-agent-panel?tag=v0.1.0#d9c33d375a0ad195cea3d2fd903a57e51e3d42ff"
+version = "0.2.0"
+source = "git+https://github.com/otherwisetech/otherwise-agent-panel?tag=v0.2.0#21cc28730dede00c3b5aaf0c937057fe5d4d6d89"
 dependencies = [
  "alacritty_terminal",
  "chrono",
@@ -4762,7 +4762,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.6.4"
+version = "0.6.5"
 dependencies = [
  "anyhow",
  "chrono",
@@ -4785,7 +4785,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.6.4"
+version = "0.6.5"
 dependencies = [
  "chrono",
  "flate2",
@@ -4804,11 +4804,11 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.6.4"
+version = "0.6.5"
 
 [[package]]
 name = "otherwise-helper"
-version = "0.6.4"
+version = "0.6.5"
 dependencies = [
  "block2 0.6.2",
  "chrono",
