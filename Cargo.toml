@@ -4,7 +4,7 @@ members = ["crates/i18n", "crates/core", "crates/app", "crates/helper"]
 default-members = ["crates/i18n", "crates/core", "crates/helper"]
 
 [workspace.package]
-version = "0.6.4"
+version = "0.6.5"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT OR Apache-2.0"
@@ -17,7 +17,7 @@ otherwise-core = { path = "crates/core", package = "otherwise-apps-core" }
 otherwise-link = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.5.3" }
 otherwise-mcp-hub = { git = "https://github.com/otherwisetech/otherwise-link", tag = "v0.5.3" }
 # the AI panel docked next to every page (Claude Code / Codex / opencode with the hub attached)
-otherwise-agent-panel = { git = "https://github.com/otherwisetech/otherwise-agent-panel", tag = "v0.1.0" }
+otherwise-agent-panel = { git = "https://github.com/otherwisetech/otherwise-agent-panel", tag = "v0.2.0" }
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }

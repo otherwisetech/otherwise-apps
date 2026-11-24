@@ -73,7 +73,8 @@ Otherwise Apps is also the hub of the apps, through
   [otherwise-agent-panel](https://github.com/otherwisetech/otherwise-agent-panel), docked as a
   bar, below, on the right or full window. Ask questions across every installed app ("What's
   due this month?", "Which devices are down?"; the starter questions only mention installed apps) with **your own** Claude Code,
-  Codex or opencode subscription; pick the agent, model and permission mode (read-only, ask
+  Codex or opencode subscription, or a model of your own Ollama on this computer (processed
+  locally; writes stay proposals); pick the agent, model and permission mode (read-only, ask
   before changing, automatic). **Chat** streams answers with the app tools used as chips;
   **Terminal** opens the agent itself in an embedded terminal. Attach images, PDFs and files by
   dropping or pasting them. The hub is attached for that session only (a temporary
