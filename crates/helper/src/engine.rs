@@ -16,6 +16,9 @@ use std::path::PathBuf;
 pub struct Engine {
     pub loc: Locations,
     pub specs: Vec<AppSpec>,
+    /// Re-read the app list (built-in table plus apps that describe themselves) on every scan,
+    /// so an app installed later is found without restarting (the real engine; tests keep theirs).
+    pub refresh_specs: bool,
     pub state_dir: PathBuf,
     pub state: State,
     /// Installed apps that declare jobs, as of the last scan or run.
@@ -46,7 +49,7 @@ pub enum Step {
 impl Engine {
     pub fn new(loc: Locations, specs: Vec<AppSpec>, state_dir: PathBuf) -> Engine {
         let state = State::load(&state_dir);
-        let mut e = Engine { loc, specs, state_dir, state, apps: vec![], gone: BTreeSet::new(), held: BTreeMap::new(), waiting: BTreeMap::new(), me: None, clock: None };
+        let mut e = Engine { loc, specs, refresh_specs: false, state_dir, state, apps: vec![], gone: BTreeSet::new(), held: BTreeMap::new(), waiting: BTreeMap::new(), me: None, clock: None };
         e.rescan();
         e
     }
@@ -54,6 +57,9 @@ impl Engine {
     /// Finds installed apps with jobs again; apps that disappeared go to `gone`, ones that came
     /// back (reinstalled) leave it.
     pub fn rescan(&mut self) {
+        if self.refresh_specs {
+            self.specs = otherwise_link::apps::all_specs(&self.loc);
+        }
         let found = background::scan_specs(&self.specs, &self.loc);
         let now: BTreeSet<String> = found.iter().map(|r| r.spec.id.clone()).collect();
         for r in &self.apps {

@@ -320,3 +320,27 @@ fn turning_jobs_off_lets_go_of_the_lease() {
     a.refresh_leases(&w.root, &off);
     assert!(a.held.is_empty() && a.waiting.is_empty());
 }
+
+#[test]
+fn the_real_engine_finds_apps_that_describe_themselves_installed_later() {
+    let w = world();
+    let mut e = w.engine();
+    e.refresh_specs = true;
+    assert!(e.apps.is_empty());
+    // an app not in otherwise-link's table, with its own otherwise-app.json
+    let c = w.apps.join("Surco Riego.app/Contents");
+    fs::create_dir_all(c.join("MacOS")).unwrap();
+    fs::create_dir_all(c.join("Resources")).unwrap();
+    fs::write(c.join("Info.plist"), "<plist><dict><key>CFBundleIdentifier</key><string>com.otherwisetech.surco.riego</string></dict></plist>").unwrap();
+    let exe = c.join("MacOS/surco-riego");
+    fs::write(&exe, "#!/bin/sh\n").unwrap();
+    fs::set_permissions(&exe, fs::Permissions::from_mode(0o755)).unwrap();
+    fs::write(c.join("Resources").join(otherwise_link::apps::APP_MANIFEST), r#"{"schema":1,"id":"surco-riego","name":"Surco Riego","bundleId":"com.otherwisetech.surco.riego","binary":"surco-riego"}"#).unwrap();
+    fs::write(c.join("Resources").join(background::MANIFEST), Manifest { schema: 1, app: "surco-riego".into(), jobs: vec![mail()] }.to_json()).unwrap();
+    e.rescan();
+    assert_eq!(e.apps.iter().map(|r| r.spec.id.as_str()).collect::<Vec<_>>(), ["surco-riego"]);
+    // a test engine keeps the list it was given
+    let mut fixed = w.engine();
+    fixed.rescan();
+    assert!(fixed.apps.is_empty());
+}

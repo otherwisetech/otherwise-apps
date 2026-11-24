@@ -4762,7 +4762,7 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-app"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "anyhow",
  "chrono",
@@ -4775,7 +4775,7 @@ dependencies = [
  "otherwise-agent-panel",
  "otherwise-apps-core",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.0",
+ "otherwise-link 0.5.2",
  "otherwise-mcp-hub",
  "serde_json",
  "ureq",
@@ -4785,12 +4785,12 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-core"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "chrono",
  "flate2",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.0",
+ "otherwise-link 0.5.2",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -4804,11 +4804,11 @@ dependencies = [
 
 [[package]]
 name = "otherwise-apps-i18n"
-version = "0.6.2"
+version = "0.6.3"
 
 [[package]]
 name = "otherwise-helper"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "block2 0.6.2",
  "chrono",
@@ -4818,7 +4818,7 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "objc2-user-notifications",
  "otherwise-apps-i18n",
- "otherwise-link 0.5.0",
+ "otherwise-link 0.5.2",
  "serde",
  "serde_json",
  "tempfile",
@@ -4838,8 +4838,8 @@ dependencies = [
 
 [[package]]
 name = "otherwise-link"
-version = "0.5.0"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.0#a1a0d1cf9699f6f42479de70915b838c5c88324c"
+version = "0.5.2"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.2#c6a45c847caa514bc49e1b1b2a8a0370856aab7f"
 dependencies = [
  "chrono",
  "rusqlite",
@@ -4850,11 +4850,11 @@ dependencies = [
 
 [[package]]
 name = "otherwise-mcp-hub"
-version = "0.5.0"
-source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.0#a1a0d1cf9699f6f42479de70915b838c5c88324c"
+version = "0.5.2"
+source = "git+https://github.com/otherwisetech/otherwise-link?tag=v0.5.2#c6a45c847caa514bc49e1b1b2a8a0370856aab7f"
 dependencies = [
  "chrono",
- "otherwise-link 0.5.0",
+ "otherwise-link 0.5.2",
  "serde_json",
  "uuid",
 ]
