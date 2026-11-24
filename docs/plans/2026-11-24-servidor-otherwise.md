@@ -1,6 +1,6 @@
 # Servidor Otherwise: las apps de escritorio contra un servidor (Local o Mac Studio)
 
-Estado: **propuesta para revisión**. No hay nada implementado. Fecha: 2026-11-24.
+Estado: **aprobado e implementándose** (fases 0-2 en expense Business, piloto en el Mac Studio). Las decisiones del usuario y lo que se construyó están en §14. Fecha: 2026-11-24.
 
 La idea, ya aprobada en principio, es que las apps GPUI (expense Business, expense me, Brújula, Vigía,
 Nodo, genealogy, Mi Huerta, Surco, Voltia, Helio, CACFU) puedan trabajar contra un **servidor**,
@@ -1040,6 +1040,77 @@ Surco, Voltia, Helio, CACFU y genealogy: "Abrir desde servidor" y "Guardar en se
 - Empaquetado on-prem del servidor: Linux con un `systemd` unit; el Helper ya es multiplataforma.
 
 ---
+
+## 14. Decisiones (2026-11-24) e implementación
+
+### 14.1 Decisiones del usuario
+
+- **Alcance:** expense Business es la app multicliente y va primero. El Mac Studio hace todo el
+  trabajo y queda siempre encendido: el libro, los importadores de correo y extractos, los
+  recordatorios y las herramientas de IA. El MacBook Pro es un cliente del Studio.
+- **expense me** se queda en un solo computador. Más adelante solo expondrá sus datos a un
+  cliente móvil; **no** se construye multiusuario para expense me. El código compartido en
+  expense-core queda reutilizable (el trait `BookBackend` no depende de la edición).
+- **Licencias:** tramos por tamaño de equipo con conteo de puestos en el servidor (§10.2). En
+  este piloto el conteo es **solo local y se registra en el log**; **no** se envía telemetría a
+  Vcity (el endpoint de licencias de Vcity no existe todavía) y nadie pasa a solo lectura por
+  puestos.
+
+### 14.2 Valores por defecto (sin respuesta del usuario; registrados como decisiones)
+
+- **Data root del Studio en disco local** (`~/.otherwise`, no OneDrive en vivo). Copias
+  nocturnas a una carpeta aparte (`~/.otherwise-backups/<app>/<doc>/<yyyy-mm-dd>.db`, 14
+  diarias, 8 semanales, 12 mensuales), hechas con la instantánea de la propia app.
+- **Secretos (IMAP, contraseñas de extractos) solo en el keychain del Studio.** Los pone el
+  usuario en el Studio (opción (a) de §6.4). No hay endpoint de secretos.
+- **Sin conexión, el cliente queda en solo lectura** con la última instantánea (§4.6). No hay
+  cola de escrituras offline.
+- **Pregunta 1 (runners de CI en otro usuario):** sigue siendo decisión del usuario. Mientras
+  tanto el código no confía en loopback (14.4).
+
+### 14.3 Qué se construyó
+
+| Pieza | Dónde | Qué |
+|---|---|---|
+| Contrato `/v1` | otherwise-link 0.6.0, `docs/SPEC.md` §12 | hello, docs, doc hello, snapshot (ETag/304), ops con `idempotencyKey` y `baseRevision`, undo, eventos SSE, roles, errores, puestos, auditoría, sección `serve` del manifiesto |
+| Cliente | otherwise-link 0.6.0, crate `otherwise-remote` | tipos con vectores golden, cliente `ureq` + SSE, `servers.json` en el device dir, descubrimiento del tailnet con el CLI local de Tailscale y sondeo de `/v1/hello` |
+| Vista | otherwise-ui 0.1.2, `ServerSwitcher` | Servidores (Local / Mac Studio) con check, submenú por servidor (Usar, Ajustes, Quitar), Añadir un servidor, estado como punto del tile; en `Sidebar::header` |
+| `expense serve` | expense-rs, `cli/src/serve.rs` | el libro sin ventana: lock, el socket de la app (CLI, MCP y jobs del Studio escriben a través de él), revisión de correo con el keychain de la app, protocolo appsock por stdin/stdout con `seq`, `actor`, `base_revision`, `undo` propio o `any`, eventos `changed` |
+| Núcleo | expense-core | `backend.rs` (`BookBackend`, `LocalBackend`), `appsock` `snapshot` y `actor`, `Change.actor`, `store::vacuum_into`, `background::mail_on` |
+| App | expense-rs, `app/src/remote.rs` | `ServerSwitcher` en la barra lateral, Añadir un servidor (pares del tailnet o dirección), elegir libro, réplica de solo lectura con SSE y latido, franja de estado; `app_op` (panel del recibo, tarjetas, planes, simulador, limpiar comercios) y ⌘Z van al servidor; Local igual que antes |
+| Servidor | otherwise-apps, crate `otherwise-server` + `otherwise-helper server …` | HTTP en 127.0.0.1:47900, identidad Tailscale, `server.json` (libros compartidos, miembros, roles por libro), supervisor de `expense serve`, auditoría, idempotencia persistente, puestos, copias nocturnas; `server run` corre además los jobs del Helper (correo, recordatorios, inbox) |
+
+Cambios respecto al plan:
+
+- El protocolo entre el Helper y `<app> serve` es stdio; la ventana de expense en el Studio,
+  si está abierta, sigue siendo el escritor (serve le reenvía).
+- El correo del libro servido lo revisa el propio `expense serve` (como lo haría la ventana);
+  el job `mail` del Helper ve la app abierta y no duplica. Recordatorios e inbox siguen como
+  jobs del Helper.
+- La ventana de "Ajustes del servidor" (miembros, roles, compartir) es por ahora la línea de
+  comandos del Studio (`otherwise-helper server init|share|member|tier|status|doctor`); en la
+  app el menú muestra la dirección y remite a ella.
+- Fase 2 en la app: escriben las acciones que ya pasan por operaciones (`app_op`); el resto de
+  las ediciones de la UI (inventario de §4.2) sigue en solo lectura en remoto. Los archivos de
+  los recibos (PDF) no se descargan todavía: la réplica trae el índice, no los documentos.
+- MCP por HTTP (`/v1/mcp`), `inbox` remoto, "Publicar en el servidor" y notificaciones a los
+  clientes por SSE quedan para después.
+
+### 14.4 Seguridad implementada
+
+- El servidor escucha solo en `127.0.0.1` y nunca cambia la configuración de Tailscale; imprime
+  el comando `tailscale serve --bg --https=443 http://127.0.0.1:47900`.
+- **Loopback no es confianza.** Cada conexión se verifica una vez: el otro extremo del socket
+  (`lsof`) debe ser un proceso de la app de Tailscale con firma de Apple App Store para sus
+  bundle ids, o Developer ID del equipo de Tailscale (`codesign --verify -R …`). Un runner de
+  CI que llame a `127.0.0.1:47900` recibe `401` aunque escriba las cabeceras.
+- Cada petición: `X-Forwarded-For` (el último valor, el que añade serve) debe ser del tailnet,
+  `tailscale whois` debe conocerlo y coincidir con `Tailscale-User-Login`; Funnel se rechaza.
+- Roles por libro; un libro no compartido es `404`; el agente escribe como `mcp` (las
+  operaciones de personas siguen vetadas).
+- **Riesgo residual:** un proceso con el mismo usuario de macOS que los runners puede leer los
+  libros en disco y el keychain desbloqueado, y reconfigurar Tailscale. Mover los runners a otro
+  usuario es decisión del usuario.
 
 ## Apéndice: referencias
 
