@@ -1,5 +1,5 @@
 //! The family's tokens come from otherwise-ui (github.com/otherwisetech/otherwise-ui, by tag);
-//! Otherwise Apps only picks its petrol accent (`otherwise_ui::accents::HUB`, set in main.rs).
+//! Otherwise Hub only picks its petrol accent (`otherwise_ui::accents::HUB`, set in main.rs).
 pub use otherwise_ui::Theme as Tokens;
 pub use otherwise_ui::tokens::SANS;
 use gpui::{App, Window};

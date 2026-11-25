@@ -1,6 +1,6 @@
 [package]
 name = "otherwise-apps-core"
-description = "Catalog, version checks, verified downloads and installs for Otherwise Apps"
+description = "Catalog, version checks, verified downloads and installs for Otherwise Hub"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

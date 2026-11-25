@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 # Wraps the `otherwise-apps` binary in "Otherwise Apps.app" so Finder and the Dock show the icon.
+# The product is called Otherwise Hub, but the bundle file keeps its old name: self-update,
+# otherwise-link discovery and the MCP command people pasted (`/Applications/Otherwise Apps.app/
+# Contents/MacOS/otherwise-apps mcp`) depend on it. Finder, the Dock, Spotlight and the menu bar
+# show "Otherwise Hub" through the localized display name (LSHasLocalizedDisplayName +
+# <lang>.lproj/InfoPlist.strings); LaunchServices only uses it while the file name still
+# matches the plain CFBundleName / CFBundleDisplayName, so those stay "Otherwise Apps".
 # Usage: script/bundle-macos.sh [debug|release]   (default: release; builds first)
 #        UNIVERSAL=1 script/bundle-macos.sh       (release for Apple silicon + Intel, joined with lipo)
 # Honours CARGO_TARGET_DIR (binary read from, and the .app written to, that directory).
@@ -33,6 +39,8 @@ cat > "$app/Contents/Info.plist" <<PLIST
 <dict>
   <key>CFBundleName</key><string>Otherwise Apps</string>
   <key>CFBundleDisplayName</key><string>Otherwise Apps</string>
+  <key>LSHasLocalizedDisplayName</key><true/>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleIdentifier</key><string>io.github.otherwisetech.otherwise-apps</string>
   <key>CFBundleExecutable</key><string>$bin</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
@@ -54,6 +62,10 @@ cat > "$app/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 plutil -lint -s "$app/Contents/Info.plist"
+for l in en es fr pt; do
+  mkdir -p "$app/Contents/Resources/$l.lproj"
+  printf '"CFBundleName" = "Otherwise Hub";\n"CFBundleDisplayName" = "Otherwise Hub";\n' > "$app/Contents/Resources/$l.lproj/InfoPlist.strings"
+done
 # The launcher's own background jobs (Otherwise Helper finds them here; nothing to register).
 "$app/Contents/MacOS/$bin" background manifest > "$app/Contents/Resources/otherwise-background.json"
 # Otherwise Helper: a menu-bar app (no Dock icon) inside ours, its own bundle id so

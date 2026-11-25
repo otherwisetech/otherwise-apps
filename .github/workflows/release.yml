@@ -1,7 +1,9 @@
 name: Release
 
-# Builds downloadable apps for macOS, Linux and Windows. Asset names must match the catalog
-# (otherwise-apps-<platform>.zip/.tar.gz): Otherwise Apps updates itself from them.
+# Builds downloadable apps for macOS, Linux and Windows. Each download is attached twice:
+# otherwise-hub-<platform>.zip/.tar.gz (the product's name, from 0.7.1) and the same bytes as
+# otherwise-apps-<platform>.zip/.tar.gz, which the catalog and every installed copy (0.7.0 and
+# older) update from. Keep both. Inside, the bundle is still "Otherwise Apps.app".
 # - push a tag like v0.2.0 → a GitHub Release with the three downloads attached
 # - "Run workflow" by hand → the same builds as workflow artifacts, no release
 on:
@@ -56,6 +58,7 @@ jobs:
           UNIVERSAL=1 script/bundle-macos.sh
           mkdir -p dist
           ditto -c -k --keepParent "target/release/Otherwise Apps.app" dist/otherwise-apps-${{ matrix.name }}.zip
+          cp dist/otherwise-apps-${{ matrix.name }}.zip dist/otherwise-hub-${{ matrix.name }}.zip
 
       - name: Build (Linux)
         if: runner.os == 'Linux'
@@ -70,6 +73,7 @@ jobs:
           cp README.md LICENSE-MIT LICENSE-APACHE dist/$pkg/
           tar -C dist -czf dist/$pkg.tar.gz $pkg
           rm -rf dist/$pkg
+          cp dist/$pkg.tar.gz dist/otherwise-hub-${{ matrix.name }}.tar.gz
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
@@ -83,6 +87,7 @@ jobs:
           Copy-Item README.md, LICENSE-MIT, LICENSE-APACHE dist/$pkg/
           Compress-Archive -Path dist/$pkg -DestinationPath dist/$pkg.zip
           Remove-Item -Recurse dist/$pkg
+          Copy-Item dist/$pkg.zip dist/otherwise-hub-${{ matrix.name }}.zip
 
       - uses: actions/upload-artifact@v4
         with:

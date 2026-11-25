@@ -90,11 +90,14 @@ pub struct Settings {
     pub vcity_orgs: Vec<VcityOrg>,
     /// Write `otherwise.ics` whenever the calendar is read.
     pub combined: bool,
+    /// Show `reminder` events (heads-up days before a deadline that has its own event, e.g.
+    /// Vigía's "30 days before"). Off: only the dates things actually happen.
+    pub show_reminders: bool,
 }
 
 impl Default for Settings {
     fn default() -> Settings {
-        Settings { schema: 1, show_holidays: true, holidays: default_holidays(), hidden: Vec::new(), overlays: Vec::new(), vcity: false, vcity_base: None, vcity_orgs: Vec::new(), combined: false }
+        Settings { schema: 1, show_holidays: true, holidays: default_holidays(), hidden: Vec::new(), overlays: Vec::new(), vcity: false, vcity_base: None, vcity_orgs: Vec::new(), combined: false, show_reminders: false }
     }
 }
 
@@ -233,10 +236,20 @@ pub fn build<Tz: TimeZone>(root: &Root, s: &Settings, from: NaiveDate, to: Naive
     v
 }
 
-/// The items visible with the user's filters: sources not hidden and, with `entity`, only the
-/// ones about that entity.
+/// The items visible with the user's filters: sources not hidden, reminders only when asked
+/// for and, with `entity`, only the ones about that entity.
 pub fn visible<'a>(v: &'a View, s: &Settings, entity: Option<uuid::Uuid>) -> Vec<&'a Item> {
-    v.items.iter().filter(|i| s.shows(&i.source.key())).filter(|i| entity.is_none_or(|id| i.occ.event.entities.contains(&id))).collect()
+    v.items
+        .iter()
+        .filter(|i| s.shows(&i.source.key()))
+        .filter(|i| s.show_reminders || i.occ.event.kind != events::Kind::Reminder)
+        .filter(|i| entity.is_none_or(|id| i.occ.event.entities.contains(&id)))
+        .collect()
+}
+
+/// Reminder events in the range (what "Show reminders" would add).
+pub fn reminder_count(v: &View, s: &Settings) -> usize {
+    v.items.iter().filter(|i| s.shows(&i.source.key()) && i.occ.event.kind == events::Kind::Reminder).count()
 }
 
 /// Items covering day `d`.
@@ -250,7 +263,7 @@ pub fn combined(root: &Root, name: &str, busy_label: &str) -> String {
     let f = events::feeds(root);
     let stamp = f.feeds.iter().filter_map(|x| DateTime::parse_from_rfc3339(&x.updated_at).ok()).map(|t| t.with_timezone(&Utc)).max().unwrap_or(DateTime::<Utc>::UNIX_EPOCH);
     let evs: Vec<Event> = f.feeds.into_iter().flat_map(|x| x.events).collect();
-    ics::write(&evs, &ics::Options { name: name.into(), product: "Otherwise Apps".into(), busy_label: busy_label.into(), stamp, refresh_hours: 1 })
+    ics::write(&evs, &ics::Options { name: name.into(), product: "Otherwise Hub".into(), busy_label: busy_label.into(), stamp, refresh_hours: 1 })
 }
 
 pub fn combined_path(root: &Root) -> PathBuf {
@@ -454,5 +467,30 @@ mod tests {
         s.save(&root).unwrap();
         assert_eq!(Settings::load(&root), s);
         assert!(!std::fs::read_to_string(dir.path().join("otherwise-apps/calendar/settings.json")).unwrap().contains("token"));
+        // 0.6.6 settings (no showReminders) load with reminders hidden
+        std::fs::write(dir.path().join("otherwise-apps/calendar/settings.json"), r#"{"schema":1,"showHolidays":true,"hidden":["ics"]}"#).unwrap();
+        let old = Settings::load(&root);
+        assert!(!old.show_reminders && old.hidden == ["ics"]);
+    }
+
+    #[test]
+    fn reminders_are_hidden_until_asked_for() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = Root::at(dir.path());
+        let due = Event::day("item-1", Kind::Due, "SOAT vence (Mercedes CQC925)", d("2026-12-20"));
+        let rem = Event::day("item-1-reminder", Kind::Reminder, "Recordatorio: SOAT", d("2026-11-20"));
+        events::publish(&root, "vigia", &[due, rem], None).unwrap();
+        let mut s = Settings { show_holidays: false, ..Settings::default() };
+        let v = build(&root, &s, d("2026-11-01"), d("2026-12-31"), &Utc, &[]);
+        assert_eq!(v.items.len(), 2, "the view keeps both; filtering is instant");
+        let shown: Vec<&str> = visible(&v, &s, None).iter().map(|i| i.occ.event.id.as_str()).collect();
+        assert_eq!(shown, ["item-1"], "only the real date by default");
+        assert_eq!(reminder_count(&v, &s), 1);
+        s.show_reminders = true;
+        assert_eq!(visible(&v, &s, None).len(), 2);
+        s.save(&root).unwrap();
+        assert!(Settings::load(&root).show_reminders);
+        s.toggle("vigia");
+        assert_eq!(reminder_count(&v, &s), 0);
     }
 }

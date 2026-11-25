@@ -32,7 +32,7 @@ impl AgentHost for Host {
 
     fn instructions(&self) -> Option<String> {
         Some(
-            "This is Otherwise Apps, the launcher of Otherwise Technologies' desktop apps (expense, Vigía, Nodo and others). \
+            "This is Otherwise Hub, the launcher of Otherwise Technologies' desktop apps (expense, Vigía, Nodo and others). \
              The MCP server \"otherwise\" is the Otherwise hub: app tools are named <app>.<tool> (for example vigia.due, nodo.devices, expense.search_transactions), \
              plus today (what needs attention), calendar_events (the user's calendar across apps for a date range: due dates, payments, birthdays, audits, holidays), entities_search / entities_get (shared people, companies, devices…) and open_link. \
              If an app's tools are missing, say which app would have to be installed or enabled. Write tools exist only when the user turned them on in Settings → Hub."

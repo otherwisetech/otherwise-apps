@@ -70,8 +70,13 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
   `#[ignore]`d, which installs into a temp dir). Every core change ships with a test.
 - `crates/core/data/catalog.json` is the bundled fallback: a snapshot of
   https://otherwisetech.com/apps.json. Refresh it when apps are added.
-- Release asset names must stay `otherwise-apps-<platform>.zip|.tar.gz` and the bundle
-  `Otherwise Apps.app` / `io.github.otherwisetech.otherwise-apps`: self-update depends on them.
+- The product is **Otherwise Hub** (window, menus, About, footer, Dock / Finder through the
+  bundle's localized display name, catalog `name`, KNOWN name). Kept on purpose: the bundle file
+  `Otherwise Apps.app` (catalog `appName`), `io.github.otherwisetech.otherwise-apps`, the
+  `otherwise-apps` binary / install name / app id / data folder, `Otherwise Helper.app` and its
+  login item: self-update, discovery, MCP paths and registry ids depend on them. Releases attach
+  `otherwise-hub-<platform>.zip|.tar.gz` and the same bytes as `otherwise-apps-<platform>…`,
+  which the catalog and every installed copy update from: keep both.
 - **The hub uses otherwise-link** (github.com/otherwisetech/otherwise-link, by tag): discovery,
   links, Today files, the entity registry and `hub.json` follow its docs/SPEC.md. The shared
   registry stays off until the user turns it on; MCP write tools stay off until the user

@@ -1,4 +1,4 @@
-//! Everything Otherwise Apps does that isn't UI: the catalog and where it comes from, version
+//! Everything Otherwise Hub does that isn't UI: the catalog and where it comes from, version
 //! comparison, picking the right release file, verified downloads, installing / replacing /
 //! uninstalling, and finding what is already installed; the Calendar page's data (`calendar`) and
 //! the optional Vcity source (`vcity`).

@@ -13,9 +13,9 @@ fn main() {
 fn windows_resources() {
     let mut res = winresource::WindowsResource::new();
     res.set_icon("assets/logo/AppIcon.ico");
-    res.set("ProductName", "Otherwise Apps");
-    res.set("FileDescription", "Otherwise Apps");
-    res.set("InternalName", "Otherwise Apps");
+    res.set("ProductName", "Otherwise Hub");
+    res.set("FileDescription", "Otherwise Hub");
+    res.set("InternalName", "Otherwise Hub");
     res.set("OriginalFilename", "otherwise-apps.exe");
     res.compile().expect("embed Windows resources (icon, version info)");
 }

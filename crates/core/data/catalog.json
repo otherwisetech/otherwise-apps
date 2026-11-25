@@ -292,7 +292,7 @@
     },
     {
       "id": "otherwise-apps",
-      "name": "Otherwise Apps",
+      "name": "Otherwise Hub",
       "repo": "otherwisetech/otherwise-apps",
       "tagline": {
         "en": "All our apps, installed and kept up to date in one place.",
@@ -301,10 +301,10 @@
         "pt": "Todos os nossos apps, instalados e atualizados num só lugar."
       },
       "description": {
-        "en": "Otherwise Apps lists Otherwise Technologies' open-source apps, installs the right build for your computer and keeps them up to date. Every download is checked against the SHA-256 that GitHub publishes before it is installed, and your apps' settings and data are never touched.",
-        "es": "Otherwise Apps lista las apps de código abierto de Otherwise Technologies, instala la versión correcta para tu computador y las mantiene al día. Cada descarga se comprueba con el SHA-256 que publica GitHub antes de instalarse, y nunca toca la configuración ni los datos de tus apps.",
-        "fr": "Otherwise Apps liste les apps open source d'Otherwise Technologies, installe la bonne version pour votre ordinateur et les garde à jour. Chaque téléchargement est vérifié avec le SHA-256 publié par GitHub avant d'être installé, et les réglages et données de vos apps ne sont jamais touchés.",
-        "pt": "Otherwise Apps lista os apps de código aberto da Otherwise Technologies, instala o certo para o seu computador e os mantém atualizados. Cada download é conferido com o SHA-256 que o GitHub publica antes de ser instalado, e as configurações e os dados dos seus apps nunca são tocados."
+        "en": "Otherwise Hub lists Otherwise Technologies' open-source apps, installs the right build for your computer and keeps them up to date. Every download is checked against the SHA-256 that GitHub publishes before it is installed, and your apps' settings and data are never touched.",
+        "es": "Otherwise Hub lista las apps de código abierto de Otherwise Technologies, instala la versión correcta para tu computador y las mantiene al día. Cada descarga se comprueba con el SHA-256 que publica GitHub antes de instalarse, y nunca toca la configuración ni los datos de tus apps.",
+        "fr": "Otherwise Hub liste les apps open source d'Otherwise Technologies, installe la bonne version pour votre ordinateur et les garde à jour. Chaque téléchargement est vérifié avec le SHA-256 publié par GitHub avant d'être installé, et les réglages et données de vos apps ne sont jamais touchés.",
+        "pt": "Otherwise Hub lista os apps de código aberto da Otherwise Technologies, instala o certo para o seu computador e os mantém atualizados. Cada download é conferido com o SHA-256 que o GitHub publica antes de ser instalado, e as configurações e os dados dos seus apps nunca são tocados."
       },
       "icon": "https://otherwisetech.com/apps/otherwise-apps.png",
       "homepage": "https://otherwisetech.com/apps/otherwise-apps",
