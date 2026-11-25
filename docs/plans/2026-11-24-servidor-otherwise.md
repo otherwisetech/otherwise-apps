@@ -1096,7 +1096,22 @@ Cambios respecto al plan:
 - MCP por HTTP (`/v1/mcp`), `inbox` remoto, "Publicar en el servidor" y notificaciones a los
   clientes por SSE quedan para después.
 
-### 14.4 Seguridad implementada
+### 14.4 Versiones y despliegue (2026-11-24)
+
+- otherwise-link **0.6.0** (SPEC §12 + `otherwise-remote`), otherwise-ui **0.1.2**
+  (`ServerSwitcher`), Otherwise Apps **0.7.0** (server mode), expense Business **0.9.12**
+  (construida localmente para Apple silicon: GitHub Actions no arrancó por facturación).
+- Mac Studio: Otherwise Apps y expense en `/Applications`; agente de launchd
+  `io.github.otherwisetech.otherwise-server` (`otherwise-helper server run`, sesión gráfica,
+  KeepAlive); `tailscale serve --bg --https=443 http://127.0.0.1:47900` (solo tailnet);
+  `server.json` con el usuario como `owner` y tramo de 3; un libro **sintético**
+  (`~/OtherwiseServerDemo/Demo SAS`) compartido como `demo`. El libro real no se movió.
+- Probado de punta a punta por el tailnet: identidad y rol desde el MacBook, `401` a peticiones
+  locales con cabeceras falsificadas, instantánea con ETag, op con reintento idempotente, evento
+  SSE con el `actor`, escritura de la CLI del Studio a través de `serve` que llega a la réplica
+  del MacBook en segundos, copia nocturna.
+
+### 14.5 Seguridad implementada
 
 - El servidor escucha solo en `127.0.0.1` y nunca cambia la configuración de Tailscale; imprime
   el comando `tailscale serve --bg --https=443 http://127.0.0.1:47900`.
