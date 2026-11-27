@@ -115,6 +115,15 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 - GPUI pins: `Cargo.lock` pins the same zed / gpui-component revs as the other apps. Never
   `cargo update` them; building only core can prune them from the lock — restore it.
 
+## Release
+
+Releases are GitHub releases, builds only: version bump merged to main, tag, build locally,
+`gh release create` with both `otherwise-hub-*` and `otherwise-apps-*` files (+ `.sha256`).
+How the Hub discovers, validates and verifies releases, and the rules for notes, file names and
+issue forms that every app follows: `docs/releases.md`. Closed-source apps release from a public
+release-only repo (policy: otherwisetech/suite `docs/politica-releases.md`); the catalog's `repo`
+names that repo, no code change needed.
+
 ## Validate
 
 ```
