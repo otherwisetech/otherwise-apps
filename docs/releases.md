@@ -63,6 +63,18 @@ gh release create vX.Y.Z --repo otherwisetech/<repo> --title "<App> X.Y.Z" --not
 gh release view vX.Y.Z --repo otherwisetech/<repo> --json assets -q '.assets[]|.name+" "+.digest'
 ```
 
+**The other platforms come from Actions** (open-source repos only: public repos get free
+runner minutes). Pushing the tag starts each repo's `.github/workflows/release.yml`, which builds
+`<bin>-macos-universal.zip`, `<bin>-windows-x86_64.zip` and `<bin>-linux-x86_64.tar.gz`, each
+with a `.sha256`, and attaches them to the tag's release: it creates the release if the local
+`gh release create` hasn't yet, otherwise it only adds (or replaces) its own files, so the local
+notes and `<bin>-macos-arm64.zip` stay. If the local release comes second, add the local files
+with `gh release upload` (and the notes with `gh release edit --notes-file`) instead. To rebuild
+an existing tag (a failed run, a release made while Actions was down):
+`gh workflow run release.yml -R otherwisetech/<repo> -f tag=vX.Y.Z` (add `-f skip_tests=true`
+only when that tag's tests can't pass on a runner for a reason fixed later on main). Write the
+notes for all the files; don't say a platform is missing before the run has finished.
+
 - **Stable file names** without the version (`<bin>-<os>-<arch>.<ext>`), so
   `releases/latest/download/<file>` keeps working and the catalog patterns stay simple. The website's
   `lib/catalog.ts` assumes `<bin>-macos-universal.zip`, `<bin>-windows-x86_64.zip` and
