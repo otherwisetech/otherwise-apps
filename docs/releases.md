@@ -1,0 +1,84 @@
+# Releases: how the Hub finds them, and how to publish one
+
+Every Otherwise Technologies app publishes its versions as **GitHub releases**, builds only.
+Open-source apps release from their own repository. Closed-source apps release from a **public,
+release-only repository** (README, user docs, CHANGELOG, issue templates and the release files;
+never the source), because releases in a private repository can't be seen or downloaded by users.
+The full policy, with the list of apps, lives in otherwisetech/suite `docs/politica-releases.md`
+(private).
+
+## How Otherwise Hub discovers and installs a release
+
+1. **Catalog**: `https://otherwisetech.com/apps.json` (`catalog::MANIFEST_URL`), else the last
+   catalog saved after a successful check, else the copy compiled in (`crates/core/data/catalog.json`).
+   The website builds `apps.json` from its published apps and each one's latest release.
+2. **Fresher release data**: for every catalog entry the Hub asks
+   `https://api.github.com/repos/<repo>/releases/latest` **without authentication**
+   (`net::fetch_latest_release`) and keeps it when it is at least as new (`catalog::apply_release`).
+   Drafts, pre-releases and non-semver tags are ignored; **404 means "no release yet"**. A 403/429
+   (anonymous quota: 60 requests per hour per IP) stops the round for the remaining repos.
+3. **Validation** (`AppEntry::validate`): `repo` must be `otherwisetech/<name>`, the release URL must
+   be under `https://github.com/<repo>/releases/` and every asset under
+   `https://github.com/<repo>/releases/download/`. Any repository in the org passes, so a release-only
+   repository needs no code change: its catalog entry just names it in `repo`.
+4. **Asset choice** (`platform::select_asset`): the entry's `platforms.<os>[].pattern` (glob, `*`
+   matches any run, e.g. `app-*-macos-arm64.zip`) with its `arch`: native first (`arm64` on Apple
+   silicon), then `universal` on macOS, then `x86_64` under emulation (not on Linux). `.zip` and
+   `.tar.gz` are unpacked.
+5. **Verification** (`pipeline::fresh_digest`, `verify_file`): right before downloading, the Hub asks
+   the API again for the asset's `digest`; **no SHA-256 digest, or a mismatch, means nothing is
+   installed**. GitHub computes that digest for every uploaded asset; the `.sha256` files are for
+   people.
+6. The Hub updates itself the same way (entry `otherwise-apps`).
+
+What this means for releases in a **private** repository: the API answers 404 to anonymous
+callers, so the Hub sees "no release", and the `releases/download/…` and
+`releases/latest/download/…` links are 404 for anyone not signed in to GitHub with access. A
+website build with a token would only publish links that fail for everyone else. Private-repo
+releases are therefore internal only.
+
+## Publishing a release (local build)
+
+```bash
+# in the source repo: version bumped, merged to main, tests + clippy green, then
+git tag vX.Y.Z && git push origin vX.Y.Z        # never move or delete tags
+
+# build (script/bundle-macos.sh) with local paths stripped from the binary
+RUSTFLAGS="--remap-path-prefix=$HOME=~ --remap-path-prefix=$PWD=." script/bundle-macos.sh
+ditto -c -k --keepParent "<App>.app" dist/<bin>-macos-arm64.zip
+(cd dist && shasum -a 256 <bin>-macos-arm64.zip > <bin>-macos-arm64.zip.sha256)
+
+# open source: the app's own repo; closed source: its public release-only repo
+gh release create vX.Y.Z --repo otherwisetech/<repo> --title "<App> X.Y.Z" --notes-file notes.md \
+  dist/<bin>-macos-arm64.zip dist/<bin>-macos-arm64.zip.sha256
+# a release-only repo has no source to tag: add --target main
+
+gh release view vX.Y.Z --repo otherwisetech/<repo> --json assets -q '.assets[]|.name+" "+.digest'
+```
+
+- **Stable file names** without the version (`<bin>-<os>-<arch>.<ext>`), so
+  `releases/latest/download/<file>` keeps working and the catalog patterns stay simple. The website's
+  `lib/catalog.ts` currently assumes `<bin>-macos-universal.zip`, `<bin>-windows-x86_64.zip` and
+  `<bin>-linux-x86_64.tar.gz`; an Apple-silicon-only build needs its own pattern there.
+- The Hub's releases attach every file twice, as `otherwise-hub-*` and `otherwise-apps-*` (see
+  CLAUDE.md).
+- **Notes are for users**: what changed, in plain words. For a closed-source app never paste the
+  source repo's auto-generated "What's Changed" (private PR titles and links), local paths, customer
+  names or anyone's data. Keep the same text in the release-only repo's `CHANGELOG.md`.
+- Check the binary before uploading: `strings <binary> | grep -i "/Users/"` finds unstripped paths;
+  no API keys or internal URLs may be compiled in.
+
+## Issues
+
+Each public repository (the app's own, or its release-only one) takes bug reports and feature
+requests through issue forms (`.github/ISSUE_TEMPLATE/bug.yml`, `feature.yml`, `config.yml` with
+blank issues off and a private contact for security reports). The forms ask for the app version,
+OS and chip, steps and expected result; screenshots are optional and the form asks people to cover
+names, amounts, documents and paths first; a required checkbox confirms there is no personal,
+financial or customer data. Never ask for a user's data file.
+
+## Actions
+
+Public repositories get free GitHub-hosted runner minutes. A release-only repository has no source,
+so it can't build the app there; it could still run checks that need no code (assets have a
+`.sha256` and a matching digest).
