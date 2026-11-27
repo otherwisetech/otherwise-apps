@@ -2,8 +2,10 @@
 
 Every Otherwise Technologies app publishes its versions as **GitHub releases**, builds only.
 Open-source apps release from their own repository. Closed-source apps release from a **public,
-release-only repository** (README, user docs, CHANGELOG, issue templates and the release files;
-never the source), because releases in a private repository can't be seen or downloaded by users.
+release-only repository** named **`otherwisetech/<app>-releases`**, one per app (README, user docs,
+CHANGELOG, licence, issue templates and the release files; never the source), because releases in
+a private repository can't be seen or downloaded by users. The first one is
+[`otherwisetech/expense-me-releases`](https://github.com/otherwisetech/expense-me-releases).
 The full policy, with the list of apps, lives in otherwisetech/suite `docs/politica-releases.md`
 (private).
 
@@ -20,7 +22,9 @@ The full policy, with the list of apps, lives in otherwisetech/suite `docs/polit
 3. **Validation** (`AppEntry::validate`): `repo` must be `otherwisetech/<name>`, the release URL must
    be under `https://github.com/<repo>/releases/` and every asset under
    `https://github.com/<repo>/releases/download/`. Any repository in the org passes, so a release-only
-   repository needs no code change: its catalog entry just names it in `repo`.
+   repository needs no code change: its catalog entry just names it in `repo`
+   (`"repo": "otherwisetech/<app>-releases"`, with an `id` that need not match; pinned by the
+   `release_only_repo` test in `crates/core/tests/catalog.rs`).
 4. **Asset choice** (`platform::select_asset`): the entry's `platforms.<os>[].pattern` (glob, `*`
    matches any run, e.g. `app-*-macos-arm64.zip`) with its `arch`: native first (`arm64` on Apple
    silicon), then `universal` on macOS, then `x86_64` under emulation (not on Linux). `.zip` and
@@ -43,12 +47,15 @@ releases are therefore internal only.
 # in the source repo: version bumped, merged to main, tests + clippy green, then
 git tag vX.Y.Z && git push origin vX.Y.Z        # never move or delete tags
 
-# build (script/bundle-macos.sh) with local paths stripped from the binary
-RUSTFLAGS="--remap-path-prefix=$HOME=~ --remap-path-prefix=$PWD=." script/bundle-macos.sh
+# build (script/bundle-macos.sh) with local paths stripped from the binary; the last matching
+# prefix wins, so the more specific one goes last (add --remap-path-prefix=$PWD=<app> if the
+# checkout is outside $HOME)
+RUSTFLAGS="--remap-path-prefix=$HOME=~ --remap-path-prefix=$HOME/.cargo=cargo" script/bundle-macos.sh
+strings "<App>.app/Contents/MacOS/<bin>" | grep /Users/    # must print nothing
 ditto -c -k --keepParent "<App>.app" dist/<bin>-macos-arm64.zip
 (cd dist && shasum -a 256 <bin>-macos-arm64.zip > <bin>-macos-arm64.zip.sha256)
 
-# open source: the app's own repo; closed source: its public release-only repo
+# open source: the app's own repo; closed source: otherwisetech/<app>-releases
 gh release create vX.Y.Z --repo otherwisetech/<repo> --title "<App> X.Y.Z" --notes-file notes.md \
   dist/<bin>-macos-arm64.zip dist/<bin>-macos-arm64.zip.sha256
 # a release-only repo has no source to tag: add --target main
@@ -58,8 +65,9 @@ gh release view vX.Y.Z --repo otherwisetech/<repo> --json assets -q '.assets[]|.
 
 - **Stable file names** without the version (`<bin>-<os>-<arch>.<ext>`), so
   `releases/latest/download/<file>` keeps working and the catalog patterns stay simple. The website's
-  `lib/catalog.ts` currently assumes `<bin>-macos-universal.zip`, `<bin>-windows-x86_64.zip` and
-  `<bin>-linux-x86_64.tar.gz`; an Apple-silicon-only build needs its own pattern there.
+  `lib/catalog.ts` assumes `<bin>-macos-universal.zip`, `<bin>-windows-x86_64.zip` and
+  `<bin>-linux-x86_64.tar.gz` for open-source apps; a closed-source product lists its own files
+  (e.g. only `<bin>-macos-arm64.zip`) next to its `releasesRepo` in `lib/site.ts`.
 - The Hub's releases attach every file twice, as `otherwise-hub-*` and `otherwise-apps-*` (see
   CLAUDE.md).
 - **Notes are for users**: what changed, in plain words. For a closed-source app never paste the

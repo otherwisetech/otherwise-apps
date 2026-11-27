@@ -167,3 +167,35 @@ fn source_fallbacks() {
     let l = sources::load(down, no_release, (catalog::bundled(), Source::Saved));
     assert_eq!(l.sources, vec![Source::GitHub]);
 }
+
+/// A closed-source app releases from a public release-only repo whose name differs from the
+/// app's id (`expense-me` from `otherwisetech/expense-me-releases`): it validates, takes its
+/// GitHub releases and picks its Apple-silicon-only file, with no special case in the Hub.
+#[test]
+fn release_only_repo() {
+    let m = r#"{ "schema": 1, "apps": [{
+      "id": "expense-me", "name": "expense me", "repo": "otherwisetech/expense-me-releases",
+      "bundleId": "com.otherwisetech.expense-me", "installName": "expense-me", "appName": "expense me",
+      "license": "Proprietary (free to use)",
+      "platforms": { "macos": [ { "pattern": "expense-me-macos-arm64.zip", "arch": "arm64" } ] },
+      "release": { "tag": "v0.3.17", "url": "https://github.com/otherwisetech/expense-me-releases/releases/tag/v0.3.17",
+        "assets": [
+          { "name": "expense-me-macos-arm64.zip", "size": 10, "url": "https://github.com/otherwisetech/expense-me-releases/releases/download/v0.3.17/expense-me-macos-arm64.zip", "digest": "sha256:00" },
+          { "name": "expense-me-macos-arm64.zip.sha256", "size": 1, "url": "https://github.com/otherwisetech/expense-me-releases/releases/download/v0.3.17/expense-me-macos-arm64.zip.sha256" }
+        ] } }] }"#;
+    let mut a = catalog::parse_manifest(m).unwrap().apps.remove(0);
+    assert_eq!(a.releases_url(), "https://github.com/otherwisetech/expense-me-releases/releases");
+    let assets = a.release.as_ref().unwrap().assets.clone();
+    let pick = |t| otherwise_core::platform::select_asset(&a, &assets, t).map(|(_, x)| x.name.clone());
+    assert_eq!(pick(t(Os::Macos, Arch::Aarch64)).as_deref(), Some("expense-me-macos-arm64.zip"));
+    assert_eq!(pick(t(Os::Macos, Arch::X86_64)), None, "no Intel build");
+    // the private source repo's files (404 for users) are refused
+    let private = m.replacen("expense-me-releases/releases/download", "expense-me/releases/download", 1);
+    assert!(catalog::parse_manifest(&private).is_err());
+
+    let gh = r#"{ "tag_name": "v0.3.18", "html_url": "https://github.com/otherwisetech/expense-me-releases/releases/tag/v0.3.18",
+        "assets": [ { "name": "expense-me-macos-arm64.zip", "size": 5, "digest": "sha256:11",
+          "browser_download_url": "https://github.com/otherwisetech/expense-me-releases/releases/download/v0.3.18/expense-me-macos-arm64.zip" } ] }"#;
+    assert!(catalog::apply_release(&mut a, catalog::parse_github_release(gh).unwrap().unwrap()));
+    assert_eq!(a.release.as_ref().unwrap().tag, "v0.3.18");
+}
