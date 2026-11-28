@@ -21,6 +21,9 @@ use std::collections::BTreeMap;
 
 pub const MANIFEST_URL: &str = "https://otherwisetech.com/apps.json";
 pub const ORG: &str = "otherwisetech";
+/// Release-only repositories outside [`ORG`] that the catalog may name, exactly (owner/name).
+/// Vcity is owned by Otherwise Technologies, but its repositories live in the `owsas` org.
+pub const EXTRA_REPOS: &[&str] = &["owsas/vcity-desk-releases"];
 /// Our own entry: updating it is a self-update.
 pub const SELF_ID: &str = "otherwise-apps";
 pub const SCHEMA: u32 = 1;
@@ -44,7 +47,7 @@ pub struct Manifest {
 pub struct AppEntry {
     pub id: String,
     pub name: String,
-    /// `otherwisetech/<repo>`
+    /// `otherwisetech/<repo>`, or one of [`EXTRA_REPOS`]
     pub repo: String,
     #[serde(default)]
     pub tagline: Localized,
@@ -156,9 +159,11 @@ impl AppEntry {
         if !safe(&self.install_name) || self.app_name.as_deref().is_some_and(|n| n.is_empty() || n.contains(['/', '\\', ':']) || n.starts_with('.')) {
             return Err("installName"); // i18n-ok: field name
         }
-        let Some(repo) = self.repo.strip_prefix(ORG).and_then(|r| r.strip_prefix('/')) else { return Err("repo") }; // i18n-ok: field name
-        if !safe(repo) {
-            return Err("repo"); // i18n-ok: field name
+        if !EXTRA_REPOS.contains(&self.repo.as_str()) {
+            let Some(repo) = self.repo.strip_prefix(ORG).and_then(|r| r.strip_prefix('/')) else { return Err("repo") }; // i18n-ok: field name
+            if !safe(repo) {
+                return Err("repo"); // i18n-ok: field name
+            }
         }
         if !safe(&self.bundle_id) {
             return Err("bundleId"); // i18n-ok: field name
