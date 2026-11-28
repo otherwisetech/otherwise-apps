@@ -199,3 +199,33 @@ fn release_only_repo() {
     assert!(catalog::apply_release(&mut a, catalog::parse_github_release(gh).unwrap().unwrap()));
     assert_eq!(a.release.as_ref().unwrap().tag, "v0.3.18");
 }
+
+/// Vcity (owned by Otherwise) keeps its repositories in the `owsas` org: Vcity Desk releases from
+/// `owsas/vcity-desk-releases`, the one repo outside `otherwisetech` the catalog accepts
+/// (`catalog::EXTRA_REPOS`). Its files must still come from that repo's own releases, and any
+/// other `owsas` repo is refused.
+#[test]
+fn allowlisted_repo_outside_org() {
+    let m = r#"{ "schema": 1, "apps": [{
+      "id": "vcity-desk", "name": "Vcity Desk", "repo": "owsas/vcity-desk-releases",
+      "bundleId": "io.vcity.desk", "installName": "vcity-desk", "appName": "Vcity Desk",
+      "license": "Proprietary",
+      "platforms": { "macos": [ { "pattern": "vcity-desk-macos-arm64.zip", "arch": "arm64" } ] },
+      "release": { "tag": "v0.1.0", "url": "https://github.com/owsas/vcity-desk-releases/releases/tag/v0.1.0",
+        "assets": [
+          { "name": "vcity-desk-macos-arm64.zip", "size": 10, "url": "https://github.com/owsas/vcity-desk-releases/releases/download/v0.1.0/vcity-desk-macos-arm64.zip", "digest": "sha256:00" }
+        ] } }] }"#;
+    let a = catalog::parse_manifest(m).unwrap().apps.remove(0);
+    assert_eq!(a.releases_url(), "https://github.com/owsas/vcity-desk-releases/releases");
+    let assets = a.release.as_ref().unwrap().assets.clone();
+    let pick = |t| otherwise_core::platform::select_asset(&a, &assets, t).map(|(_, x)| x.name.clone());
+    assert_eq!(pick(t(Os::Macos, Arch::Aarch64)).as_deref(), Some("vcity-desk-macos-arm64.zip"));
+
+    // only that exact repo: other owsas repos (e.g. the private source monorepo) are refused
+    for other in ["owsas/vcity-monorepo", "owsas/vcity-desk-releases-x", "OWSAS/vcity-desk-releases", "owsas/vcity-desk-releases/"] {
+        assert!(catalog::parse_manifest(&m.replace("owsas/vcity-desk-releases", other)).is_err(), "{other}");
+    }
+    // files from another repo are refused even for the allowlisted one
+    let elsewhere = m.replacen("owsas/vcity-desk-releases/releases/download", "owsas/vcity-monorepo/releases/download", 1);
+    assert!(catalog::parse_manifest(&elsewhere).is_err());
+}

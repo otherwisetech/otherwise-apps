@@ -24,7 +24,12 @@ The full policy, with the list of apps, lives in otherwisetech/suite `docs/polit
    `https://github.com/<repo>/releases/download/`. Any repository in the org passes, so a release-only
    repository needs no code change: its catalog entry just names it in `repo`
    (`"repo": "otherwisetech/<app>-releases"`, with an `id` that need not match; pinned by the
-   `release_only_repo` test in `crates/core/tests/catalog.rs`).
+   `release_only_repo` test in `crates/core/tests/catalog.rs`). The only repositories outside the
+   org that pass are listed exactly in `catalog::EXTRA_REPOS`: `owsas/vcity-desk-releases` (Vcity
+   Desk; Vcity is owned by Otherwise but its repositories live in the `owsas` org), pinned by the
+   `allowlisted_repo_outside_org` test. A catalog naming any other repository is rejected as a
+   whole, so **a website must not publish such an entry in `apps.json` before a Hub release that
+   accepts it is out** (older Hubs would fall back to their saved catalog until they update).
 4. **Asset choice** (`platform::select_asset`): the entry's `platforms.<os>[].pattern` (glob, `*`
    matches any run, e.g. `app-*-macos-arm64.zip`) with its `arch`: native first (`arm64` on Apple
    silicon), then `universal` on macOS, then `x86_64` under emulation (not on Linux). `.zip` and
