@@ -11,9 +11,19 @@ The full policy, with the list of apps, lives in otherwisetech/suite `docs/polit
 
 ## How Otherwise Hub discovers and installs a release
 
-1. **Catalog**: `https://otherwisetech.com/apps.json` (`catalog::MANIFEST_URL`), else the last
-   catalog saved after a successful check, else the copy compiled in (`crates/core/data/catalog.json`).
-   The website builds `apps.json` from its published apps and each one's latest release.
+1. **Catalog**: `https://otherwisetech.com/apps.v2.json` (`catalog::MANIFEST_URL`, schema 2), else
+   `https://otherwisetech.com/apps.json` (`LEGACY_MANIFEST_URL`, schema 1), else the last catalog
+   saved after a successful check, else the copy compiled in (`crates/core/data/catalog.json`).
+   The website builds both from its published apps and each one's latest release.
+   **Why two files**: Hubs up to 0.7.x read only `apps.json` and reject it *as a whole* when one
+   entry fails their validation (they then fall back to their saved catalog: they keep working and
+   still update themselves through GitHub, but stop seeing catalog changes). So `apps.json` lists
+   only entries every Hub accepts, and anything that needs a newer Hub goes in `apps.v2.json`
+   only, with `"minHub": "<version>"`. From 0.8.0 the Hub validates **each entry on its own**
+   (`catalog::parse_manifest_lenient`): a bad entry is dropped and reported in the check's errors,
+   the others stay, and an entry whose `minHub` is newer than the Hub is skipped quietly. Future
+   additions therefore need only a `minHub`, not a new file. Unreadable JSON or a newer `schema`
+   still fail the whole file.
 2. **Fresher release data**: for every catalog entry the Hub asks
    `https://api.github.com/repos/<repo>/releases/latest` **without authentication**
    (`net::fetch_latest_release`) and keeps it when it is at least as new (`catalog::apply_release`).
@@ -27,13 +37,15 @@ The full policy, with the list of apps, lives in otherwisetech/suite `docs/polit
    `release_only_repo` test in `crates/core/tests/catalog.rs`). The only repositories outside the
    org that pass are listed exactly in `catalog::EXTRA_REPOS`: `owsas/vcity-desk-releases` (Vcity
    Desk; Vcity is owned by Otherwise but its repositories live in the `owsas` org), pinned by the
-   `allowlisted_repo_outside_org` test. A catalog naming any other repository is rejected as a
-   whole, so **a website must not publish such an entry in `apps.json` before a Hub release that
-   accepts it is out** (older Hubs would fall back to their saved catalog until they update).
+   `allowlisted_repo_outside_org` test. Hubs ≤ 0.7.x reject a whole catalog naming any other
+   repository, so **such an entry goes only in `apps.v2.json`, with a `minHub`** (Vcity Desk:
+   `"minHub": "0.8.0"`); 0.8.0+ drop just that entry.
 4. **Asset choice** (`platform::select_asset`): the entry's `platforms.<os>[].pattern` (glob, `*`
    matches any run, e.g. `app-*-macos-arm64.zip`) with its `arch`: native first (`arm64` on Apple
    silicon), then `universal` on macOS, then `x86_64` under emulation (not on Linux). `.zip` and
-   `.tar.gz` are unpacked.
+   `.tar.gz` are unpacked. An app with no file for this OS / CPU (Vcity Desk and expense me ship
+   only `macos` `arm64`) is listed with "not available on <OS>" and no install button
+   (`Status::Unsupported`; test `mac_arm64_only_app_elsewhere_is_unsupported`).
 5. **Verification** (`pipeline::fresh_digest`, `verify_file`): right before downloading, the Hub asks
    the API again for the asset's `digest`; **no SHA-256 digest, or a mismatch, means nothing is
    installed**. GitHub computes that digest for every uploaded asset; the `.sha256` files are for

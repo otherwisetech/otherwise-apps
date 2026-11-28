@@ -63,7 +63,7 @@ fn parses_manifest() {
 #[test]
 fn rejects_bad_manifests() {
     let bad = |from: &str, to: &str| catalog::parse_manifest(&MANIFEST.replacen(from, to, 1)).is_err();
-    assert!(bad("\"schema\": 1", "\"schema\": 2"), "future schema");
+    assert!(bad("\"schema\": 1", "\"schema\": 3"), "future schema");
     assert!(bad("otherwisetech/rama-rs\"", "someone-else/rama-rs\""), "repo outside the org");
     assert!(bad("https://github.com/otherwisetech/rama-rs/releases/download/v0.2.0/rama-macos-universal.zip", "https://evil.example/rama.zip"), "asset hosted elsewhere");
     assert!(bad("https://github.com/otherwisetech/rama-rs/releases/download/v0.2.0/rama-linux", "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.2.0/rama-linux"), "asset of another repo");
@@ -138,8 +138,8 @@ fn statuses() {
 
 #[test]
 fn source_fallbacks() {
-    let website = || catalog::parse_manifest(MANIFEST).map_err(NetError::Catalog);
-    let down = || Err::<catalog::Manifest, _>(NetError::Transport("offline".into()));
+    let website = || catalog::parse_manifest_lenient(MANIFEST).map_err(NetError::Catalog);
+    let down = || Err::<catalog::Parsed, _>(NetError::Transport("offline".into()));
     let no_release = |_: &str| Ok(None);
     let limited = |_: &str| Err(NetError::Status(403));
     let bundled = (catalog::bundled(), Source::Bundled);
@@ -228,4 +228,99 @@ fn allowlisted_repo_outside_org() {
     // files from another repo are refused even for the allowlisted one
     let elsewhere = m.replacen("owsas/vcity-desk-releases/releases/download", "owsas/vcity-monorepo/releases/download", 1);
     assert!(catalog::parse_manifest(&elsewhere).is_err());
+}
+
+const DESK: &str = r#"{
+      "id": "vcity-desk", "name": "Vcity Desk", "repo": "owsas/vcity-desk-releases",
+      "bundleId": "io.vcity.desk", "installName": "vcity-desk", "appName": "Vcity Desk",
+      "platforms": { "macos": [ { "pattern": "vcity-desk-macos-arm64.zip", "arch": "arm64" } ] },
+      "minHub": "0.8.0",
+      "release": { "tag": "v0.1.0", "url": "https://github.com/owsas/vcity-desk-releases/releases/tag/v0.1.0",
+        "assets": [ { "name": "vcity-desk-macos-arm64.zip", "size": 10, "url": "https://github.com/owsas/vcity-desk-releases/releases/download/v0.1.0/vcity-desk-macos-arm64.zip", "digest": "sha256:00" } ] } }"#;
+
+/// `apps.v2.json` next to the rama entry: the schema-2 file this Hub reads first.
+fn v2(extra: &str) -> String {
+    MANIFEST.replacen("\"schema\": 1", "\"schema\": 2", 1).replacen("\"apps\": [{", &format!("\"apps\": [{extra}, {{"), 1)
+}
+
+fn ids(p: &catalog::Parsed) -> Vec<&str> {
+    p.manifest.apps.iter().map(|a| a.id.as_str()).collect()
+}
+
+/// One bad entry no longer costs the whole catalog: it is dropped and reported, the rest stay.
+#[test]
+fn invalid_entries_are_skipped_one_by_one() {
+    let bad = r#"{ "id": "evil", "name": "x", "repo": "someone-else/evil", "bundleId": "a", "installName": "evil" }"#;
+    let p = catalog::parse_manifest_lenient(&v2(bad)).unwrap();
+    assert_eq!(ids(&p), ["rama"]);
+    assert_eq!(p.skipped, vec![catalog::CatalogError::Invalid { id: "evil".into(), why: "repo" }]);
+    // the strict parse (bundled catalog) still refuses it
+    assert!(catalog::parse_manifest(&v2(bad)).is_err());
+
+    // a duplicate keeps the first entry
+    let dup = r#"{ "id": "rama", "name": "first", "repo": "otherwisetech/rama-rs", "bundleId": "a", "installName": "rama" }"#;
+    let p = catalog::parse_manifest_lenient(&v2(dup)).unwrap();
+    assert_eq!(p.manifest.apps.len(), 1);
+    assert_eq!(p.manifest.apps[0].name, "first");
+    assert_eq!(p.skipped.len(), 1);
+
+    let unreadable = DESK.replace("\"minHub\": \"0.8.0\"", "\"minHub\": \"soon\"");
+    let p = catalog::parse_manifest_lenient(&v2(&unreadable)).unwrap();
+    assert_eq!(ids(&p), ["rama"]);
+    assert_eq!(p.skipped, vec![catalog::CatalogError::Invalid { id: "vcity-desk".into(), why: "minHub" }]);
+
+    // whole-file failures stay whole-file
+    assert!(catalog::parse_manifest_lenient("{").is_err());
+    assert!(catalog::parse_manifest_lenient(&MANIFEST.replacen("\"schema\": 1", "\"schema\": 3", 1)).is_err());
+
+    // the website's reported skips reach the check's errors, and the good entries are listed
+    let website = || catalog::parse_manifest_lenient(&v2(bad)).map_err(NetError::Catalog);
+    let l = sources::load(website, |_: &str| Ok(None), (catalog::bundled(), Source::Bundled));
+    assert!(l.manifest.apps.iter().any(|a| a.id == "rama"));
+    assert!(!l.manifest.apps.iter().any(|a| a.id == "evil"));
+    assert_eq!(l.errors.len(), 1);
+}
+
+/// `minHub` hides an entry from Hubs older than it, quietly (it isn't an error).
+#[test]
+fn min_hub_gates_entries() {
+    let json = v2(DESK);
+    let v = |s| otherwise_core::version::Version::parse(s).unwrap();
+    let old = catalog::parse_manifest_for(&json, &v("0.7.9")).unwrap();
+    assert_eq!(ids(&old), ["rama"]);
+    assert!(old.skipped.is_empty());
+    assert_eq!(ids(&catalog::parse_manifest_for(&json, &v("0.8.0")).unwrap()), ["vcity-desk", "rama"]);
+    // this build is new enough for Desk
+    let p = catalog::parse_manifest_lenient(&json).unwrap();
+    assert_eq!(ids(&p), ["vcity-desk", "rama"]);
+    assert!(catalog::hub_version() >= v("0.8.0"));
+    // round-trips through the saved catalog with minHub kept
+    let again = catalog::parse_manifest_lenient(&catalog::to_json(&p.manifest)).unwrap();
+    assert_eq!(again.manifest, p.manifest);
+    assert_eq!(again.manifest.apps[0].min_hub.as_deref(), Some("0.8.0"));
+}
+
+/// The schema-1 apps.json that Hubs ≤ 0.7.x read still parses here (the fallback file).
+#[test]
+fn legacy_catalog_still_reads() {
+    let p = catalog::parse_manifest_lenient(MANIFEST).unwrap();
+    assert_eq!(p.manifest.schema, 1);
+    assert_eq!(ids(&p), ["rama"]);
+    assert!(p.skipped.is_empty());
+    assert!(catalog::MANIFEST_URL.ends_with("/apps.v2.json"));
+    assert!(catalog::LEGACY_MANIFEST_URL.ends_with("/apps.json"));
+}
+
+/// Desk ships only an Apple-silicon zip: everywhere else its card says it isn't available here
+/// (never offers an install).
+#[test]
+fn mac_arm64_only_app_elsewhere_is_unsupported() {
+    let p = catalog::parse_manifest_lenient(&v2(DESK)).unwrap();
+    let desk = p.manifest.apps.iter().find(|a| a.id == "vcity-desk").unwrap();
+    assert_eq!(pipeline::status(desk, None, t(Os::Macos, Arch::Aarch64)), Status::NotInstalled);
+    for target in [t(Os::Macos, Arch::X86_64), t(Os::Windows, Arch::X86_64), t(Os::Windows, Arch::Aarch64), t(Os::Linux, Arch::X86_64), t(Os::Linux, Arch::Aarch64)] {
+        assert_eq!(pipeline::status(desk, None, target), Status::Unsupported, "{target:?}");
+        assert!(pipeline::plan(desk, target).is_none());
+        assert!(!otherwise_core::platform::supports(desk, target));
+    }
 }

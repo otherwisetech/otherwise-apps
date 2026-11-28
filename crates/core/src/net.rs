@@ -1,6 +1,6 @@
 //! HTTPS: the manifest, GitHub's release API, icons, and release downloads (hashed while they
 //! stream to disk). All blocking; run on a background thread.
-use crate::catalog::{self, CatalogError, Manifest, Release};
+use crate::catalog::{self, CatalogError, Parsed, Release};
 use crate::digest::{HashingWriter, Sha};
 use std::io::{Read, Write};
 use std::path::Path;
@@ -84,8 +84,11 @@ pub fn get_bytes(url: &str, limit: u64) -> Result<Vec<u8>, NetError> {
     Ok(resp.body_mut().with_config().limit(limit).read_to_vec()?)
 }
 
-pub fn fetch_manifest() -> Result<Manifest, NetError> {
-    catalog::parse_manifest(&get_text(catalog::MANIFEST_URL, 4 << 20)?).map_err(NetError::Catalog)
+/// `apps.v2.json`, else the schema-1 `apps.json` (a website that doesn't serve v2 yet, or a
+/// broken v2 file); the v2 error is the one reported when both fail.
+pub fn fetch_manifest() -> Result<Parsed, NetError> {
+    let get = |url| catalog::parse_manifest_lenient(&get_text(url, 4 << 20)?).map_err(NetError::Catalog);
+    get(catalog::MANIFEST_URL).or_else(|e| get(catalog::LEGACY_MANIFEST_URL).map_err(|_| e))
 }
 
 /// `Ok(None)`: the repository has no published release yet.

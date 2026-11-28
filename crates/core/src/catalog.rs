@@ -1,14 +1,20 @@
-//! The app catalog: `https://otherwisetech.com/apps.json` (schema below), GitHub's
-//! `releases/latest` as a second source, and a copy bundled with the launcher as the last resort.
+//! The app catalog: `https://otherwisetech.com/apps.v2.json` (schema below; `apps.json` when that
+//! fails), GitHub's `releases/latest` as a second source, and a copy bundled with the launcher as
+//! the last resort.
+//!
+//! Two files, because Hubs up to 0.7.x reject the whole of `apps.json` when one entry fails their
+//! validation: `apps.json` (schema 1) keeps only entries every Hub accepts, and `apps.v2.json`
+//! (schema 2) lists everything, read by Hubs from 0.8.0 on, which drop a bad entry on its own and
+//! skip entries whose `minHub` is newer than themselves.
 //!
 //! ```json
-//! { "schema": 1, "generatedAt": "2026-11-20T12:00:00Z", "apps": [ {
+//! { "schema": 2, "generatedAt": "2026-11-20T12:00:00Z", "apps": [ {
 //!     "id": "rama", "name": "rama", "repo": "otherwisetech/rama-rs",
 //!     "tagline": { "en": "…", "es": "…" }, "description": { "en": "…" },
 //!     "icon": "https://otherwisetech.com/apps/rama.png", "homepage": "https://otherwisetech.com/apps/rama",
 //!     "bundleId": "io.github.otherwisetech.rama", "installName": "rama", "appName": "rama",
 //!     "platforms": { "macos": [ { "pattern": "rama-macos-universal.zip", "arch": "universal" } ], … },
-//!     "minimumOs": { "macos": "11.0" },
+//!     "minimumOs": { "macos": "11.0" }, "minHub": "0.8.0",
 //!     "release": { "tag": "v0.1.0", "publishedAt": "…", "url": "…", "notes": "…",
 //!                  "assets": [ { "name": "…", "size": 1, "url": "…", "digest": "sha256:…" } ] } } ] }
 //! ```
@@ -19,14 +25,16 @@ use crate::version::Version;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-pub const MANIFEST_URL: &str = "https://otherwisetech.com/apps.json";
+pub const MANIFEST_URL: &str = "https://otherwisetech.com/apps.v2.json";
+/// The schema-1 catalog older Hubs read; used when [`MANIFEST_URL`] can't be fetched or parsed.
+pub const LEGACY_MANIFEST_URL: &str = "https://otherwisetech.com/apps.json";
 pub const ORG: &str = "otherwisetech";
 /// Release-only repositories outside [`ORG`] that the catalog may name, exactly (owner/name).
 /// Vcity is owned by Otherwise Technologies, but its repositories live in the `owsas` org.
 pub const EXTRA_REPOS: &[&str] = &["owsas/vcity-desk-releases"];
 /// Our own entry: updating it is a self-update.
 pub const SELF_ID: &str = "otherwise-apps";
-pub const SCHEMA: u32 = 1;
+pub const SCHEMA: u32 = 2;
 
 static BUNDLED: &str = include_str!("../data/catalog.json");
 
@@ -71,6 +79,9 @@ pub struct AppEntry {
     pub minimum_os: BTreeMap<String, String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub license: Option<String>,
+    /// Oldest Hub version that may list this entry (`0.8.0`); older Hubs skip it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_hub: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub release: Option<Release>,
 }
@@ -187,21 +198,60 @@ impl AppEntry {
     }
 }
 
-/// Parses and validates a manifest. Entries that fail validation make the whole manifest fail:
-/// a half-trusted catalog is worse than falling back to the next source.
-pub fn parse_manifest(json: &str) -> Result<Manifest, CatalogError> {
-    let m: Manifest = serde_json::from_str(json).map_err(|e| CatalogError::Json(e.to_string()))?;
+/// A manifest with the entries that failed validation taken out (and reported in `skipped`).
+#[derive(Debug, Clone, PartialEq)]
+pub struct Parsed {
+    pub manifest: Manifest,
+    pub skipped: Vec<CatalogError>,
+}
+
+/// This Hub's version, compared with an entry's `minHub`.
+pub fn hub_version() -> Version {
+    Version::parse(env!("CARGO_PKG_VERSION")).expect("crate version is semver")
+}
+
+/// Parses a manifest and validates each entry on its own: an entry that fails (bad repo or URL,
+/// duplicate id, unreadable `minHub`) is dropped and reported, the rest stay. Each entry's URLs
+/// are checked against its own repo, so dropping one can't make another one less safe; failing
+/// the whole catalog for one entry is what locked Hubs ≤ 0.7.x out of new apps. Entries whose
+/// `minHub` is newer than `hub` are dropped quietly. Unreadable JSON or a newer schema still fail
+/// as a whole.
+pub fn parse_manifest_for(json: &str, hub: &Version) -> Result<Parsed, CatalogError> {
+    let mut m: Manifest = serde_json::from_str(json).map_err(|e| CatalogError::Json(e.to_string()))?;
     if m.schema == 0 || m.schema > SCHEMA {
         return Err(CatalogError::Schema(m.schema));
     }
     let mut seen = std::collections::BTreeSet::new();
-    for a in &m.apps {
-        a.validate().map_err(|why| CatalogError::Invalid { id: a.id.clone(), why })?;
-        if !seen.insert(a.id.as_str()) {
-            return Err(CatalogError::Invalid { id: a.id.clone(), why: "duplicate" }); // i18n-ok: reason code
+    let mut skipped = Vec::new();
+    m.apps.retain(|a| {
+        let check = a.validate().and_then(|()| match a.min_hub.as_deref().map(Version::parse) {
+            Some(None) => Err("minHub"), // i18n-ok: field name
+            _ if !seen.insert(a.id.clone()) => Err("duplicate"), // i18n-ok: reason code
+            _ => Ok(()),
+        });
+        match check {
+            Err(why) => {
+                skipped.push(CatalogError::Invalid { id: a.id.clone(), why });
+                false
+            }
+            Ok(()) => a.min_hub.as_deref().and_then(Version::parse).is_none_or(|min| *hub >= min),
         }
+    });
+    Ok(Parsed { manifest: m, skipped })
+}
+
+/// [`parse_manifest_for`] this Hub.
+pub fn parse_manifest_lenient(json: &str) -> Result<Parsed, CatalogError> {
+    parse_manifest_for(json, &hub_version())
+}
+
+/// Strict parse: any invalid entry fails the whole manifest (the bundled copy and tests).
+pub fn parse_manifest(json: &str) -> Result<Manifest, CatalogError> {
+    let p = parse_manifest_lenient(json)?;
+    match p.skipped.into_iter().next() {
+        Some(e) => Err(e),
+        None => Ok(p.manifest),
     }
-    Ok(m)
 }
 
 /// The catalog compiled into the launcher (a snapshot of apps.json).
@@ -279,6 +329,7 @@ mod tests {
     fn bundled_catalog_parses_and_has_us() {
         let m = bundled();
         assert!(m.apps.iter().any(|a| a.is_self()));
+        assert!(m.apps.iter().any(|a| a.id == "vcity-desk" && a.min_hub.is_some()));
         for a in &m.apps {
             assert!(!pick(&a.tagline, "en").is_empty(), "{} tagline", a.id);
             for lang in ["en", "es", "fr", "pt"] {
