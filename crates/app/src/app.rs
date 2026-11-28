@@ -155,7 +155,7 @@ fn saved_catalog_path() -> PathBuf {
 
 /// The catalog saved after the last good check, else the bundled one.
 fn initial_catalog() -> (Manifest, Source) {
-    std::fs::read_to_string(saved_catalog_path()).ok().and_then(|s| catalog::parse_manifest(&s).ok()).map(|m| (m, Source::Saved)).unwrap_or_else(|| (catalog::bundled(), Source::Bundled))
+    std::fs::read_to_string(saved_catalog_path()).ok().and_then(|s| catalog::parse_manifest_lenient(&s).ok()).map(|p| (p.manifest, Source::Saved)).unwrap_or_else(|| (catalog::bundled(), Source::Bundled))
 }
 
 impl Launcher {

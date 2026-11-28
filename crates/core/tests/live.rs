@@ -14,7 +14,7 @@ use std::sync::atomic::AtomicBool;
 #[test]
 #[ignore = "network"]
 fn real_release_downloads_verifies_and_installs() {
-    let website_down = || Err::<catalog::Manifest, _>(NetError::Transport("skipped".into()));
+    let website_down = || Err::<catalog::Parsed, _>(NetError::Transport("skipped".into()));
     let l = sources::load(website_down, net::fetch_latest_release, (catalog::bundled(), Source::Bundled));
     assert!(l.sources.contains(&Source::GitHub), "{:?}", l.errors);
     let e = l.manifest.apps.iter().find(|a| a.id == "rama").unwrap().clone();

@@ -56,7 +56,7 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 
 - **Never install anything unverified.** Every download is checked against GitHub's asset
   `digest` (SHA-256); no digest or a mismatch → the file is deleted and nothing is installed.
-  Catalog URLs are validated (org repos, the app's own release downloads only).
+  Catalog URLs are validated (org repos + `EXTRA_REPOS`, the app's own release downloads only).
 - **Never delete user data or an installed app.** Replaced and uninstalled apps go to the Trash
   (`install::system_trash`); the only folders removed outright are our own temp unpack and
   download folders. App settings/data dirs are never touched. Uninstall only accepts paths from
@@ -69,7 +69,9 @@ tools/icon   resvg rasteriser used by script/build-icons.sh (own workspace)
 - Tests never touch the real Trash, /Applications or the network (except `tests/live.rs`,
   `#[ignore]`d, which installs into a temp dir). Every core change ships with a test.
 - `crates/core/data/catalog.json` is the bundled fallback: a snapshot of
-  https://otherwisetech.com/apps.json. Refresh it when apps are added.
+  https://otherwisetech.com/apps.v2.json. Refresh it when apps are added. The Hub reads
+  `apps.v2.json` (schema 2, per-entry validation, `minHub`), else `apps.json` (schema 1, what Hubs
+  ≤ 0.7.x read: they reject the whole file for one bad entry); see docs/releases.md.
 - The product is **Otherwise Hub** (window, menus, About, footer, Dock / Finder through the
   bundle's localized display name, catalog `name`, KNOWN name). Kept on purpose: the bundle file
   `Otherwise Apps.app` (catalog `appName`), `io.github.otherwisetech.otherwise-apps`, the

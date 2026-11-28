@@ -1,7 +1,7 @@
 //! Putting the catalog together: otherwisetech.com's manifest first, then GitHub's latest
 //! release for every app (fresher, and it carries the SHA-256 digests), else the last catalog we
 //! saved, else the one bundled with the launcher.
-use crate::catalog::{self, Manifest, Release, SELF_ID};
+use crate::catalog::{self, Manifest, Parsed, Release, SELF_ID};
 use crate::net::NetError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -21,13 +21,14 @@ pub struct Loaded {
 }
 
 /// `fallback` is the saved catalog (with `Source::Saved`) or the bundled one.
-pub fn load(website: impl FnOnce() -> Result<Manifest, NetError>, github: impl Fn(&str) -> Result<Option<Release>, NetError>, fallback: (Manifest, Source)) -> Loaded {
+pub fn load(website: impl FnOnce() -> Result<Parsed, NetError>, github: impl Fn(&str) -> Result<Option<Release>, NetError>, fallback: (Manifest, Source)) -> Loaded {
     let mut sources = Vec::new();
     let mut errors = Vec::new();
     let mut manifest = match website() {
-        Ok(m) => {
+        Ok(p) => {
             sources.push(Source::Website);
-            m
+            errors.extend(p.skipped.iter().map(ToString::to_string));
+            p.manifest
         }
         Err(e) => {
             errors.push(e.to_string());

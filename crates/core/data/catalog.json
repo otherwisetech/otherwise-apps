@@ -1,10 +1,10 @@
 {
-  "schema": 1,
-  "generatedAt": "2026-11-20T16:44:31.683Z",
+  "schema": 2,
+  "generatedAt": "2026-11-28T19:12:03.032Z",
   "apps": [
     {
       "id": "genealogy",
-      "name": "genealogy-rs",
+      "name": "genealogy",
       "repo": "otherwisetech/genealogy-rs",
       "tagline": {
         "en": "Your family tree, fast and private.",
@@ -13,10 +13,10 @@
         "pt": "Sua árvore genealógica, rápida e privada."
       },
       "description": {
-        "en": "genealogy-rs is a fast desktop app to explore and edit GEDCOM family trees. Open the .ged export from your genealogy site or program and walk through the generations on a pan-and-zoom canvas, a fan chart or a map, then edit people and save without losing anything the file already had.",
-        "es": "genealogy-rs es una app de escritorio rápida para explorar y editar árboles genealógicos GEDCOM. Abre el .ged que exportaste de tu sitio o programa de genealogía y recorre las generaciones en un lienzo con zoom, un abanico o un mapa; luego edita personas y guarda sin perder nada de lo que el archivo ya tenía.",
-        "fr": "genealogy-rs est une app de bureau rapide pour explorer et modifier des arbres généalogiques GEDCOM. Ouvrez le .ged exporté depuis votre site ou logiciel de généalogie et parcourez les générations sur un canevas zoomable, un éventail ou une carte, puis modifiez les personnes et enregistrez sans rien perdre de ce que le fichier contenait.",
-        "pt": "genealogy-rs é um app de desktop rápido para explorar e editar árvores genealógicas GEDCOM. Abra o .ged exportado do seu site ou programa de genealogia e percorra as gerações numa tela com zoom, num leque ou num mapa; depois edite pessoas e salve sem perder nada do que o arquivo já tinha."
+        "en": "genealogy is a fast desktop app to explore and edit GEDCOM family trees. Open the .ged export from your genealogy site or program and walk through the generations on a pan-and-zoom canvas, a fan chart or a map, then edit people and save without losing anything the file already had.",
+        "es": "genealogy es una app de escritorio rápida para explorar y editar árboles genealógicos GEDCOM. Abre el .ged que exportaste de tu sitio o programa de genealogía y recorre las generaciones en un lienzo con zoom, un abanico o un mapa; luego edita personas y guarda sin perder nada de lo que el archivo ya tenía.",
+        "fr": "genealogy est une app de bureau rapide pour explorer et modifier des arbres généalogiques GEDCOM. Ouvrez le .ged exporté depuis votre site ou logiciel de généalogie et parcourez les générations sur un canevas zoomable, un éventail ou une carte, puis modifiez les personnes et enregistrez sans rien perdre de ce que le fichier contenait.",
+        "pt": "genealogy é um app de desktop rápido para explorar e editar árvores genealógicas GEDCOM. Abra o .ged exportado do seu site ou programa de genealogia e percorra as gerações numa tela com zoom, num leque ou num mapa; depois edite pessoas e salve sem perder nada do que o arquivo já tinha."
       },
       "icon": "https://otherwisetech.com/apps/genealogy-rs.png",
       "homepage": "https://otherwisetech.com/apps/genealogy-rs",
@@ -48,28 +48,58 @@
       },
       "license": "MIT OR Apache-2.0",
       "release": {
-        "tag": "v0.3.0",
-        "publishedAt": "2026-11-19T23:26:06Z",
-        "url": "https://github.com/otherwisetech/genealogy-rs/releases/tag/v0.3.0",
-        "notes": "## What's Changed\n* Open .ged files from Finder / Open With (file association) by @jcguarinpenaranda in https://github.com/otherwisetech/genealogy-rs/pull/5\n* Release v0.3.0 by @jcguarinpenaranda in https://github.com/otherwisetech/genealogy-rs/pull/6\n\n\n**Full Changelog**: https://github.com/otherwisetech/genealogy-rs/compare/v0.2.0...v0.3.0",
+        "tag": "v0.8.3",
+        "publishedAt": "2026-11-27T10:48:10Z",
+        "url": "https://github.com/otherwisetech/genealogy-rs/releases/tag/v0.8.3",
+        "notes": "otherwise-ui 0.1.3: About keeps its logo when its content is taller than the window. No other changes.\n\n**Downloads:** `genealogy-rs-macos-arm64.zip` (Apple silicon) was built locally and is ad hoc signed; `genealogy-rs-macos-universal.zip`, `genealogy-rs-windows-x86_64.zip`, `genealogy-rs-linux-x86_64.tar.gz` were built by GitHub Actions. Each file has a `.sha256`.\n\n**Full Changelog**: https://github.com/otherwisetech/genealogy-rs/compare/v0.8.2...v0.8.3\n",
         "assets": [
           {
             "name": "genealogy-rs-linux-x86_64.tar.gz",
-            "size": 19719258,
-            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.3.0/genealogy-rs-linux-x86_64.tar.gz",
-            "digest": "sha256:9b52c0f3b45a42b4693bec0a7935f1e75d2f0676472553db16a72313258e8681"
+            "size": 22733474,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.8.3/genealogy-rs-linux-x86_64.tar.gz",
+            "digest": "sha256:d7ccb31a0d28b9714b8ba88127d6d4e203e39efeb94a7c5942b96457516a0826"
+          },
+          {
+            "name": "genealogy-rs-linux-x86_64.tar.gz.sha256",
+            "size": 99,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.8.3/genealogy-rs-linux-x86_64.tar.gz.sha256",
+            "digest": "sha256:4f7a58fd1c77d8be5a3c40dfb4b479ebd9306c47dafd2968906bccea9cf31595"
+          },
+          {
+            "name": "genealogy-rs-macos-arm64.zip",
+            "size": 13504847,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.8.3/genealogy-rs-macos-arm64.zip",
+            "digest": "sha256:c68202bdfdbbfefc76b45bc148af8aa4bcad45261cda7c33dad41e55f4d2f10e"
+          },
+          {
+            "name": "genealogy-rs-macos-arm64.zip.sha256",
+            "size": 95,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.8.3/genealogy-rs-macos-arm64.zip.sha256",
+            "digest": "sha256:a5bbf5705ccf9bda0735cd8118dd8297b982f14a495f455abf1e6a98125403fa"
           },
           {
             "name": "genealogy-rs-macos-universal.zip",
-            "size": 21760547,
-            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.3.0/genealogy-rs-macos-universal.zip",
-            "digest": "sha256:775f57ec3b986936b85459be722d8cfbd0501b7f40d5c5220a2387ac8c4c1bbe"
+            "size": 27456860,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.8.3/genealogy-rs-macos-universal.zip",
+            "digest": "sha256:f61aa9d895f7ee3928b852a86957a06e94967db3dad958f95cd742646c45a9c9"
+          },
+          {
+            "name": "genealogy-rs-macos-universal.zip.sha256",
+            "size": 99,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.8.3/genealogy-rs-macos-universal.zip.sha256",
+            "digest": "sha256:687305fd5fae623c081f43b55dcbf7607a55f35d5c3b44531c06edf4a8877413"
           },
           {
             "name": "genealogy-rs-windows-x86_64.zip",
-            "size": 11329154,
-            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.3.0/genealogy-rs-windows-x86_64.zip",
-            "digest": "sha256:3cb1b63b0e8d11b50d807d91526a73c5a36406fe7bee5891ebf903b431e187c1"
+            "size": 14191870,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.8.3/genealogy-rs-windows-x86_64.zip",
+            "digest": "sha256:c0b2d2bb6785b09a5887e6cf6de4a77ee9e46cdc640680f7cc518e7a1f576b83"
+          },
+          {
+            "name": "genealogy-rs-windows-x86_64.zip.sha256",
+            "size": 98,
+            "url": "https://github.com/otherwisetech/genealogy-rs/releases/download/v0.8.3/genealogy-rs-windows-x86_64.zip.sha256",
+            "digest": "sha256:2ab25274ea1389b3e4cfd37ff66ab149ed35d9af27c370f276849d1120f7bb50"
           }
         ]
       }
@@ -120,28 +150,58 @@
       },
       "license": "MIT OR Apache-2.0",
       "release": {
-        "tag": "v0.3.0",
-        "publishedAt": "2026-11-19T23:35:17Z",
-        "url": "https://github.com/otherwisetech/diskmap-rs/releases/tag/v0.3.0",
-        "notes": "## What's Changed\n* Analyze a folder from Finder's right-click menu by @jcguarinpenaranda in https://github.com/otherwisetech/diskmap-rs/pull/8\n* Release v0.3.0 by @jcguarinpenaranda in https://github.com/otherwisetech/diskmap-rs/pull/9\n\n\n**Full Changelog**: https://github.com/otherwisetech/diskmap-rs/compare/v0.2.0...v0.3.0",
+        "tag": "v0.6.2",
+        "publishedAt": "2026-11-27T09:56:40Z",
+        "url": "https://github.com/otherwisetech/diskmap-rs/releases/tag/v0.6.2",
+        "notes": "## What's Changed\n* otherwise-ui 0.1: the family's tokens and shared chrome; v0.6.2 by @jcguarinpenaranda in https://github.com/otherwisetech/diskmap-rs/pull/17\n\n**Downloads:** `diskmap-macos-arm64.zip` (Apple silicon) was built locally and is ad hoc signed; `diskmap-macos-universal.zip`, `diskmap-windows-x86_64.zip`, `diskmap-linux-x86_64.tar.gz` were built by GitHub Actions. Each file has a `.sha256`.\n\n**Full Changelog**: https://github.com/otherwisetech/diskmap-rs/compare/v0.6.1...v0.6.2\n",
         "assets": [
           {
             "name": "diskmap-linux-x86_64.tar.gz",
-            "size": 17541300,
-            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.3.0/diskmap-linux-x86_64.tar.gz",
-            "digest": "sha256:1eba19d0c7cc6b38cbb639eb5933e5d4474e5e8f908c8b526487994fbce24765"
+            "size": 20119367,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.6.2/diskmap-linux-x86_64.tar.gz",
+            "digest": "sha256:d1b23ad0e8abc2450f90c6aac8c149690a5ae67d25d4c8789d6d4c20edbf0755"
+          },
+          {
+            "name": "diskmap-linux-x86_64.tar.gz.sha256",
+            "size": 94,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.6.2/diskmap-linux-x86_64.tar.gz.sha256",
+            "digest": "sha256:6eb4d0031cb062425ec3f3f2d5b95baa0ef56834287c46c30106f6d1c07763f9"
+          },
+          {
+            "name": "diskmap-macos-arm64.zip",
+            "size": 10522991,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.6.2/diskmap-macos-arm64.zip",
+            "digest": "sha256:3c4d1bf92dc685f4d0e91ea8b28472bb71ba07f226e37d1936b7eaad394d76fb"
+          },
+          {
+            "name": "diskmap-macos-arm64.zip.sha256",
+            "size": 90,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.6.2/diskmap-macos-arm64.zip.sha256",
+            "digest": "sha256:5195e1674572bf2d95f1838103b5a8e5284c425a4433721c78dbc64b0ed11318"
           },
           {
             "name": "diskmap-macos-universal.zip",
-            "size": 16835301,
-            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.3.0/diskmap-macos-universal.zip",
-            "digest": "sha256:a2aa3f507ea294ee1787aa3c8803716ce8c45555b109aae0f844e4477c16b7d5"
+            "size": 21721133,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.6.2/diskmap-macos-universal.zip",
+            "digest": "sha256:88f3c82b201de497b979783494958c6c76f06143482b40dc094bd1132877c2cc"
+          },
+          {
+            "name": "diskmap-macos-universal.zip.sha256",
+            "size": 94,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.6.2/diskmap-macos-universal.zip.sha256",
+            "digest": "sha256:08a997d180a881a4671862b9477f15a5cade357c0c9df9ea1fcd5ad38d79f1ee"
           },
           {
             "name": "diskmap-windows-x86_64.zip",
-            "size": 9242227,
-            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.3.0/diskmap-windows-x86_64.zip",
-            "digest": "sha256:7e2d35a584f924b25ff56c65581e3e50058fa208cf3bab07ab3b1bd5dd37aa5b"
+            "size": 11618743,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.6.2/diskmap-windows-x86_64.zip",
+            "digest": "sha256:43ce4aa6bc04fc226bcdd16db8a18c959b07dc301752ebd1bdcc12422546ed6c"
+          },
+          {
+            "name": "diskmap-windows-x86_64.zip.sha256",
+            "size": 93,
+            "url": "https://github.com/otherwisetech/diskmap-rs/releases/download/v0.6.2/diskmap-windows-x86_64.zip.sha256",
+            "digest": "sha256:281882b7e31536c836693f9346d8aab6b3229a72433948fdc229f3338f811189"
           }
         ]
       }
@@ -192,28 +252,58 @@
       },
       "license": "MIT OR Apache-2.0",
       "release": {
-        "tag": "v0.1.0",
-        "publishedAt": "2026-11-19T22:37:42Z",
-        "url": "https://github.com/otherwisetech/rama-rs/releases/tag/v0.1.0",
-        "notes": "**Full Changelog**: https://github.com/otherwisetech/rama-rs/commits/v0.1.0",
+        "tag": "v0.6.3",
+        "publishedAt": "2026-11-27T10:35:55Z",
+        "url": "https://github.com/otherwisetech/rama-rs/releases/tag/v0.6.3",
+        "notes": "otherwise-ui 0.1.3: About keeps its logo when its content is taller than the window. No other changes.\n\n**Downloads:** `rama-macos-arm64.zip` (Apple silicon) was built locally and is ad hoc signed; `rama-macos-universal.zip`, `rama-windows-x86_64.zip`, `rama-linux-x86_64.tar.gz` were built by GitHub Actions. Each file has a `.sha256`.\n\n**Full Changelog**: https://github.com/otherwisetech/rama-rs/compare/v0.6.2...v0.6.3\n",
         "assets": [
           {
             "name": "rama-linux-x86_64.tar.gz",
-            "size": 18639430,
-            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.1.0/rama-linux-x86_64.tar.gz",
-            "digest": "sha256:3b0e750923554a303c376a3b56df3439aafc0badfb9ee90c9479da60b863d8b4"
+            "size": 22655943,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.6.3/rama-linux-x86_64.tar.gz",
+            "digest": "sha256:b2715788ef046c4f1d19977678a086e121628e776d8498f8706775be24a0edd7"
+          },
+          {
+            "name": "rama-linux-x86_64.tar.gz.sha256",
+            "size": 91,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.6.3/rama-linux-x86_64.tar.gz.sha256",
+            "digest": "sha256:915b2a888cf8d9da9250c7515affcf3b7e1f6ac5da7b7f093e2be4a90ad71977"
+          },
+          {
+            "name": "rama-macos-arm64.zip",
+            "size": 12945486,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.6.3/rama-macos-arm64.zip",
+            "digest": "sha256:e671ec1f88428827f97738b326f99a3ff7d9cf06aa5af357a09831909633143e"
+          },
+          {
+            "name": "rama-macos-arm64.zip.sha256",
+            "size": 87,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.6.3/rama-macos-arm64.zip.sha256",
+            "digest": "sha256:7784dddc5eb96357634e4edb234e1fec23b05f18e18b1e7ef1d9032391b30892"
           },
           {
             "name": "rama-macos-universal.zip",
-            "size": 19608733,
-            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.1.0/rama-macos-universal.zip",
-            "digest": "sha256:418be4e0d2235b39154e62e3308a72e8801e8c7c6ab8e22d548ffe9410b1d2d3"
+            "size": 26764112,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.6.3/rama-macos-universal.zip",
+            "digest": "sha256:acd4358c135c61692c865990b6a48e92f665680901e3db73e630dd82a0333fb7"
+          },
+          {
+            "name": "rama-macos-universal.zip.sha256",
+            "size": 91,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.6.3/rama-macos-universal.zip.sha256",
+            "digest": "sha256:9dcb59db4268b18b354b8d024b69742ba2f2e523e98c5ab05f48e7d7cba1eecf"
           },
           {
             "name": "rama-windows-x86_64.zip",
-            "size": 10283899,
-            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.1.0/rama-windows-x86_64.zip",
-            "digest": "sha256:38182ebd9f9e8319b8dceeb0292fee0984ebcd71a79013e95e750c89491a4938"
+            "size": 13891065,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.6.3/rama-windows-x86_64.zip",
+            "digest": "sha256:5944c5d209b2da046e4b68022474ca08cf3c335fa8275b0ecac3a7a48cde494f"
+          },
+          {
+            "name": "rama-windows-x86_64.zip.sha256",
+            "size": 90,
+            "url": "https://github.com/otherwisetech/rama-rs/releases/download/v0.6.3/rama-windows-x86_64.zip.sha256",
+            "digest": "sha256:64ba214d046108d138939c8f2f5546b9bb0dabbaea4ad3279d82e228a7233942"
           }
         ]
       }
@@ -264,28 +354,167 @@
       },
       "license": "MIT OR Apache-2.0",
       "release": {
-        "tag": "v0.1.0",
-        "publishedAt": "2026-11-19T23:30:30Z",
-        "url": "https://github.com/otherwisetech/mosaico-rs/releases/tag/v0.1.0",
-        "notes": "**Full Changelog**: https://github.com/otherwisetech/mosaico-rs/commits/v0.1.0",
+        "tag": "v0.3.2",
+        "publishedAt": "2026-11-27T10:26:11Z",
+        "url": "https://github.com/otherwisetech/mosaico-rs/releases/tag/v0.3.2",
+        "notes": "otherwise-ui 0.1.3: About keeps its logo when its content is taller than the window. No other changes.\n\n**Downloads:** `mosaico-macos-arm64.zip` (Apple silicon) was built locally and is ad hoc signed; `mosaico-macos-universal.zip`, `mosaico-windows-x86_64.zip`, `mosaico-linux-x86_64.tar.gz` were built by GitHub Actions. Each file has a `.sha256`.\n\n**Full Changelog**: https://github.com/otherwisetech/mosaico-rs/compare/v0.3.1...v0.3.2\n",
         "assets": [
           {
             "name": "mosaico-linux-x86_64.tar.gz",
-            "size": 18007423,
-            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.1.0/mosaico-linux-x86_64.tar.gz",
-            "digest": "sha256:1fb1ba06da7cce6bb70040482bd2273e45381e9d29521492532d181b963b0c2a"
+            "size": 20578751,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.3.2/mosaico-linux-x86_64.tar.gz",
+            "digest": "sha256:2e4baf1783e7f0a06b9dd172d340606eb5c8e249342a6fad2fe4fa0e7bedda2c"
+          },
+          {
+            "name": "mosaico-linux-x86_64.tar.gz.sha256",
+            "size": 94,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.3.2/mosaico-linux-x86_64.tar.gz.sha256",
+            "digest": "sha256:adebe2431fe0917123598c7fb82952125978d36ea18c6f2029326ba871e91142"
+          },
+          {
+            "name": "mosaico-macos-arm64.zip",
+            "size": 11112816,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.3.2/mosaico-macos-arm64.zip",
+            "digest": "sha256:4eb45e9e8ebc46987226d4e6c97c2891b6d4a45f3feae613bd3142d58a5cd4f8"
+          },
+          {
+            "name": "mosaico-macos-arm64.zip.sha256",
+            "size": 90,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.3.2/mosaico-macos-arm64.zip.sha256",
+            "digest": "sha256:ae6d89f0afc117e03cd8e562d9a54dda3203560f924b28079a80b19c9d8acd22"
           },
           {
             "name": "mosaico-macos-universal.zip",
-            "size": 18126539,
-            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.1.0/mosaico-macos-universal.zip",
-            "digest": "sha256:d4f02309b291343045c166b53ed0591d9dd481d86ac854e5a47e8f4af8aee055"
+            "size": 22915350,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.3.2/mosaico-macos-universal.zip",
+            "digest": "sha256:46d2ffdfe477deb6a06e054d54093fe3d9f61efb495305c81ac149f38a2695ea"
+          },
+          {
+            "name": "mosaico-macos-universal.zip.sha256",
+            "size": 94,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.3.2/mosaico-macos-universal.zip.sha256",
+            "digest": "sha256:1604d5e0ad5fa97384eb027ea5e610619a3e07f8b33fc9d1368c654b8ba1027a"
           },
           {
             "name": "mosaico-windows-x86_64.zip",
-            "size": 9884100,
-            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.1.0/mosaico-windows-x86_64.zip",
-            "digest": "sha256:ace4bd188f22e085bdf7658b0ac2e4203321bee45d19bd33867a620ffcb522e1"
+            "size": 12224662,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.3.2/mosaico-windows-x86_64.zip",
+            "digest": "sha256:4c730797390db2aa048f570b90e0b25eb99e96ea572400c6a199ec59ef0aee85"
+          },
+          {
+            "name": "mosaico-windows-x86_64.zip.sha256",
+            "size": 93,
+            "url": "https://github.com/otherwisetech/mosaico-rs/releases/download/v0.3.2/mosaico-windows-x86_64.zip.sha256",
+            "digest": "sha256:362d97a65badb7261638e8c7134b3cef58a3eac0bacae6b3df7f0cb73d4b8377"
+          }
+        ]
+      }
+    },
+    {
+      "id": "expense-me",
+      "name": "expense me",
+      "repo": "otherwisetech/expense-me-releases",
+      "tagline": {
+        "en": "Free, private personal finance on your Mac.",
+        "es": "Tus finanzas personales, gratis y privadas, en tu Mac.",
+        "fr": "Vos finances personnelles, gratuites et privées, sur votre Mac.",
+        "pt": "Suas finanças pessoais, grátis e privadas, no seu Mac."
+      },
+      "description": {
+        "en": "expense me is a free personal-finance app for one person or a household. Drop in receipts and bank statements and it reads them on your computer; see how much you can safely spend today, what's due soon, every card and loan with its rate and payoff date, your budget, subscriptions and income, and how your money moved day by day. No account and no subscription: your books stay in a folder you choose.",
+        "es": "expense me es una app gratuita de finanzas personales para una persona o un hogar. Suelta recibos y extractos y los lee en tu computador; mira cuánto puedes gastar hoy sin pasarte, lo que vence pronto, cada tarjeta y crédito con su tasa y fecha de pago final, tu presupuesto, tus suscripciones e ingresos, y cómo se movió tu plata día a día. Sin cuenta y sin suscripción: tus libros se quedan en una carpeta que tú eliges.",
+        "fr": "expense me est une app gratuite de finances personnelles pour une personne ou un foyer. Déposez vos reçus et relevés bancaires : ils sont lus sur votre ordinateur. Voyez combien vous pouvez dépenser aujourd'hui, ce qui arrive à échéance, chaque carte et crédit avec son taux et sa date de fin, votre budget, vos abonnements et revenus, et l'évolution de votre argent jour après jour. Sans compte ni abonnement : vos livres restent dans un dossier que vous choisissez.",
+        "pt": "expense me é um app gratuito de finanças pessoais para uma pessoa ou uma casa. Solte recibos e extratos e ele os lê no seu computador; veja quanto pode gastar hoje, o que vence em breve, cada cartão e empréstimo com sua taxa e data de quitação, seu orçamento, suas assinaturas e rendas, e como seu dinheiro se moveu dia a dia. Sem conta e sem assinatura: seus livros ficam numa pasta que você escolhe."
+      },
+      "icon": "https://otherwisetech.com/apps/expense-me.png",
+      "homepage": "https://otherwisetech.com/products/expense-me",
+      "bundleId": "com.otherwisetech.expense-me",
+      "installName": "expense-me",
+      "appName": "expense me",
+      "platforms": {
+        "macos": [
+          {
+            "pattern": "expense-me-macos-arm64.zip",
+            "arch": "arm64"
+          }
+        ]
+      },
+      "minimumOs": {
+        "macos": "11.0"
+      },
+      "license": "Proprietary (free to use)",
+      "release": {
+        "tag": "v0.3.18",
+        "publishedAt": "2026-11-27T15:23:26Z",
+        "url": "https://github.com/otherwisetech/expense-me-releases/releases/tag/v0.3.18",
+        "notes": "## expense me 0.3.18\n\n**Ya no te pide la contraseña del Mac.** Antes, después de cada actualización, macOS volvía a pedir la contraseña de inicio de sesión para dejar que expense me usara el llavero (a veces varias veces: la app, los avisos en segundo plano, el correo). Ahora las claves que guardas en la app (la del correo y las de tus extractos) quedan en un archivo de expense me en este computador que solo tu usuario puede leer, fuera de tus libros y de OneDrive.\n\n- La primera vez que abras esta versión, macOS puede pedir **una última vez** acceso al llavero para pasar tus claves guardadas. Elige \"Permitir siempre\" (o \"Permitir\"). Después no vuelve a preguntar, tampoco en las próximas actualizaciones.\n- Si en ese momento eliges \"Denegar\", tus claves no se pierden: se intenta otra vez al abrir la app.\n- Tus libros y tus datos no cambian.\n\nPara macOS 11 o posterior en Mac con Apple silicon. Firma *ad hoc*: la primera vez, clic derecho → Abrir.\n\n---\n\n**No more Mac password prompts.** After every update, macOS used to ask for your login password again to let expense me use the keychain (sometimes several times: the app, background reminders, mail). The passwords you save in the app (your mail and your statements) now live in an expense me file on this computer that only your user can read, outside your books and OneDrive.\n\n- The first time you open this version, macOS may ask **one last time** for keychain access to move your saved passwords. Choose \"Always Allow\" (or \"Allow\"). After that it won't ask again, including on future updates.\n- If you choose \"Deny\" then, nothing is lost: it tries again the next time you open the app.\n- Your books and data are unchanged.\n\nFor macOS 11 or later on Apple silicon Macs. Signed *ad hoc*: the first time, right-click → Open.\n",
+        "assets": [
+          {
+            "name": "expense-me-macos-arm64.zip",
+            "size": 21739058,
+            "url": "https://github.com/otherwisetech/expense-me-releases/releases/download/v0.3.18/expense-me-macos-arm64.zip",
+            "digest": "sha256:beae25ebf1025d8bd2ca6a23b5ede19d993d28d8e62443cdfef95032ff8392fe"
+          },
+          {
+            "name": "expense-me-macos-arm64.zip.sha256",
+            "size": 93,
+            "url": "https://github.com/otherwisetech/expense-me-releases/releases/download/v0.3.18/expense-me-macos-arm64.zip.sha256",
+            "digest": "sha256:3a515ae82eb8cc8c4f4920180be0fb3ca1855be4ab508ba88ca87df92f28c7d3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vcity-desk",
+      "name": "Vcity Desk",
+      "repo": "owsas/vcity-desk-releases",
+      "tagline": {
+        "en": "Your Vcity stores on your desktop.",
+        "es": "Tus tiendas de Vcity en tu escritorio.",
+        "fr": "Vos boutiques Vcity sur votre bureau.",
+        "pt": "Suas lojas Vcity na sua área de trabalho."
+      },
+      "description": {
+        "en": "Vcity Desk is the native desktop app for Vcity store administrators. Sign in with your Vcity account and keep every store's customer inbox live, with a notification for each new message, next to today's orders, the calendar, project boards, the team chat, the CRM and the store's Knowledge Vault. It is in beta and free to download; you need a Vcity account with access to a store.",
+        "es": "Vcity Desk es la app de escritorio nativa para quienes administran tiendas en Vcity. Inicia sesión con tu cuenta de Vcity y mantén en vivo la bandeja de clientes de todas tus tiendas, con una notificación por cada mensaje nuevo, junto a los pedidos de hoy, el calendario, los tableros de proyectos, el chat del equipo, el CRM y el Knowledge Vault de la tienda. Está en beta y se descarga gratis; necesitas una cuenta de Vcity con acceso a una tienda.",
+        "fr": "Vcity Desk est l'app de bureau native pour les administrateurs de boutiques Vcity. Connectez-vous avec votre compte Vcity et gardez en direct la messagerie clients de toutes vos boutiques, avec une notification pour chaque nouveau message, à côté des commandes du jour, du calendrier, des tableaux de projets, du chat d'équipe, du CRM et du Knowledge Vault de la boutique. Elle est en bêta et gratuite à télécharger ; il faut un compte Vcity ayant accès à une boutique.",
+        "pt": "Vcity Desk é o app de desktop nativo para quem administra lojas na Vcity. Entre com sua conta Vcity e mantenha ao vivo a caixa de entrada de clientes de todas as suas lojas, com uma notificação para cada nova mensagem, junto com os pedidos do dia, o calendário, os quadros de projetos, o chat da equipe, o CRM e o Knowledge Vault da loja. Está em beta e o download é gratuito; é preciso uma conta Vcity com acesso a uma loja."
+      },
+      "icon": "https://otherwisetech.com/apps/vcity-desk.png",
+      "homepage": "https://otherwisetech.com/products/vcity-desk",
+      "bundleId": "io.vcity.desk",
+      "installName": "vcity-desk",
+      "appName": "Vcity Desk",
+      "platforms": {
+        "macos": [
+          {
+            "pattern": "vcity-desk-macos-arm64.zip",
+            "arch": "arm64"
+          }
+        ]
+      },
+      "minimumOs": {
+        "macos": "11.0"
+      },
+      "license": "Proprietary",
+      "minHub": "0.8.0",
+      "release": {
+        "tag": "v0.1.0",
+        "publishedAt": "2026-11-28T12:23:26Z",
+        "url": "https://github.com/owsas/vcity-desk-releases/releases/tag/v0.1.0",
+        "notes": "**Vcity Desk 0.1.0 (beta): first public version.** Your Vcity stores on your desktop: every store's conversations, today's orders and the agenda in one window, with desktop notifications, a Dock badge and a menu-bar item.\n\n- Sign in with your Vcity account (you approve the device in the browser); the session is kept in the macOS keychain.\n- Home dashboard, live Inbox for all your stores, Orders, Calendar (month / week / day, bookings), Projects (kanban boards), Team chat, CRM (customers, deals, follow-ups), Knowledge Vault (wiki, graph, folder sync) and the Vcity AI panel (⌘J).\n- Nine languages: English, Spanish, German, Greek, French, Italian, Portuguese, Russian and Chinese.\n\n**Install:** for macOS 11 or later on Apple silicon Macs (M1 or later). Download `vcity-desk-macos-arm64.zip`, open it and drag **Vcity Desk** into **Applications**.\n\n**First launch (Gatekeeper):** this build is signed *ad hoc* and is not notarized by Apple yet (no Developer ID signature), so macOS asks before opening it. Right-click (or Control-click) **Vcity Desk** → **Open** → **Open**. On macOS 15 or later, if you only see \"Done\" or \"Move to Trash\", go to **System Settings → Privacy & Security** and click **Open Anyway**. After that it opens normally.\n\nVerify the download: `shasum -a 256 -c vcity-desk-macos-arm64.zip.sha256`.\n\nIntel Macs, Windows and Linux: coming soon.\n\n---\n\n**Vcity Desk 0.1.0 (beta): primera versión pública.** Tus tiendas de Vcity en tu escritorio: las conversaciones de todas tus tiendas, los pedidos de hoy y la agenda en una sola ventana, con notificaciones, contador en el Dock e ícono en la barra de menús.\n\n- Inicia sesión con tu cuenta de Vcity (apruebas el dispositivo en el navegador); la sesión se guarda en el llavero de macOS.\n- Panel de inicio, bandeja en vivo de todas tus tiendas, pedidos, calendario (mes / semana / día, reservas), proyectos (tableros kanban), chat del equipo, CRM (clientes, negocios, seguimientos), Knowledge Vault (wiki, grafo, sincronización con carpeta) y el panel de Vcity AI (⌘J).\n- Nueve idiomas.\n\n**Instalar:** para macOS 11 o posterior en Mac con Apple silicon (M1 o posterior). Descarga `vcity-desk-macos-arm64.zip`, ábrelo y arrastra **Vcity Desk** a **Aplicaciones**.\n\n**Primera apertura (Gatekeeper):** esta versión tiene firma *ad hoc* y todavía no está notarizada por Apple, por eso macOS pregunta. Haz clic derecho (o Control-clic) sobre **Vcity Desk** → **Abrir** → **Abrir**. En macOS 15 o posterior, si solo ves \"Listo\" o \"Mover a la papelera\", ve a **Ajustes del Sistema → Privacidad y seguridad** y pulsa **Abrir igualmente**.\n\nMac con Intel, Windows y Linux: próximamente.\n",
+        "assets": [
+          {
+            "name": "vcity-desk-macos-arm64.zip",
+            "size": 14508442,
+            "url": "https://github.com/owsas/vcity-desk-releases/releases/download/v0.1.0/vcity-desk-macos-arm64.zip",
+            "digest": "sha256:521b57586fec439b4d91429d9b36c91d6e9e27fa3076f0b404a30457278a6666"
+          },
+          {
+            "name": "vcity-desk-macos-arm64.zip.sha256",
+            "size": 93,
+            "url": "https://github.com/owsas/vcity-desk-releases/releases/download/v0.1.0/vcity-desk-macos-arm64.zip.sha256",
+            "digest": "sha256:8c8cb47bb0f99121ca064efbd9357c52e081f372dc83add179880352e78092fe"
           }
         ]
       }
@@ -335,7 +564,111 @@
         "macos": "11.0",
         "windows": "10"
       },
-      "license": "MIT OR Apache-2.0"
+      "license": "MIT OR Apache-2.0",
+      "release": {
+        "tag": "v0.7.2",
+        "publishedAt": "2026-11-27T10:56:49Z",
+        "url": "https://github.com/otherwisetech/otherwise-apps/releases/tag/v0.7.2",
+        "notes": "otherwise-ui 0.1.3 (from 0.1.0): About keeps its logo when its content is taller than the window. No other changes.\n\n**Downloads:** `otherwise-hub-macos-arm64.zip` and `otherwise-apps-macos-arm64.zip` (the same Apple silicon build) were built locally and are ad hoc signed; `otherwise-hub-macos-universal.zip`, `otherwise-hub-windows-x86_64.zip`, `otherwise-hub-linux-x86_64.tar.gz`, `otherwise-apps-macos-universal.zip`, `otherwise-apps-windows-x86_64.zip`, `otherwise-apps-linux-x86_64.tar.gz` were built by GitHub Actions. Each file has a `.sha256`.\n\n**Full Changelog**: https://github.com/otherwisetech/otherwise-apps/compare/v0.7.1...v0.7.2\n",
+        "assets": [
+          {
+            "name": "otherwise-apps-linux-x86_64.tar.gz",
+            "size": 24538170,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-apps-linux-x86_64.tar.gz",
+            "digest": "sha256:5a3dc8d7cfb563965e4aabc533cd28b73c255c76752bad3789e0f1d3dd22f37c"
+          },
+          {
+            "name": "otherwise-apps-linux-x86_64.tar.gz.sha256",
+            "size": 101,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-apps-linux-x86_64.tar.gz.sha256",
+            "digest": "sha256:aa8301e4dc47431b97e8eee0f4c12a73a0108625dd8693b5c11a4cd0671da320"
+          },
+          {
+            "name": "otherwise-apps-macos-arm64.zip",
+            "size": 14637940,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-apps-macos-arm64.zip",
+            "digest": "sha256:69eab73e6558645e07f4b976f9365dd2639bc39e5f0c06be416818ec801e18e1"
+          },
+          {
+            "name": "otherwise-apps-macos-arm64.zip.sha256",
+            "size": 97,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-apps-macos-arm64.zip.sha256",
+            "digest": "sha256:85760e8d8fc5fa199c9f09bef935f8ab3000b0df310780844fdf2ea6dcc62328"
+          },
+          {
+            "name": "otherwise-apps-macos-universal.zip",
+            "size": 30300645,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-apps-macos-universal.zip",
+            "digest": "sha256:73e69c37c9628d13db76d57e862662a2390fcf8e8e934cedd19df71de8fe3b68"
+          },
+          {
+            "name": "otherwise-apps-macos-universal.zip.sha256",
+            "size": 101,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-apps-macos-universal.zip.sha256",
+            "digest": "sha256:8960a620a939dc1dd0122b0352aca3d3133b4c72b873af38aefdb6b8ca4ad2a1"
+          },
+          {
+            "name": "otherwise-apps-windows-x86_64.zip",
+            "size": 15690168,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-apps-windows-x86_64.zip",
+            "digest": "sha256:bed44686b72fbf3af9450faf253220b74de66bc81b913b76ef832741e013483a"
+          },
+          {
+            "name": "otherwise-apps-windows-x86_64.zip.sha256",
+            "size": 100,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-apps-windows-x86_64.zip.sha256",
+            "digest": "sha256:0ab2bc71ca230372344e599b29f35dab87287d1af2d577dfea5cc2821bee4d7c"
+          },
+          {
+            "name": "otherwise-hub-linux-x86_64.tar.gz",
+            "size": 24538170,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-hub-linux-x86_64.tar.gz",
+            "digest": "sha256:5a3dc8d7cfb563965e4aabc533cd28b73c255c76752bad3789e0f1d3dd22f37c"
+          },
+          {
+            "name": "otherwise-hub-linux-x86_64.tar.gz.sha256",
+            "size": 100,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-hub-linux-x86_64.tar.gz.sha256",
+            "digest": "sha256:b99783957d346909e027dd10bb0a3e85c6f8c5e7f9d6d71282101cef5be41f6f"
+          },
+          {
+            "name": "otherwise-hub-macos-arm64.zip",
+            "size": 14637940,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-hub-macos-arm64.zip",
+            "digest": "sha256:69eab73e6558645e07f4b976f9365dd2639bc39e5f0c06be416818ec801e18e1"
+          },
+          {
+            "name": "otherwise-hub-macos-arm64.zip.sha256",
+            "size": 96,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-hub-macos-arm64.zip.sha256",
+            "digest": "sha256:ead5b430715f6a5e46dfb4bfaf3599ea593f6cca66976666ab88aef2eb71e970"
+          },
+          {
+            "name": "otherwise-hub-macos-universal.zip",
+            "size": 30300645,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-hub-macos-universal.zip",
+            "digest": "sha256:73e69c37c9628d13db76d57e862662a2390fcf8e8e934cedd19df71de8fe3b68"
+          },
+          {
+            "name": "otherwise-hub-macos-universal.zip.sha256",
+            "size": 100,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-hub-macos-universal.zip.sha256",
+            "digest": "sha256:0cf3a03ac75d15a40ad861c3d950c196f8fe1480c271ab73ecd71bd182d0d7f6"
+          },
+          {
+            "name": "otherwise-hub-windows-x86_64.zip",
+            "size": 15690168,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-hub-windows-x86_64.zip",
+            "digest": "sha256:bed44686b72fbf3af9450faf253220b74de66bc81b913b76ef832741e013483a"
+          },
+          {
+            "name": "otherwise-hub-windows-x86_64.zip.sha256",
+            "size": 99,
+            "url": "https://github.com/otherwisetech/otherwise-apps/releases/download/v0.7.2/otherwise-hub-windows-x86_64.zip.sha256",
+            "digest": "sha256:35b2f8a3f8f8243b8718db3b375b856de19205dffbc984258f920f33b6cf7cc9"
+          }
+        ]
+      }
     }
   ]
 }
